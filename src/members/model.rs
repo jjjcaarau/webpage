@@ -44,7 +44,7 @@ pub struct NewMember {
     pub comment: String,
 }
 
-#[derive(FromForm, Default)]
+#[derive(FromForm, Default, Serialize, Deserialize)]
 pub struct UpdateMember {
     pub id: i32,
     pub first_name: String,

@@ -26,12 +26,12 @@ pub fn list_json() -> Json<Vec<Member>> {
     Json(crate::members::actions::list_all(&connection).unwrap())
 }
 
-#[post("/update", data = "<member>")]
-pub fn update(member: Form<UpdateMember>) {
+#[post("/update", format = "json", data = "<member>")]
+pub fn update(member: Json<UpdateMember>) {
     let connection = crate::db::establish_connection();
 
     let member = member.0;
-    let birthday = NaiveDate::parse_from_str(member.birthday.as_ref(), "%Y-%m-%d").expect("This is a bug. Please report it.");
+    let birthday = NaiveDate::parse_from_str(member.birthday.as_ref(), "%Y-%m-%d").unwrap_or(NaiveDate::from_ymd(1970, 1, 1));
     let result = if member.id == 0 {
         let member = NewMember {
             first_name: member.first_name,
