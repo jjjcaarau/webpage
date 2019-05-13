@@ -1,0 +1,140 @@
+@font-face {
+    font-family: 'Avenir';
+    src: url(fonts/Avenir_Medium.ttf);
+}
+
+html {
+    min-height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    overflow-x: hidden;
+    position: relative;
+}
+
+main {
+    background-color: #EEEEEE;
+}
+
+a {
+    color: #e3000b;
+}
+
+a:hover {
+    color: #e3000b;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Avenir", Helvetica, sans-serif;
+    margin-bottom: 1em;
+}
+
+p {
+    margin-bottom: 1.5rem;
+}
+
+.content {
+    padding: 120px 0 50px 0;
+}
+
+.header a {
+    color: #aac;
+}
+
+#navigation {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    top: 0;
+    color: #ddd;
+    background-color: #e3000b;
+    z-index: 300;
+    box-sizing: border-box;
+    background-image: url(../img/banner.jpg);
+    background-repeat: no-repeat;
+    background-size: auto 64px;
+}
+
+#banner {
+    height: 3rem;
+    display: block;
+    /* clip-path: inset(0px 13rem 0px 10px); */
+}
+
+#navigation-links {
+    /*font-family: "Avenir", Helvetica, sans-serif;*/
+    font-size: 1em;
+    letter-spacing: 0.2em;
+}
+
+#navigation-links a {
+    padding: 12px 1.2rem 12px 0;
+    color: white;
+}
+
+#navigation-links a:hover {
+    text-decoration: none;
+    color: black;
+}
+
+#navigation-links a.active {
+    color: #fff;
+}
+
+#navigation-links a.lang_toggler-link {
+    padding: 12px 0.5rem 12px 0;
+}
+
+.footer {
+    background-color: #e3000b;
+    color: #ddd;
+    padding: 100px 0;
+}
+
+.footer a {
+    color: white;
+    text-decoration: none;
+}
+
+.section {
+    background: white;
+}
+
+.section-content {
+    padding: 50px 0;
+}
+
+.section-title-placeholder {
+    visibility: hidden;
+    height: 50px;
+}
+
+.section-title-wrapper {
+    padding-top: 40px;
+    text-align: center;
+}
+
+.section-title, .content-title {
+    margin: 2em 0;
+    display: inline-block;
+    padding-bottom: 10px;
+
+    border-bottom: 3px solid #f44242;
+}
+
+#cube {
+    width: 100%;
+    height: 300px;
+}
+
+.gdpr_consent {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.row {
+    margin-top: 2em;
+    margin-bottom: 2em;
+}

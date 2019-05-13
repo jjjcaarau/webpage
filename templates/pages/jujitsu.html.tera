@@ -1,0 +1,165 @@
+{% extends 'layout' %}
+{% block includes %}
+    <link rel="stylesheet" href="/static/css/pages/jujitsu.css">
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <div class="text-center">
+                <h1 class="content-title">Ju Jitsu</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row align-items-center equal">
+        <div class="col-md-8">
+            <p>
+                Ju-Jitsu ist die wirksamste waffenlose Selbstverteidigungs – Kampfkunst, die es gibt. Sie ist an keine Regeln gebunden und kann deswegen auch keine Wettkämpfe bieten. In einem Ernstfall bekommt man keine Medaillen für Fairness, sondern man versucht, sich oder eine Drittperson zu schützen.
+            </p>
+            <p>
+                Wer hätte früher gedacht, dass man seine Wohnungstüre und die Fenster verschliessen und das ganze Haus mit einer Alarmanlage überwachen muss, nur um zu verhindern, dass eingebrochen, gestohlen oder zerstört wird. Man konnte früher auch nachts alleine unterwegs sein, ohne befürchten zu müssen, überfallen, zusammengeschlagen oder vergewaltigt zu werden. Diese Zeiten sind schon lange vorbei. Das Bedrohungsbild unserer Gesellschaft hat sich verändert und die Hemmschwelle zur Gewalt sinkt beständig. Früher wurde man bei Konflikten beschimpft, herumgestossen und vielleicht geschlagen. Heute wird nicht mehr geredet. Es wird rücksichtslos und brutal nur der Gedanke verfolgt: Je brutaler, desto besser. Leider kommen auch immer mehr Messer und andere Waffen zum Einsatz. Deswegen lernt ein Jiuka bei uns schnell, hart und flexibel auf allerlei Angriffe zu reagieren. Doch es sei gesagt, dass nicht derjenige, der jeden Angreifer besiegen kann, ein wahrer Meister ist, sondern derjenige, der einen Konflikt ohne Kampf lösen kann, da er seine Überlegenheit nicht beweisen muss.
+            </p>
+            <p>
+                Im Ju-Jitsu ist nicht alleine der Selbstverteidigungswert Kern der Sache. Das Wesentliche ist die Persönlichkeitsformung. So sollen die im Training entfalteten Qualitäten der Ruhe, der Aufmerksamkeit, der Sicherheit, des Beurteilungsvermögens und der Entschlusskraft im praktischen Leben umgesetzt werden. Wobei die Handlungsweise geprägt sein soll von Logik, Zweckmässigkeit, Ökonomie und Wirksamkeit, vor allem aber von fairer Freundlichkeit.
+            </p>
+            <p>
+                Um während jedem Training eine optimale und stufengerechte Ausbildung bieten zu können, werden unsere Allgemeintrainings in zwei Gruppen (Anfänger und Fortgeschrittene) unterteilt. Ein Haupttrainer leitet das Training der Fortgeschrittenen, während der zweite Trainer die Anfänger unterrichtet. Auf diese Art ist es uns möglich, alle Schüler zu fordern und einen grossen Lerneffekt auf allen Ausbildungsstufen zu erreichen.
+                Um dieser Aufgabe gerecht zu werden, steht mir eine grosse Trainermannschaft zur Seite. Ehrenamtlich und mit sehr grossem Engagement und Herzblut unterrichten wir unsere Schüler und begleiten sie auf dem Weg der Kampfkunst Ju-Jitsu. Eine so vielfältige Trainermannschaft bietet für die Schüler viel Abwechslung, da nicht nur die Erfahrungen, das Wissen und die Ansichten eines Trainers, sondern die von mehreren ins Spiel kommen. Grossen Wert lege ich auch auf stetige Weiterbildung meiner Trainermannschaft, da wir so in der Lage sind, immer neue Erkenntnisse und Erfahrungen an unsere Schüler weitergeben zu können.
+                Auch aus diesem Grund organisiere und führe ich jedes Jahr verschiedene Kurse für Schüler und Trainer durch, um stetig „neues“ lernen zu können, die Kameradschaft zu fördern und eine grosse Abwechslung zu erreichen.
+            </p>
+        </div>
+        <div class="col-md-4 side-img kanji-jujitsu"></div>
+    </div>
+     <div class="row text-center align-items-center">
+        <div class="col-md-12">
+            <blockquote class="blockquote">
+                <p class="lead">Wer die Technik beherrscht, ist noch nicht Meister.</p>
+                <footer class="blockquote-footer">Zen-Buddhistisches Sprichwort</footer>
+            </blockquote>
+        </div>
+    </div>
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <p>
+                Wir unterrichten keine Kinder, da Ju-Jitsu einen bestimmten Stand der körperlichen Entwicklung und eine grosse Eigenverantwortung verlangt. Zudem kann Ju-Jitsu, unüberlegt eingesetzt, schwere Verletzungen nach sich ziehen. Das Mindestalter in unserem Club beträgt daher 15 Jahre, welches nicht unterschritten wird.
+                Auch „Schlägertypen“ sind bei uns falsch und werden nicht ins Training aufgenommen, da der Missbrauch dieser Kampfkunst unverantwortlich wäre. Zudem werden solche Leute nie den Bushido (Ehrenkodex der ethischen Verhaltensnormen eines Samurai, oder im übertragenen Sinne, eines Budotreibenden) verstehen und respektieren lernen.
+            </p>
+        </div>
+        <div class="col-md-4 side-img kanji-jujitsu"></div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="text-center">
+                <h1 class="content-title">Trainermannschaft</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <img class="rounded-circle img-thumbnail" src="/static/img/jujitsu/trainermannschaft/tom.jpg"/>
+            <p class="trainer-description text-center">
+                <strong>Thomas Meister</strong><br/>
+                3. Dan<br/>
+                Ju Jitsu-Lehrer mit Eidgenössischem Fachausweis
+            </p>
+        </div>
+        <div class="col-md-3">
+            <img class="rounded-circle img-thumbnail" src="/static/img/jujitsu/trainermannschaft/cris.jpg"/>
+            <p class="trainer-description text-center">
+                <strong>Cristina Tonet</strong><br/>
+                2. Dan
+            </p>
+        </div>
+        <div class="col-md-3">
+            <img class="rounded-circle img-thumbnail" src="/static/img/jujitsu/trainermannschaft/roland.jpg"/>
+            <p class="trainer-description text-center">
+                <strong>Roland Kleiner</strong><br/>
+                1. Dan
+            </p>
+        </div>
+        <div class="col-md-3">
+            <img class="rounded-circle img-thumbnail" src="/static/img/jujitsu/trainermannschaft/georg.jpg"/>
+            <p class="trainer-description text-center">
+                <strong>Georg Mumenthaler</strong><br/>
+                1. Dan
+            </p>
+        </div>
+        <div class="col-md-3">
+            <img class="rounded-circle img-thumbnail" src="/static/img/jujitsu/trainermannschaft/bjoern.jpg"/>
+            <p class="trainer-description text-center">
+                <strong>Bjoern Weiss</strong><br/>
+                1. Kyu
+            </p>
+        </div>
+        <div class="col-md-3">
+            <img class="rounded-circle img-thumbnail" src="/static/img/jujitsu/trainermannschaft/marcel.jpg"/>
+            <p class="trainer-description text-center">
+                <strong>Marcel Locher</strong><br/>
+                1. Kyu
+            </p>
+        </div>
+        <div class="col-md-3">
+            <img class="rounded-circle img-thumbnail" src="/static/img/jujitsu/trainermannschaft/sylvia.jpg"/>
+            <p class="trainer-description text-center">
+                <strong>Sylvia Fischer</strong><br/>
+                3. Kyu
+            </p>
+        </div>
+        <div class="col-md-3">
+            <img class="rounded-circle img-thumbnail" src="/static/img/jujitsu/trainermannschaft/joelle.jpg"/>
+            <p class="trainer-description text-center">
+                <strong>Joëlle Fischer</strong><br/>
+                3. Kyu
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="text-center">
+                <h1 class="content-title">Elemente im Ju Jitsu</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <p>
+                Im Ju Jitsu findet man im wesentlichen die drei Budosportarten Karate, Judo und Aikido im Ju Jitsu wieder. Ein Jiuka muss die Fallübungen, Würfe und Würger aus dem Judo, die Schläge, Tritte, Stösse und Blocktechniken aus dem Karate, sowie die Hebeltechniken aus dem Aikido erlernen. So ist ein Jiuka in der Lage, sich auf Distanz, im Nahkampf, sowie am Boden verteidigen zu können und dabei den Gegner unter Kontrolle zu bringen und zu halten.<br/>
+                <br/>
+                Diese Grundelemente werden zu einem allumfassenden und wirkungsvollen Selbstverteidigungssystem zusammengeführt und sind die Kampfkunst Ju Jitsu.
+            </p>
+        </div>
+    </div>
+    <div class="row align-items-center">
+        <div class="col-md-9">
+            <h3>Karate</h3>
+            <p>
+                Ohne den Einsatz von Kraft und Dynamik bringen Schläge, Tritte und Stösse keine entscheidende Wirkung. Darum ist konzentrierte Kraft, mit grösstmöglicher Beschleunigung und absoluter Körperspannung, in einem kurzen Moment zur Abwehr oder zum Angriff beim Gegner so einzusetzen, dass eine hochwirksame Schockwirkung erzielt wird. Auch diese „harten Mittel“ verbinden sich sinnvoll mit dem „ökonomischen Prinzip“, wenn man grundsätzlich zuerst einen Angreifer „leerlaufen“ lässt, bzw. seine angreifende Kraft in eine andere Richtung lenkt.
+            </p>
+        </div>
+        <div class="col-md-3">
+            <img class="rounded-circle img-thumbnail" src="/static/img/jujitsu/karate.jpg"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <img class="rounded-circle img-thumbnail" src="/static/img/jujitsu/judo.jpg"/>
+        </div>
+        <div class="col-md-9">
+            <h3>Judo</h3>
+            <p>
+                Nicht Kraft gegen Kraft setzen – nachgeben um zu siegen. Ziehen, wenn gestossen wird und stossen, wenn gezogen wird. Den Angreifer geschickt aus dem Gleichgewicht bringen und damit seine Kraft brechen. Erst dann kann eine Technik mühelos angewendet werden. Daran denken, dass es im Ernstfall auf der Strasse keine Gewichtsklassen gibt.
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-9">
+            <h3>Aikido</h3>
+            <p>
+                Zentrifugal- und Zentripetalkraft sind durch schwungvolle Kreis- und Drehbewegungen so nutzbar zu machen, dass der Angreifer in diese Drehbewegungen hineingezogen wird. Dadurch verliert er sein Gleichgewicht und seinen Mittelpunkt. Er wird schwach und hilflos und kann mühelos mit einer Hebel- oder Wurftechnik besiegt werden. Nicht die Kraft, sondern die Bewegung bringt den Effekt.
+            </p>
+        </div>
+        <div class="col-md-3">
+            <img class="rounded-circle img-thumbnail" src="/static/img/jujitsu/aikido.jpg"/>
+        </div>
+    </div>
+{% endblock %}

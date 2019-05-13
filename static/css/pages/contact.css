@@ -1,0 +1,35 @@
+#contact {
+    color: white;
+}
+
+#contact #questions {
+    margin: 40px 0;
+}
+
+#contact input::placeholder {
+    color: #aaa;
+}
+
+#contact textarea {
+    background-color: transparent;
+    font-size: 1.2em;
+    color: white;
+    border: 2px solid white;
+    padding: 20px;
+}
+
+#contact textarea::placeholder {
+    color: #ccc;
+}
+
+#contact #questions a {
+    color: #aac;
+}
+
+.contact-map {
+    margin-top: 64px;
+    height: 500px;
+    width: 100%;
+    border: 0;
+    background-color: #eee;
+}

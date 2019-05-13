@@ -1,0 +1,19 @@
+.side-img {
+    height: 100%;
+    min-height: 500px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.kanji-jujitsu {
+    background-image: url(../../img/jujitsu/kanji_jujitsu.svg);
+}
+
+.kanji-bushido {
+    background-image: url(../../img/jujitsu/kanji_bushido.svg);
+}
+
+.trainer-description {
+    margin-top: 1em;
+}

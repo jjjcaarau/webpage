@@ -1,0 +1,25 @@
+#dojo-map {
+    margin-top: 64px;
+    height: 500px;
+    width: 100%;
+    border: 0;
+    background-color: #eee;
+}
+
+#dojo-events {
+    margin-top: 64px;
+    max-height: 500px;
+    width: 100%;
+    border: 0;
+    background-color: #eee;
+    overflow: hidden;
+}
+
+#dojo-calendar {
+    margin-top: 64px;
+    height: 500px;
+    width: 100%;
+    border: 0;
+    background-color: #eee;
+    overflow: hidden;
+}

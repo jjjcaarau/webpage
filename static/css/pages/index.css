@@ -1,0 +1,95 @@
+main {
+    padding: 0;
+}
+
+#index {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    padding: 0px 0px;
+    margin: 0;
+    box-sizing: border-box;
+
+    background-image: url(../../img/pcb_design_dark.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+
+    font-size: 1.2em;
+    background-color: #334;
+    color: #ddd;
+}
+
+#index #particles {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+#index .container {
+    min-height: 100vh;
+    display: flex;
+}
+
+#headline_row {
+    margin: 100px auto;
+}
+
+#headline a {
+    color: #bbd;
+    text-decoration: none;
+}
+
+.index-logo {
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.news-banner {
+    padding: 0;
+}
+
+.news-banner a {
+    text-decoration: none;
+}
+
+.news-banner > a > div {
+    margin: 10px;
+    border: 1px solid #f44242;
+    border-radius: 2px;
+    width: calc(100% - 20px);
+    position: relative;
+    transition: .5s;
+
+    overflow: hidden;
+    padding: 20px;
+
+    background-color: #334;
+    color: #DDD;
+}
+
+.news-banner > a > div:hover {
+    filter: drop-shadow( 0px 6px 4px rgba(0, 0, 0, 0.3));
+    transition: .5s;
+}
+
+.news-banner > a div > img {
+    width: 100%;
+    float: left;
+}
+
+.news-banner > a > div > div > h5 > span {
+    color: #f44242;
+    opacity: 0.8;
+}
+
+.news-banner div div h2 {
+    font-size: 2em;
+}
+
+.index-buttons {
+    margin: 80px 0 0 0;
+}

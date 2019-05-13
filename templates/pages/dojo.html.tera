@@ -1,0 +1,52 @@
+{% extends 'layout' %}
+{% block includes %}
+    <link rel="stylesheet" href="static/css/pages/dojo.css">
+    <link rel="stylesheet" href="https://fullcalendar.io/releases/core/4.0.1/main.min.css">
+    <link rel="stylesheet" href="https://fullcalendar.io/releases/daygrid/4.0.1/main.min.css">
+    <link rel="stylesheet" href="https://fullcalendar.io/releases/list/4.0.1/main.min.css">
+    <link rel="stylesheet" href="https://fullcalendar.io/releases/timegrid/4.0.1/main.min.css">
+    <script type="text/javascript" src="https://fullcalendar.io/releases/core/4.0.1/main.min.js" defer></script>
+    <script type="text/javascript" src="https://fullcalendar.io/releases/daygrid/4.0.1/main.min.js" defer></script>
+    <script type="text/javascript" src="https://fullcalendar.io/releases/list/4.0.1/main.min.js" defer></script>
+    <script type="text/javascript" src="https://fullcalendar.io/releases/timegrid/4.0.1/main.min.js" defer></script>
+    <script type="text/javascript" src="https://fullcalendar.io/releases/google-calendar/4.0.1/main.min.js" defer></script>
+    <script type="text/javascript" src="static/js/calendar.js" defer></script>
+    <script type="text/javascript" src="static/js/map.js" defer></script>
+{% endblock %}
+{% block title %}Dojo{% endblock %}
+{% block main %}
+<div class="content">
+    <div class="container">
+        <div class="text-center">
+            <h1 class="content-title">Anfahrt</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <iframe id="dojo-map"
+                    src="http://maps.google.ch/maps/ms?f=q&hl=de&geocode=&ie=UTF8&s=AARTsJoSjvsVGLfhuS7r9Wms4Za4iRn3Sg&msa=0&msid=115603747001830587834.00045818962747412af75&ll=47.400673,8.063235&spn=0.013072,0.023603&z=15&output=embed"
+                    frameborder="0" llowfullscreen></iframe>
+        </div>
+    </div>
+    <div class="container">
+        <div class="text-center">
+            <h1 class="content-title">Events</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div id="dojo-events"></div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="text-center">
+            <h1 class="content-title">Belegungsplan</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div id="dojo-calendar"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
