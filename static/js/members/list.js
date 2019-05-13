@@ -16,10 +16,12 @@ window.onload = function() {
     var updateMember = function(member) {
         var data = new FormData(document.getElementById('update-member'));
         data.append('id', member.id);
+        console.log('kek')
         m.request({
             method: 'POST',
             url: '/members/update',
             data: data,
+            config: function(xhr) { console.log(JSON.stringify(xhr)) }
         })
         .then(function(result) {
             console.log('success');
