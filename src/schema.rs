@@ -7,19 +7,12 @@ table! {
 }
 
 table! {
-    event_types (id) {
-        id -> Integer,
-        name -> Text,
-    }
-}
-
-table! {
     events (id) {
         id -> Integer,
-        event_type_id -> Integer,
-        #[sql_name = "type"]
-        type_ -> Text,
-        division -> Text,
+        member_id -> Integer,
+        event_type -> crate::events::model::EventTypeMapping,
+        class -> crate::events::model::EventClassMapping,
+        division -> crate::events::model::EventDivisionMapping,
         comment -> Nullable<Text>,
         date -> Date,
     }
@@ -28,6 +21,7 @@ table! {
 table! {
     members (id) {
         id -> Integer,
+        family_id -> Nullable<Integer>,
         first_name -> Text,
         middle_name -> Text,
         last_name -> Text,
@@ -43,10 +37,8 @@ table! {
         address_no -> Text,
         comment -> Text,
         email_allowed -> Bool,
-        membership_type_id -> Integer,
         passport_no -> Text,
-        member_type -> Integer,
-        honorary_member -> Bool,
+        member_type -> crate::members::model::MemberTypeMapping,
         honorary_member_reason -> Text,
         needs_mark_jujitsu -> Bool,
         needs_mark_judo -> Bool,
@@ -55,7 +47,6 @@ table! {
 
 allow_tables_to_appear_in_same_query!(
     courses,
-    event_types,
     events,
     members,
 );

@@ -72,7 +72,7 @@ window.onload = function() {
                     m('.form-row', [
                         m('.col', [
                             m('label', 'Email'),
-                            m('input[type="text"][name=email_1].form-control[placeholder="Email"]', { value: member.email_1 })
+                            m('input[type="text"][name=email].form-control[placeholder="Email"]', { value: member.email })
                         ]),
                         m('.col', [
                             m('label', 'Phone'),
@@ -82,17 +82,17 @@ window.onload = function() {
                     m('.form-row', [
                         m('.col', [
                             m('label', 'Address'),
-                            m('input[type="text"][name=street].form-control[placeholder="Address"]', { value: member.street })
+                            m('input[type="text"][name=address].form-control[placeholder="Address"]', { value: member.address })
                         ]),
                         m('.col', [
                             m('label', 'Address No'),
-                            m('input[type="text"][name=street_nr].form-control[placeholder="Address No"]', { value: member.street_nr })
+                            m('input[type="text"][name=address_no].form-control[placeholder="Address No"]', { value: member.address_no })
                         ]),
                     ]),
                     m('.form-row', [
                         m('.col', [
                             m('label', 'PLZ'),
-                            m('input[type="text"][name=zip_code].form-control[placeholder="PLZ"]', { value: member.zip_code })
+                            m('input[type="text"][name=postcode].form-control[placeholder="PLZ"]', { value: member.postcode })
                         ]),
                         m('.col', [
                             m('label', 'City'),
@@ -174,7 +174,7 @@ window.onload = function() {
                                     }, [
                                         m('td', member.first_name),
                                         m('td', member.last_name),
-                                        m('td', member.email_1),
+                                        m('td', member.email),
                                         m('td', member.birthday),
                                     ]),
                                     vnode.state.selected == member.id ? m('tr', [

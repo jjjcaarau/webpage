@@ -2,6 +2,8 @@
 
 extern crate diesel;
 #[macro_use]
+extern crate diesel_derive_enum;
+#[macro_use]
 extern crate derivative;
 #[macro_use]
 extern crate rocket;
@@ -12,6 +14,7 @@ extern crate serde_derive;
 
 mod db;
 mod members;
+mod events;
 mod schema;
 mod routes;
 
@@ -36,7 +39,7 @@ fn main() {
         .mount("/members", routes![
             crate::routes::members::list,
             crate::routes::members::list_json,
-            crate::routes::members::update,
+            // crate::routes::members::update,
         ])
         .mount("/", routes![
             crate::routes::root::index,
