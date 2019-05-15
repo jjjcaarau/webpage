@@ -1,4 +1,5 @@
 use crate::schema::*;
+use crate::members::model::Member;
 
 #[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug)]
 #[derivative(Default(bound=""))]
@@ -29,7 +30,7 @@ pub enum EventDivision {
 }
 
 #[derive(Queryable, Identifiable, AsChangeset, Associations, Serialize, Deserialize, PartialEq, Debug)]
-#[belongs_to(crate::members::model::Member, foreign_key = "member_id")]
+#[belongs_to(Member, foreign_key = "member_id")]
 #[table_name="events"]
 pub struct Event {
     id: i32,

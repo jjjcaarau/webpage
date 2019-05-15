@@ -1,16 +1,23 @@
-use super::model::*;
-use crate::events::model::*;
-use crate::schema::*;
+use super::model::{
+    Member,
+    NewMember,
+};
+use crate::schema::members;
+use crate::events::model::Event;
 use diesel::prelude::*;
 use diesel::SaveChangesDsl;
 
-pub fn list_all(connection: &SqliteConnection) -> Result<Vec<(Member, Vec<Event>)>, diesel::result::Error> {
-    use crate::schema::members::dsl::*;
-
-    let member_list = members.load::<Member>(connection)?;
-    let event_list = <Event as BelongingToDsl<&Vec<Member>>>::belonging_to(&member_list)
+pub fn list_all(
+    connection: &SqliteConnection,
+) -> Result<Vec<(Member, Vec<Event>)>, diesel::result::Error> {
+    let member_list = members::table.load::<Member>(connection)?;
+    let event_list = Event::belonging_to(&member_list)
         .load::<Event>(connection)?
         .grouped_by(&member_list);
+
+    // let ids = member_list.iter().map(Member::id).collect::<Vec<_>>();
+    // FilterDsl::filter(Event::table(), Event::foreign_key_column().eq_any(ids));
+
     Ok(member_list.into_iter().zip(event_list).collect::<Vec<_>>())
 }
 
