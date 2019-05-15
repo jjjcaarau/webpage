@@ -1,6 +1,6 @@
 use crate::schema::*;
 
-#[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, Debug)]
+#[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug)]
 #[derivative(Default(bound=""))]
 pub enum EventType {
     #[derivative(Default)]
@@ -11,7 +11,7 @@ pub enum EventType {
     Honorary,
 }
 
-#[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, Debug)]
+#[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug)]
 #[derivative(Default(bound=""))]
 pub enum EventClass {
     #[derivative(Default)]
@@ -19,7 +19,7 @@ pub enum EventClass {
     Demotion,
 }
 
-#[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, Debug)]
+#[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug)]
 #[derivative(Default(bound=""))]
 pub enum EventDivision {
     #[derivative(Default)]
@@ -28,8 +28,9 @@ pub enum EventDivision {
     Jujitsu,
 }
 
-#[derive(Queryable, Identifiable, AsChangeset, Associations, Serialize, Deserialize, Debug)]
+#[derive(Queryable, Identifiable, AsChangeset, Associations, Serialize, Deserialize, PartialEq, Debug)]
 #[belongs_to(crate::members::model::Member, foreign_key = "member_id")]
+#[table_name="events"]
 pub struct Event {
     id: i32,
     member_id: i32,

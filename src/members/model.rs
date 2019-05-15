@@ -1,6 +1,6 @@
 use crate::schema::*;
 
-#[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, Debug)]
+#[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug)]
 #[derivative(Default(bound=""))]
 pub enum MemberType {
     #[derivative(Default)]
@@ -12,7 +12,7 @@ pub enum MemberType {
     Kid,
 }
 
-#[derive(Queryable, Identifiable, AsChangeset, Serialize, Deserialize, Debug)]
+#[derive(Queryable, Identifiable, AsChangeset, Serialize, Deserialize, PartialEq, Debug)]
 pub struct Member {
     pub id: i32,
     pub family_id: Option<i32>,
@@ -38,7 +38,7 @@ pub struct Member {
     pub needs_mark_judo: bool,
 }
 
-#[derive(Insertable, Derivative)]
+#[derive(Insertable, Derivative, Associations)]
 #[derivative(Default)]
 #[table_name="members"]
 pub struct NewMember {
