@@ -10,6 +10,21 @@ pub enum EventType {
     Club,
     Board,
     Honorary,
+    Kyu1,
+    Kyu2,
+    Kyu3,
+    Kyu4,
+    Kyu5,
+    Dan1,
+    Dan2,
+    Dan3,
+    Dan4,
+    Dan5,
+    Dan6,
+    Dan7,
+    Dan8,
+    Dan9,
+    Dan10,
 }
 
 #[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug)]

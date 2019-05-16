@@ -86,10 +86,41 @@ with open('members.json', 'r') as file:
                 date,
             )
         )
+        for division in ['judo', 'jujitsu']:
+            for kyu in range(1, 6):
+                kyu = str(kyu)
+                date = entry['date_kyu_' + kyu + '_' + division]
+                if date and date != '0000-00-00':
+                    transformed_events.append(
+                        (
+                            entry['id'],
+                            'kyu' + kyu,
+                            'promotion',
+                            division,
+                            date,
+                        )
+                    )
+            for dan in range(1, 7):
+                dan = str(dan)
+                date = entry['date_dan_' + dan + '_' + division]
+                if date and date != '0000-00-00':
+                    transformed_events.append(
+                        (
+                            entry['id'],
+                            'dan' + dan,
+                            'promotion',
+                            division,
+                            date,
+                        )
+                    )
+        
 
     conn = sqlite3.connect('db.sqlite3')
 
     c = conn.cursor()
+
+    c.execute('DELETE FROM members')
+    c.execute('DELETE FROM events')
 
     c.executemany(r"""
 INSERT INTO members (
