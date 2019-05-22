@@ -264,7 +264,11 @@ window.onload = function() {
                                 return [
                                     m('tr', {
                                         onclick: function() {
-                                            vnode.state.selected = member.id;
+                                            if (vnode.state.selected != member.id) {
+                                                vnode.state.selected = member.id;
+                                            } else {
+                                                vnode.state.selected = undefined;
+                                            }
                                         },
                                     }, [
                                         m('td', member.first_name),
