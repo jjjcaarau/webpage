@@ -3,6 +3,7 @@ window.onload = function() {
         oninit: function(vnode) {
             vnode.state.member = {};
             vnode.state.events = [];
+            vnode.state.family = [];
             let params = window.location.href.split('/');
             let param = params[params.length - 1];
             vnode.state.id = param;
@@ -14,11 +15,14 @@ window.onload = function() {
             .then(function(result) {
                 vnode.state.member = result.member[0];
                 vnode.state.events = result.member[1];
+                vnode.state.family = result.member[2];
             })
         },
         view: function(vnode) {
             let member = vnode.state.member;
             let events = vnode.state.events;
+            let family = vnode.state.family;
+            console.log(family)
             return [
                 m('div.col-12', m('form#update-member',
                     m('.form-row', [
@@ -91,6 +95,56 @@ window.onload = function() {
                                 }
                             }, 'Save'),
                         ]),
+                    ]),
+                    m('.form-row', [
+                        m('div.col-12', [
+                            m('table.table.table-hover.col-12', [
+                                m('thead', m('tr', [
+                                        m('th', 'ID'),
+                                        m('th', 'First Name'),
+                                        m('th', 'Last Name'),
+                                        m('th', 'Email'),
+                                        m('th', 'Birthday'),
+                                ])),
+                                m('tbody', [
+                                    [
+                                        m('tr', {
+                                            onclick: function() {
+                                                vnode.state.selected = 0;
+                                            },
+                                        }, //[
+                                        //    m('td[colspan=4]', 'Add new member'),
+                                        //]),
+                                        ),
+                                        vnode.state.selected == 0 ? m('tr', [
+                                            m('td[colspan=4]', m(MemberDetails, { member: { id: 0 }, events: [] })),
+                                        ]) : '',
+                                    ],
+                                    family ? family.map(function(member) {
+                                        return [
+                                            m('tr', {
+                                                onclick: function() {
+                                                    if (vnode.state.selected != member.id) {
+                                                        vnode.state.selected = member.id;
+                                                    } else {
+                                                        vnode.state.selected = undefined;
+                                                    }
+                                                },
+                                            }, [
+                                                m('td', member.id),
+                                                m('td', member.first_name),
+                                                m('td', member.last_name),
+                                                m('td', member.email),
+                                                m('td', member.birthday),
+                                            ]),
+                                            vnode.state.selected == member.id ? m('tr', [
+                                                m('td[colspan=4]', m(MemberDetails, { member: member, events: events })),
+                                            ]) : '',
+                                        ]
+                                    }) : ''
+                                ])
+                            ])
+                        ])
                     ]),
                     m('.form-row', [
                         m('.col', [
