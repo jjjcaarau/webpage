@@ -11,6 +11,8 @@ extern crate rocket;
 extern crate rocket_contrib;
 #[macro_use]
 extern crate serde_derive;
+#[macro_use]
+extern crate itertools;
 
 mod db;
 mod members;
@@ -23,23 +25,13 @@ use rocket_contrib::{
     serve::StaticFiles,
 };
 
-
-// fn main() {
-//     let connection = crate::db::establish_connection();
-//     crate::members::actions::list_all(&connection);
-//     let mut new_member = crate::members::model::NewMember::new();
-//     new_member.first_name = "Adio".into();
-//     new_member.last_name = "Gabrielli".into();
-//     crate::members::actions::create_member(&connection, new_member);
-// }
-
 fn main() {
     rocket::ignite()
         .mount("/static", StaticFiles::from(concat!(env!("CARGO_MANIFEST_DIR"), "/static")))
         .mount("/members", routes![
             crate::routes::members::list,
             crate::routes::members::list_json,
-            // crate::routes::members::update,
+            crate::routes::members::view_json,
         ])
         .mount("/", routes![
             crate::routes::root::index,

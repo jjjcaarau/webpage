@@ -33,8 +33,9 @@ with open('members.json', 'r') as file:
             entry['birthday'] = '1970-01-01'
 
         transformed_member.append(
-            (
+            [
                 entry['id'],
+                'NULL',
                 entry['first_name'],
                 entry['middle_name'],
                 entry['last_name'],
@@ -55,7 +56,7 @@ with open('members.json', 'r') as file:
                 entry['honorary_member_extra'],
                 entry['needs_mark_jujitsu'] == '1',
                 entry['needs_mark_judo'] == '1'
-            )
+            ]
         )
 
         if entry['membership'] == '_Ausgetreten':
@@ -113,6 +114,17 @@ with open('members.json', 'r') as file:
                             date,
                         )
                     )
+
+    # Track families
+    # Haller family (set all to Urs)
+    # Ina
+    next(filter(lambda x: x[0] == '868', transformed_member))[1] = '965'
+    # Pascale
+    next(filter(lambda x: x[0] == '811', transformed_member))[1] = '965'
+    # Rebecca
+    next(filter(lambda x: x[0] == '900', transformed_member))[1] = '965'
+    # Manuela
+    next(filter(lambda x: x[0] == '1071', transformed_member))[1] = '965'
         
 
     conn = sqlite3.connect('db.sqlite3')
@@ -125,6 +137,7 @@ with open('members.json', 'r') as file:
     c.executemany(r"""
 INSERT INTO members (
     id,
+    family_id,
     first_name,
     middle_name,
     last_name,
@@ -145,7 +158,7 @@ INSERT INTO members (
     honorary_member_reason,
     needs_mark_jujitsu,
     needs_mark_judo
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, transformed_member)
 
     c.executemany(r"""

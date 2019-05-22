@@ -239,6 +239,7 @@ window.onload = function() {
                 m('div.col-12', [
                     m('table.table.table-hover.col-12', [
                         m('thead', m('tr', [
+                                m('th', 'ID'),
                                 m('th', 'First Name'),
                                 m('th', 'Last Name'),
                                 m('th', 'Email'),
@@ -267,6 +268,7 @@ window.onload = function() {
                                             vnode.state.selected = member.id;
                                         },
                                     }, [
+                                        m('td', member.id),
                                         m('td', member.first_name),
                                         m('td', member.last_name),
                                         m('td', member.email),

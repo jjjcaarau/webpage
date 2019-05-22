@@ -1,6 +1,7 @@
 use rocket_contrib::templates::Template;
 use rocket_contrib::json::Json;
 use rocket::request::Form;
+use rocket::http::Status;
 use chrono::NaiveDate;
 use crate::members::model::{
     Member,
@@ -10,10 +11,16 @@ use crate::members::model::{
 use crate::events::model::{
     Event,
 };
+use crate::members::actions::Error;
 
 #[derive(Serialize)]
 struct ListResult {
-    members: Vec<(Member, Vec<Event>)>,
+    members: Vec<(Member, Vec<Event>, Vec<Member>)>,
+}
+
+#[derive(Serialize)]
+pub struct ViewResult {
+    member: (Member, Vec<Event>, Vec<Member>),
 }
 
 #[get("/list")]
@@ -24,9 +31,20 @@ pub fn list() -> Result<Template, diesel::result::Error> {
 }
 
 #[get("/list_json")]
-pub fn list_json() -> Json<Vec<(Member, Vec<Event>)>> {
+pub fn list_json() -> Json<Vec<(Member, Vec<Event>, Vec<Member>)>> {
     let connection = crate::db::establish_connection();
     Json(crate::members::actions::list_all(&connection).unwrap())
+}
+
+#[get("/view_json/<id>")]
+pub fn view_json(id: i32) -> Json<ViewResult> {
+    let connection = crate::db::establish_connection();
+    let member = crate::members::actions::get(&connection, id);
+    match member {
+        Ok(member) => Json(ViewResult { member }),
+        Err(Error::Diesel(_)) => panic!("Fuck"),
+        Err(Error::NotFound) => panic!("Fuck"),
+    }
 }
 
 // #[post("/update", format = "json", data = "<member>")]

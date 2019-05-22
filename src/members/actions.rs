@@ -10,9 +10,20 @@ use crate::events::model::Event;
 use diesel::prelude::*;
 use diesel::SaveChangesDsl;
 
+pub enum Error {
+    Diesel(diesel::result::Error),
+    NotFound,
+}
+
+impl From<diesel::result::Error> for Error {
+    fn from(error: diesel::result::Error) -> Self {
+        Error::Diesel(error)
+    }
+}
+
 pub fn list_all(
     connection: &SqliteConnection,
-) -> Result<Vec<(Member, Vec<Event>)>, diesel::result::Error> {
+) -> Result<Vec<(Member, Vec<Event>, Vec<Member>)>, diesel::result::Error> {
     let member_list = members::table
         .order_by(members::columns::first_name)
         .load::<Member>(connection)?;
@@ -20,8 +31,34 @@ pub fn list_all(
         .order_by(events::columns::date)
         .load::<Event>(connection)?
         .grouped_by(&member_list);
+    let family_list = Member::belonging_to(&member_list)
+        .order_by(members::columns::birthday)
+        .load::<Member>(connection)?
+        .grouped_by(&member_list);
 
-    Ok(member_list.into_iter().zip(event_list).collect::<Vec<_>>())
+    Ok(itertools::izip!(member_list.into_iter(), event_list, family_list).collect::<Vec<_>>())
+}
+
+pub fn get(
+    connection: &SqliteConnection,
+    id: i32,
+) -> Result<(Member, Vec<Event>, Vec<Member>), Error> {
+    let mut member = members::table
+        .filter(members::columns::id.eq(id))
+        .load::<Member>(connection)?;
+    let event_list = Event::belonging_to(&member)
+        .order_by(events::columns::date)
+        .load::<Event>(connection)?;
+    let family_list = Member::belonging_to(&member)
+        .order_by(members::columns::birthday)
+        .load::<Member>(connection)?;
+
+    if member.len() == 1 {
+        Ok((member.remove(0), event_list, family_list))
+    } else {
+        Err(Error::NotFound)
+    }
+
 }
 
 pub fn create(connection: &SqliteConnection, new_member: NewMember) {

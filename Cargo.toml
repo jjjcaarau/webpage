@@ -14,3 +14,4 @@ rocket = "*"
 rocket_contrib = { version = "*", default-features = false, features = ["tera_templates", "serve", "json"] }
 serde = "*"
 serde_derive = "*"
+itertools = "*"

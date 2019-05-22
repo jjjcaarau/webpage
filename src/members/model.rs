@@ -12,7 +12,8 @@ pub enum MemberType {
     Kid,
 }
 
-#[derive(Queryable, Identifiable, AsChangeset, Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Queryable, Identifiable, AsChangeset, Associations, Serialize, Deserialize, PartialEq, Debug)]
+#[belongs_to(Member, foreign_key = "family_id")]
 pub struct Member {
     pub id: i32,
     pub family_id: Option<i32>,
