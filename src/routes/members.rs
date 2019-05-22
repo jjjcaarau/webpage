@@ -30,6 +30,11 @@ pub fn list() -> Result<Template, diesel::result::Error> {
     members.map(|v| Template::render("pages/members/list", ListResult { members: v }))
 }
 
+#[get("/view/<id>")]
+pub fn view(id: i32) -> Template {
+    Template::render("pages/members/view", std::collections::HashMap::<i32,i32>::new())
+}
+
 #[get("/list_json")]
 pub fn list_json() -> Json<Vec<(Member, Vec<Event>, Vec<Member>)>> {
     let connection = crate::db::establish_connection();

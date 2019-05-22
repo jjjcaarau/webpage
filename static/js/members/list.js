@@ -251,9 +251,10 @@ window.onload = function() {
                                     onclick: function() {
                                         vnode.state.selected = 0;
                                     },
-                                }, [
-                                    m('td[colspan=4]', 'Add new member'),
-                                ]),
+                                }, //[
+                                //    m('td[colspan=4]', 'Add new member'),
+                                //]),
+                                ),
                                 vnode.state.selected == 0 ? m('tr', [
                                     m('td[colspan=4]', m(MemberDetails, { member: { id: 0 }, events: [] })),
                                 ]) : '',
@@ -265,7 +266,11 @@ window.onload = function() {
                                 return [
                                     m('tr', {
                                         onclick: function() {
-                                            vnode.state.selected = member.id;
+                                            if (vnode.state.selected != member.id) {
+                                                vnode.state.selected = member.id;
+                                            } else {
+                                                vnode.state.selected = undefined;
+                                            }
                                         },
                                     }, [
                                         m('td', member.id),
