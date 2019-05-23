@@ -25,6 +25,12 @@ window.onload = function() {
             console.log(family)
             return [
                 m('div.col-12', m('form#update-member',
+                m('button[type="back"].btn.btn-primary', {
+                    onclick: function(e) {
+                        e.preventDefault();
+                        window.location='/members/list';
+                    }
+                }, 'Zurück'),
                     m('.form-row', [
                         m('.col', [
                             m('label', 'Vorname'),
