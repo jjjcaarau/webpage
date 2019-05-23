@@ -49,73 +49,82 @@ window.onload = function() {
                 m('div.col-12', m('form#update-member',
                     m('.form-row', [
                         m('.col', [
-                            m('label', 'First name'),
-                            m('input[type="text"][name=first_name].form-control[placeholder="First name"]', { value: member.first_name })
+                            m('label', member.first_name + ' ' + member.middle_name + ' ' + member.last_name + ', ' + member.birthday),
+                            //m('input[type="text"][name=first_name].form-control[placeholder="First name"]', { value: member.first_name })
+                        ]),
+                        /* m('.col', [
+                            m('label', member.middle_name),
+                            //m('input[type="text"][name=middle_name].form-control[placeholder="Middle name"]', { value: member.middle_name })
                         ]),
                         m('.col', [
-                            m('label', 'Middle name'),
-                            m('input[type="text"][name=middle_name].form-control[placeholder="Middle name"]', { value: member.middle_name })
+                            m('label', member.last_name),
+                            //m('input[type="text"][name=last_name].form-control[placeholder="Last name"]', { value: member.last_name })
                         ]),
                         m('.col', [
-                            m('label', 'Last name'),
-                            m('input[type="text"][name=last_name].form-control[placeholder="Last name"]', { value: member.last_name })
-                        ]),
+                            m('label', member.birthday),
+                            //m('input[type="text"][name=birthday].form-control[placeholder="Birthday"]', { value: member.birthday })
+                        ]), */
                     ]),
                     m('.form-row', [
-                        m('.col', [
+                        /* m('.col', [
                             m('label', 'Sex'),
                             m('input[type="text"][name=sex].form-control[placeholder="Sex"]', { value: member.sex })
                         ]),
                         m('.col', [
-                            m('label', 'Birthday'),
-                            m('input[type="text"][name=birthday].form-control[placeholder="Birthday"]', { value: member.birthday })
-                        ]),
+                            m('label', member.birthday),
+                            //m('input[type="text"][name=birthday].form-control[placeholder="Birthday"]', { value: member.birthday })
+                        ]), */
                     ]),
                     m('.form-row', [
                         m('.col', [
-                            m('label', 'Email'),
-                            m('input[type="text"][name=email].form-control[placeholder="Email"]', { value: member.email })
+                            m('label', member.postcode + ' ' + member.city + ', ' + member.address + ' ' + member.address_no),
+                            //m('input[type="text"][name=address].form-control[placeholder="Address"]', { value: member.address })
+                        ]),
+                        /* m('.col', [
+                            m('label', member.address_no),
+                            //m('input[type="text"][name=address_no].form-control[placeholder="Address No"]', { value: member.address_no })
+                        ]), */
+                    ]),
+                    m('.form-row', [
+                        /*m('.col', [
+                            m('label', member.postcode + ' ' + member.city),
+                            //m('input[type="text"][name=postcode].form-control[placeholder="PLZ"]', { value: member.postcode })
                         ]),
                         m('.col', [
-                            m('label', 'Phone'),
-                            m('input[type="text"][name=phone_p].form-control[placeholder="Phone"]', { value: member.phone_p })
-                        ]),
+                            m('label', member.city),
+                            //m('input[type="text"][name=city].form-control[placeholder="City"]', { value: member.city })
+                        ]), */
                     ]),
                     m('.form-row', [
                         m('.col', [
-                            m('label', 'Address'),
-                            m('input[type="text"][name=address].form-control[placeholder="Address"]', { value: member.address })
+                            m('label', member.email + ' / ' + member.phone_p),
+                            //m('input[type="text"][name=email].form-control[placeholder="Email"]', { value: member.email })
                         ]),
-                        m('.col', [
-                            m('label', 'Address No'),
-                            m('input[type="text"][name=address_no].form-control[placeholder="Address No"]', { value: member.address_no })
-                        ]),
+                        /* m('.col', [
+                            m('label', member.phone_p),
+                            //m('input[type="text"][name=phone_p].form-control[placeholder="Phone"]', { value: member.phone_p })
+                        ]), */
                     ]),
-                    m('.form-row', [
+                    /*m('.form-row', [
                         m('.col', [
-                            m('label', 'PLZ'),
-                            m('input[type="text"][name=postcode].form-control[placeholder="PLZ"]', { value: member.postcode })
-                        ]),
-                        m('.col', [
-                            m('label', 'City'),
-                            m('input[type="text"][name=city].form-control[placeholder="City"]', { value: member.city })
-                        ]),
-                    ]),
-                    m('.form-row', [
-                        m('.col', [
-                            m('label', 'PLZ'),
+                            m('label', 'Comment'),
                             m('textarea[name=comment].form-control[placeholder="Comment"]', { value: member.comment })
                         ]),
-                    ]),
+                    ]), */
                     m('.form-row', [
                         m('.col', [
-                            m('button[type="submit"].btn.btn-primary', {
+                            //m('button[type="submit"].btn.btn-primary', {
+                            //    onclick: function(e) {
+                            //        e.preventDefault();
+                            //        updateMember(member);
+                            //    }
+                            //}, 'Save'),
+                            m('button[type="view"].btn.btn-primary', {
                                 onclick: function(e) {
                                     e.preventDefault();
-
-                                    updateMember(member);
+                                    window.location='/members/view/' + member.id;
                                 }
-                            }, 'Save'),
+                            }, 'Details'),
                         ]),
                     ]),
                     m('.form-row', [
@@ -123,11 +132,11 @@ window.onload = function() {
                             m('.badge.badge-pill.badge-primary', ''),
                         ]),
                     ]),
-                    m('.form-row', [
+                    /* m('.form-row', [
                         m('.col', [
                             m(MemberEvents, { events: events })
                         ]),
-                    ]),
+                    ]), */
                 ))
             ]
         }
