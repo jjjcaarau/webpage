@@ -238,7 +238,7 @@ window.onload = function() {
             return [
                 m('div.col-12', m('form',
                     m('.form-group', [
-                        m('input[type=text].form-control[placeholder="Search"]', {
+                        m('input[type=text].form-control[placeholder="Suche nach Vor- oder Nachname"]', {
                             value: vnode.state.q,
                             oninput: function(e) {
                                 vnode.state.q = e.target.value;
@@ -251,10 +251,10 @@ window.onload = function() {
                     m('table.table.table-hover.col-12', [
                         m('thead', m('tr', [
                                 m('th', 'ID'),
-                                m('th', 'First Name'),
-                                m('th', 'Last Name'),
-                                m('th', 'Email'),
-                                m('th', 'Birthday'),
+                                m('th', 'Vorname'),
+                                m('th', 'Nachname(n)'),
+                                m('th', 'E-Mail'),
+                                m('th', 'Geburtstag'),
                         ])),
                         m('tbody', [
                             [
