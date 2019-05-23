@@ -10,6 +10,7 @@ use crate::events::model::Event;
 use diesel::prelude::*;
 use diesel::SaveChangesDsl;
 
+#[derive(Debug)]
 pub enum Error {
     Diesel(diesel::result::Error),
     NotFound,
@@ -73,4 +74,21 @@ pub fn update(connection: &SqliteConnection, member: Member) {
         .set(&member)
         .execute(connection)
         .expect("Error updating member.");
+}
+
+pub fn update_family(connection: &SqliteConnection, member_id: i32, family_id: Option<i32>) -> Result<(), Error> {
+    let mut member = members::table
+        .filter(members::columns::id.eq(member_id))
+        .load::<Member>(connection)?;
+    if member.len() == 1 {
+        let mut member = member.remove(0);
+        member.family_id = family_id;
+        let _ = diesel::update(&member)
+            .set(&member)
+            .execute(connection)
+            .expect("Error updating member.");
+        Ok(())
+    } else {
+        Err(Error::NotFound)
+    }
 }

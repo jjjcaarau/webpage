@@ -33,7 +33,7 @@ fn main() {
             crate::routes::members::list_json,
             crate::routes::members::view_json,
             crate::routes::members::view,
-            // crate::routes::members::update,
+            crate::routes::members::update_json,
         ])
         .mount("/", routes![
             crate::routes::root::index,
