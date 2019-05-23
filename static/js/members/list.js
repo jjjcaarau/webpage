@@ -49,7 +49,8 @@ window.onload = function() {
                 m('div.col-12', m('form#update-member',
                     m('.form-row', [
                         m('.col', [
-                            m('label', member.first_name + ' ' + member.middle_name + ' ' + member.last_name + ', ' + member.birthday),
+                            console.log(member.birthday),
+                            (member.birthday != '1970-01-01') ? m('label', member.first_name + ' ' + member.middle_name + ' ' + member.last_name + ', ' + member.birthday) : m('label', member.first_name + ' ' + member.middle_name + ' ' + member.last_name),
                             //m('input[type="text"][name=first_name].form-control[placeholder="First name"]', { value: member.first_name })
                         ]),
                         /* m('.col', [
@@ -77,7 +78,7 @@ window.onload = function() {
                     ]),
                     m('.form-row', [
                         m('.col', [
-                            m('label', member.postcode + ' ' + member.city + ', ' + member.address + ' ' + member.address_no),
+                            (member.postcode == '' && member.city == '' && member.address == '' && member.address_no == '') ? '' : m('label', member.postcode + ' ' + member.city + ', ' + member.address + ' ' + member.address_no),
                             //m('input[type="text"][name=address].form-control[placeholder="Address"]', { value: member.address })
                         ]),
                         /* m('.col', [
@@ -97,7 +98,8 @@ window.onload = function() {
                     ]),
                     m('.form-row', [
                         m('.col', [
-                            m('label', member.email + ' / ' + member.phone_p),
+                            (member.email != '' && member.phone_p != '') ? m('label', member.email + ' | ' + member.phone_p) : m('label', member.email + member.phone_p),
+                            
                             //m('input[type="text"][name=email].form-control[placeholder="Email"]', { value: member.email })
                         ]),
                         /* m('.col', [
