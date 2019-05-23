@@ -47,57 +47,79 @@ pub fn view_json(id: i32) -> Json<ViewResult> {
     let member = crate::members::actions::get(&connection, id);
     match member {
         Ok(member) => Json(ViewResult { member }),
-        Err(Error::Diesel(_)) => panic!("Fuck"),
-        Err(Error::NotFound) => panic!("Fuck"),
+        Err(Error::Diesel(_)) => panic!("Internal Server Error"),
+        Err(Error::NotFound) => panic!("Not Found"),
     }
 }
 
-// #[post("/update", format = "json", data = "<member>")]
-// pub fn update(member: Json<JsonMember>) {
-//     let connection = crate::db::establish_connection();
+#[post("/update_json", format = "json", data = "<member>")]
+pub fn update_json(member: Json<JsonMember>) {
+    let connection = crate::db::establish_connection();
 
-//     let member = member.0;
-//     let birthday = NaiveDate::parse_from_str(member.birthday.as_ref(), "%Y-%m-%d").unwrap_or(NaiveDate::from_ymd(1970, 1, 1));
-//     let result = if member.id == 0 {
-//         let member = NewMember {
-//             first_name: member.first_name,
-//             middle_name: member.middle_name,
-//             last_name: member.last_name,
-//             sex: member.sex,
-//             birthday: birthday,
-//             email_1: member.email_1,
-//             email_2: member.email_2,
-//             email_3: member.email_3,
-//             phone_p: member.phone_p,
-//             phone_g: member.phone_g,
-//             mobile: member.mobile,
-//             zip_code: member.zip_code,
-//             city: member.city,
-//             street: member.street,
-//             street_nr: member.street_nr,
-//             comment: member.comment,
-//         };
-//         crate::members::actions::create(&connection, member)
-//     } else {
-//         let member = Member {
-//             id: member.id,
-//             first_name: member.first_name,
-//             middle_name: member.middle_name,
-//             last_name: member.last_name,
-//             sex: member.sex,
-//             birthday: birthday,
-//             email_1: member.email_1,
-//             email_2: member.email_2,
-//             email_3: member.email_3,
-//             phone_p: member.phone_p,
-//             phone_g: member.phone_g,
-//             mobile: member.mobile,
-//             zip_code: member.zip_code,
-//             city: member.city,
-//             street: member.street,
-//             street_nr: member.street_nr,
-//             comment: member.comment,
-//         };
-//         crate::members::actions::update(&connection, member)
-//     };
-// }
+    let member = member.0;
+    let birthday = NaiveDate::parse_from_str(member.birthday.as_ref(), "%Y-%m-%d").unwrap_or(NaiveDate::from_ymd(1970, 1, 1));
+    let result = if member.id == 0 {
+        let member = NewMember {
+            family_id: None,
+            first_name: member.first_name,
+            middle_name: member.middle_name,
+            last_name: member.last_name,
+            sex: member.sex,
+            birthday: birthday,
+            email: member.email,
+            phone_p: member.phone_p,
+            phone_w: member.phone_w,
+            mobile: member.mobile,
+            postcode: member.postcode,
+            city: member.city,
+            address: member.address,
+            address_no: member.address_no,
+            comment: member.comment,
+            email_allowed: member.email_allowed,
+            passport_no: member.passport_no,
+            member_type: member.member_type,
+            honorary_member_reason: member.honorary_member_reason,
+            needs_mark_jujitsu: member.needs_mark_jujitsu,
+            needs_mark_judo: member.needs_mark_judo,
+        };
+        crate::members::actions::create(&connection, member)
+    } else {
+        let member = Member {
+            id: member.id,
+            family_id: member.family_id,
+            first_name: member.first_name,
+            middle_name: member.middle_name,
+            last_name: member.last_name,
+            sex: member.sex,
+            birthday: birthday,
+            email: member.email,
+            phone_p: member.phone_p,
+            phone_w: member.phone_w,
+            mobile: member.mobile,
+            postcode: member.postcode,
+            city: member.city,
+            address: member.address,
+            address_no: member.address_no,
+            comment: member.comment,
+            email_allowed: member.email_allowed,
+            passport_no: member.passport_no,
+            member_type: member.member_type,
+            honorary_member_reason: member.honorary_member_reason,
+            needs_mark_jujitsu: member.needs_mark_jujitsu,
+            needs_mark_judo: member.needs_mark_judo,
+        };
+        crate::members::actions::update(&connection, member)
+    };
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct MemberFamilyUpdate {
+    member_id: i32,
+    family_id: Option<i32>,
+}
+
+#[post("/update_family_json", format = "json", data = "<update>")]
+pub fn update(update: Json<MemberFamilyUpdate>) {
+    let connection = crate::db::establish_connection();
+    crate::members::actions::update_family(&connection, update.member_id, update.family_id).unwrap();
+}
