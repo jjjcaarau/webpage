@@ -25,47 +25,53 @@ window.onload = function() {
             console.log(family)
             return [
                 m('div.col-12', m('form#update-member',
+                m('button[type="back"].btn.btn-primary', {
+                    onclick: function(e) {
+                        e.preventDefault();
+                        window.location='/members/list';
+                    }
+                }, 'Zurück'),
                     m('.form-row', [
                         m('.col', [
-                            m('label', 'First name'),
+                            m('label', 'Vorname'),
                             m('input[type="text"][name=first_name].form-control[placeholder="First name"]', { value: member.first_name })
                         ]),
                         m('.col', [
-                            m('label', 'Middle name'),
+                            m('label', 'Zweitname(n)'),
                             m('input[type="text"][name=middle_name].form-control[placeholder="Middle name"]', { value: member.middle_name })
                         ]),
                         m('.col', [
-                            m('label', 'Last name'),
+                            m('label', 'Nachname(n)'),
                             m('input[type="text"][name=last_name].form-control[placeholder="Last name"]', { value: member.last_name })
                         ]),
                     ]),
                     m('.form-row', [
                         m('.col', [
-                            m('label', 'Sex'),
+                            m('label', 'Geschlecht'),
                             m('input[type="text"][name=sex].form-control[placeholder="Sex"]', { value: member.sex })
                         ]),
                         m('.col', [
-                            m('label', 'Birthday'),
+                            m('label', 'Geburtstag'),
                             m('input[type="text"][name=birthday].form-control[placeholder="Birthday"]', { value: member.birthday })
                         ]),
                     ]),
                     m('.form-row', [
                         m('.col', [
-                            m('label', 'Email'),
+                            m('label', 'E-Mail'),
                             m('input[type="text"][name=email].form-control[placeholder="Email"]', { value: member.email })
                         ]),
                         m('.col', [
-                            m('label', 'Phone'),
+                            m('label', 'Telefon'),
                             m('input[type="text"][name=phone_p].form-control[placeholder="Phone"]', { value: member.phone_p })
                         ]),
                     ]),
                     m('.form-row', [
                         m('.col', [
-                            m('label', 'Address'),
+                            m('label', 'Strasse'),
                             m('input[type="text"][name=address].form-control[placeholder="Address"]', { value: member.address })
                         ]),
                         m('.col', [
-                            m('label', 'Address No'),
+                            m('label', 'Hausnummer'),
                             m('input[type="text"][name=address_no].form-control[placeholder="Address No"]', { value: member.address_no })
                         ]),
                     ]),
@@ -75,13 +81,13 @@ window.onload = function() {
                             m('input[type="text"][name=postcode].form-control[placeholder="PLZ"]', { value: member.postcode })
                         ]),
                         m('.col', [
-                            m('label', 'City'),
+                            m('label', 'Ort'),
                             m('input[type="text"][name=city].form-control[placeholder="City"]', { value: member.city })
                         ]),
                     ]),
                     m('.form-row', [
                         m('.col', [
-                            m('label', 'PLZ'),
+                            m('label', 'Beschreibung'),
                             m('textarea[name=comment].form-control[placeholder="Comment"]', { value: member.comment })
                         ]),
                     ]),
