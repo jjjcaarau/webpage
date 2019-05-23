@@ -32,7 +32,15 @@ pub fn list_all(
         .order_by(events::columns::date)
         .load::<Event>(connection)?
         .grouped_by(&member_list);
-    let family_list = Member::belonging_to(&member_list)
+    let family_list = members::table
+        .filter({
+            let ids = member_list
+                .iter()
+                .map(|member| (member.id, member.family_id))
+                .unzip::<i32, Option<i32>, Vec<i32>, Vec<Option<i32>>>();
+            members::columns::family_id.eq_any(ids.1)
+            .and(members::columns::id.ne_all(ids.0))
+        })
         .order_by(members::columns::birthday)
         .load::<Member>(connection)?
         .grouped_by(&member_list);
@@ -44,21 +52,27 @@ pub fn get(
     connection: &SqliteConnection,
     id: i32,
 ) -> Result<(Member, Vec<Event>, Vec<Member>), Error> {
-    let mut member = members::table
-        .filter(members::columns::id.eq(id))
-        .load::<Member>(connection)?;
+    let member = {
+        let mut members = members::table
+            .filter(members::columns::id.eq(id))
+            .load::<Member>(connection)?;
+        if members.len() == 1 {
+            members.remove(0)
+        } else {
+            return Err(Error::NotFound)
+        }
+    };
     let event_list = Event::belonging_to(&member)
         .order_by(events::columns::date)
         .load::<Event>(connection)?;
-    let family_list = Member::belonging_to(&member)
+    let family_list = members::table
+        .filter({
+            members::columns::family_id.eq(member.family_id)
+            .and(members::columns::id.ne(member.id))
+        })
         .order_by(members::columns::birthday)
         .load::<Member>(connection)?;
-
-    if member.len() == 1 {
-        Ok((member.remove(0), event_list, family_list))
-    } else {
-        Err(Error::NotFound)
-    }
+    Ok((member, event_list, family_list))
 
 }
 

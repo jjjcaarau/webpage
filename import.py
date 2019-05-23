@@ -117,6 +117,8 @@ with open('members.json', 'r') as file:
 
     # Track families
     # Haller family (set all to Urs)
+    # Urs
+    next(filter(lambda x: x[0] == '965', transformed_member))[1] = '965'
     # Ina
     next(filter(lambda x: x[0] == '868', transformed_member))[1] = '965'
     # Pascale

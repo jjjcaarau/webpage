@@ -2,9 +2,11 @@
 {% block includes %}
     <script type="text/javascript" src="/static/js/extern/mithril.min.js" defer></script>
     <script type="text/javascript" src="/static/js/extern/fuse.min.js" defer></script>
+    <script type="text/javascript" src="/static/js/members/badges.js" defer></script>
     <script type="text/javascript" src="/static/js/members/event_list.js" defer></script>
+    <script type="text/javascript" src="/static/js/members/family.js" defer></script>
     <script type="text/javascript" src="/static/js/members/view.js" defer></script>
-    <link rel="stylesheet" href="/static/css/pages/jujitsu.css">
+    <link rel="stylesheet" href="/static/css/pages/members/view.css">
 {% endblock %}
 
 {% block content %}

@@ -1,0 +1,7 @@
+.family-row {
+    cursor: pointer;
+}
+
+span.badge.badge-pill {
+    margin-right: 0.5em;
+}

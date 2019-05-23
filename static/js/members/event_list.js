@@ -43,9 +43,7 @@ var MemberEvents = {
         }
 
         return [
-            m('', badges.map(function(badge) {
-                return m('span.badge.badge-pill.badge-' + badge.type , badge.text)
-            })),
+            m(Badges, { events }),
             m('table.table.table-hover.col-12', [
                 m('thead', m('tr', [
                         m('th', 'Event'),

@@ -126,28 +126,7 @@ window.onload = function() {
                                             m('td[colspan=4]', m(MemberDetails, { member: { id: 0 }, events: [] })),
                                         ]) : '',
                                     ],
-                                    family ? family.map(function(member) {
-                                        return [
-                                            m('tr', {
-                                                onclick: function() {
-                                                    if (vnode.state.selected != member.id) {
-                                                        vnode.state.selected = member.id;
-                                                    } else {
-                                                        vnode.state.selected = undefined;
-                                                    }
-                                                },
-                                            }, [
-                                                m('td', member.id),
-                                                m('td', member.first_name),
-                                                m('td', member.last_name),
-                                                m('td', member.email),
-                                                m('td', member.birthday),
-                                            ]),
-                                            vnode.state.selected == member.id ? m('tr', [
-                                                m('td[colspan=4]', m(MemberDetails, { member: member, events: events })),
-                                            ]) : '',
-                                        ]
-                                    }) : ''
+                                    m(Family, { member, family })
                                 ])
                             ])
                         ])
