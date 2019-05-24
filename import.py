@@ -35,7 +35,7 @@ with open('members.json', 'r') as file:
         transformed_member.append(
             [
                 entry['id'],
-                'NULL',
+                None,
                 entry['first_name'],
                 entry['middle_name'],
                 entry['last_name'],
@@ -71,6 +71,7 @@ with open('members.json', 'r') as file:
                     'demotion',
                     'club',
                     date,
+                    None,
                 )
             )
 
@@ -85,6 +86,7 @@ with open('members.json', 'r') as file:
                 'promotion',
                 'club',
                 date,
+                None,
             )
         )
         for division in ['judo', 'jujitsu']:
@@ -99,6 +101,7 @@ with open('members.json', 'r') as file:
                             'promotion',
                             division,
                             date,
+                            None,
                         )
                     )
             for dan in range(1, 7):
@@ -112,8 +115,65 @@ with open('members.json', 'r') as file:
                             'promotion',
                             division,
                             date,
+                            None,
                         )
                     )
+
+        # Thomas Meister
+        if entry['id'] == '493':
+            transformed_events.append(
+            (
+                entry['id'],
+                'trainer',
+                'promotion',
+                'jujitsu',
+                '2002-01-01',
+                None,
+            )
+        )
+            transformed_events.append(
+            (
+                entry['id'],
+                'board',
+                'promotion',
+                'club',
+                '2004-01-01',
+                'TK Ju Jitsu',
+            )
+        )
+
+        # Joëlle Claire Fischer
+        if entry['id'] == '458':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'co_trainer',
+                    'promotion',
+                    'jujitsu',
+                    '2016-12-17',
+                    None,
+                )
+            )
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'board',
+                    'promotion',
+                    'club',
+                    '2012-03-30',
+                    'Aktuar',
+                )
+            )
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'board',
+                    'promotion',
+                    'club',
+                    '2018-03-23',
+                    'Vizepräsidentin',
+                )
+            )
 
     # Track families
     # Haller family (set all to Urs)
@@ -169,8 +229,9 @@ INSERT INTO events (
     event_type,
     class,
     division,
-    date
-) VALUES (?, ?, ?, ?, ?)
+    date,
+    comment
+) VALUES (?, ?, ?, ?, ?, ?)
     """, transformed_events)
 
     conn.commit()

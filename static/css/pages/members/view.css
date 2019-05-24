@@ -5,3 +5,33 @@
 span.badge.badge-pill {
     margin-right: 0.5em;
 }
+
+.badge-belt-yellow {
+    color: #000;
+    background-color: #E5D418;
+}
+
+.badge-belt-orange {
+    color: #000;
+    background-color: #E56D18;
+}
+
+.badge-belt-green {
+    color: #fff;
+    background-color: #077E3C;
+}
+
+.badge-belt-blue {
+    color: #fff;
+    background-color: #1F22A7;
+}
+
+.badge-belt-brown {
+    color: #fff;
+    background-color: #5D2216;
+}
+
+.badge-belt-black {
+    color: #fff;
+    background-color: #000;
+}

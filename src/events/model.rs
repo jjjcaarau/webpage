@@ -48,11 +48,32 @@ pub enum EventDivision {
 #[belongs_to(Member, foreign_key = "member_id")]
 #[table_name="events"]
 pub struct Event {
-    id: i32,
-    member_id: i32,
-    event_type: EventType,
-    class: EventClass,
-    division: EventDivision,
-    comment: Option<String>,
-    date: chrono::NaiveDate,
+    pub id: i32,
+    pub member_id: i32,
+    pub event_type: EventType,
+    pub class: EventClass,
+    pub division: EventDivision,
+    pub comment: Option<String>,
+    pub date: chrono::NaiveDate,
+}
+
+#[derive(Insertable, Derivative, Associations)]
+#[table_name="events"]
+pub struct NewEvent {
+    pub member_id: i32,
+    pub event_type: EventType,
+    pub class: EventClass,
+    pub division: EventDivision,
+    pub comment: Option<String>,
+    pub date: chrono::NaiveDate,
+}
+
+#[derive(Default, Serialize, Deserialize)]
+pub struct JsonEvent {
+    pub member_id: i32,
+    pub event_type: EventType,
+    pub class: EventClass,
+    pub division: EventDivision,
+    pub comment: Option<String>,
+    pub date: String,
 }

@@ -119,7 +119,7 @@ pub struct MemberFamilyUpdate {
 }
 
 #[post("/update_family_json", format = "json", data = "<update>")]
-pub fn update(update: Json<MemberFamilyUpdate>) {
+pub fn update_family_json(update: Json<MemberFamilyUpdate>) {
     let connection = crate::db::establish_connection();
     crate::members::actions::update_family(&connection, update.member_id, update.family_id).unwrap();
 }

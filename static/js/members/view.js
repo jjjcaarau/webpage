@@ -22,7 +22,6 @@ window.onload = function() {
             let member = vnode.state.member;
             let events = vnode.state.events;
             let family = vnode.state.family;
-            console.log(family)
             return [
                 m('div.col-12', m('form#update-member',
                 m('button[type="back"].btn.btn-primary', {
@@ -104,41 +103,12 @@ window.onload = function() {
                     ]),
                     m('.form-row', [
                         m('div.col-12', [
-                            m('table.table.table-hover.col-12', [
-                                m('thead', m('tr', [
-                                        m('th', 'ID'),
-                                        m('th', 'First Name'),
-                                        m('th', 'Last Name'),
-                                        m('th', 'Email'),
-                                        m('th', 'Birthday'),
-                                ])),
-                                m('tbody', [
-                                    [
-                                        m('tr', {
-                                            onclick: function() {
-                                                vnode.state.selected = 0;
-                                            },
-                                        }, //[
-                                        //    m('td[colspan=4]', 'Add new member'),
-                                        //]),
-                                        ),
-                                        vnode.state.selected == 0 ? m('tr', [
-                                            m('td[colspan=4]', m(MemberDetails, { member: { id: 0 }, events: [] })),
-                                        ]) : '',
-                                    ],
-                                    m(Family, { member, family })
-                                ])
-                            ])
+                            m(Family, { member, family })
                         ])
                     ]),
                     m('.form-row', [
                         m('.col', [
-                            m('.badge.badge-pill.badge-primary', ''),
-                        ]),
-                    ]),
-                    m('.form-row', [
-                        m('.col', [
-                            m(MemberEvents, { events: events })
+                            m(MemberEvents, { events, member })
                         ]),
                     ]),
                 ))

@@ -10,18 +10,30 @@ var Family = {
     view: function(vnode) {
         let family = vnode.state.family;
 
-        return family ? family.map(function(member) {
-            return [
-                m('tr.family-row', {
-                    onclick: () => window.location = '/members/view/' + member.id
-                }, [
-                    m('td', member.id),
-                    m('td', member.first_name),
-                    m('td', member.last_name),
-                    m('td', member.email),
-                    m('td', member.birthday),
-                ]),
-            ]
-        }) : ''
+        return m('.row', m('.col', [
+            m('h3', 'Familie'),
+            family ? family.map(function(member) {
+                return m('table.table.table-hover.col-12', [
+                    m('thead', m('tr', [
+                        m('th', 'ID'),
+                        m('th', 'First Name'),
+                        m('th', 'Last Name'),
+                        m('th', 'Email'),
+                        m('th', 'Birthday'),
+                    ])),
+                    m('tbody', [
+                        m('tr.family-row', {
+                            onclick: () => window.location = '/members/view/' + member.id
+                        }, [
+                            m('td', member.id),
+                            m('td', member.first_name),
+                            m('td', member.last_name),
+                            m('td', member.email),
+                            m('td', member.birthday),
+                        ]),
+                    ])
+                ])
+            }) : ''
+        ]))
     }
 }

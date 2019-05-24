@@ -34,6 +34,10 @@ fn main() {
             crate::routes::members::view_json,
             crate::routes::members::view,
             crate::routes::members::update_json,
+            crate::routes::members::update_family_json,
+        ])
+        .mount("/events", routes![
+            crate::routes::events::create_json,
         ])
         .mount("/", routes![
             crate::routes::root::index,
