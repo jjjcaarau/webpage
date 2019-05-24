@@ -1,4 +1,6 @@
-var Family = {
+import m from 'mithril'
+
+export const Family = {
     oninit: function(vnode) {
         vnode.state.member = vnode.attrs.member;
         vnode.state.family = vnode.attrs.family;
@@ -12,7 +14,7 @@ var Family = {
 
         return m('.row', m('.col', [
             m('h3', 'Familie'),
-            family ? family.map(function(member) {
+            family && family.length > 0 ? family.map(function(member) {
                 return m('table.table.table-hover.col-12', [
                     m('thead', m('tr', [
                         m('th', 'ID'),
@@ -33,7 +35,7 @@ var Family = {
                         ]),
                     ])
                 ])
-            }) : ''
+            }) : 'Keine bekannten Familienmitglieder'
         ]))
     }
 }

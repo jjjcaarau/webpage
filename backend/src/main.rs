@@ -27,7 +27,7 @@ use rocket_contrib::{
 
 fn main() {
     rocket::ignite()
-        .mount("/static", StaticFiles::from(concat!(env!("CARGO_MANIFEST_DIR"), "/static")))
+        .mount("/static", StaticFiles::from(concat!(env!("CARGO_MANIFEST_DIR"), "/../static")))
         .mount("/members", routes![
             crate::routes::members::list,
             crate::routes::members::list_json,

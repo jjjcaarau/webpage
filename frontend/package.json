@@ -1,0 +1,18 @@
+{
+  "name": "jjjcaarau-webpage",
+  "version": "1.0.0",
+  "authors": [
+    "Noah Hüsser <yatekii@yatekii.ch>"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "watch": "parcel watch --public-url /static/js --cache-dir build/cache -d ../static/js src/members/list.js src/members/view.js",
+    "build": "parcel build --public-url /static/js --cache-dir build/cache -d ../static/js src/members/list.js src/members/view.js"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.3"
+  },
+  "dependencies": {
+    "mithril": "^1.1.6"
+  }
+}

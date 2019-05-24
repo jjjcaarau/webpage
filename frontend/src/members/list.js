@@ -13,28 +13,6 @@ window.onload = function() {
         }
     }
 
-    var updateMember = function(member) {
-        var formData = new FormData(document.getElementById('update-member'));
-        var data = {};
-        for(var entry of formData.entries()) {
-            data[entry[0]] = entry[1];
-        }
-        data['id'] = member.id;
-        data['email_2'] = member.email_2 ? member.email_2: '';
-        data['email_3'] = member.email_3 ? member.email_3: '';
-        data['phone_g'] = member.phone_g ? member.phone_g: '';
-        data['mobile'] = member.mobile ? member.mobile : '';
-
-        m.request({
-            method: 'POST',
-            url: '/members/update',
-            data: data,
-        })
-        .then(function(result) {
-            console.log('success');
-        })
-    }
-
     var q = '';
 
     var MemberDetails = {

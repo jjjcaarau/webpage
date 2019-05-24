@@ -1,3 +1,5 @@
+import m from 'mithril'
+
 function belt_color(number) {
     switch(number) {
         case '5': return 'yellow'
@@ -20,7 +22,7 @@ function member_type(member) {
     }
 }
 
-var Badges = {
+export const Badges = {
     oninit: function(vnode) {
         vnode.state.events = vnode.attrs.events;
         vnode.state.member = vnode.attrs.member;

@@ -1,3 +1,5 @@
+import m from 'mithril'
+
 function event_string(event) {
     switch(event.event_type) {
         case 'Trainer': {
@@ -255,7 +257,7 @@ var KyuEventAdd = {
     }
 }
 
-var MemberEvents = {
+export const MemberEvents = {
     oninit: function(vnode) {
         vnode.state.events = vnode.attrs.events;
         vnode.state.member = vnode.attrs.member;
@@ -271,7 +273,6 @@ var MemberEvents = {
         let events = vnode.state.events;
         
         return [
-            m(Badges, { events, member }),
             m('.row', m('.col', [
                 m('h3', 'Verlauf'),
                 m('table.table.table-hover', [
@@ -313,7 +314,7 @@ var MemberEvents = {
                     onclick: (e) => {
                         e.preventDefault()
                         vnode.state.transmitter.add()
-                        // location.reload()
+                        location.reload()
                     }
                 }, 'Hinzufügen')
             ])
