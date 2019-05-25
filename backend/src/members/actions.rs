@@ -96,8 +96,9 @@ pub fn update_family(connection: &SqliteConnection, member_id: i32, family_id: O
         .load::<Member>(connection)?;
     if member.len() == 1 {
         let mut member = member.remove(0);
+        println!("{} -> {:?}", member.id, family_id);
         member.family_id = family_id;
-        let _ = diesel::update(&member)
+        diesel::update(&member)
             .set(&member)
             .execute(connection)
             .expect("Error updating member.");

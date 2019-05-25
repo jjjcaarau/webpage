@@ -127,6 +127,11 @@ export const Badges = {
             badges.push({ type: 'light', text: 'Ehrenmitglied' })
         }
 
+        // PMatriarch
+        if(member.id == member.family_id) {
+            badges.push({ type: 'warning', text: 'Familienoberhaupt' })
+        }
+
         return m('.row', m('.col', [
             m('h3', 'Status'),
             m('h3', m('', badges.map(function(badge) {

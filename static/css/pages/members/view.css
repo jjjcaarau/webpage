@@ -3,7 +3,8 @@
 }
 
 span.badge.badge-pill {
-    margin-right: 0.5em;
+    margin-left: 0.25em;
+    margin-right: 0.25em;
 }
 
 .badge-belt-yellow {
@@ -34,4 +35,11 @@ span.badge.badge-pill {
 .badge-belt-black {
     color: #fff;
     background-color: #000;
+}
+
+.member-search-item:hover {
+    z-index: 2;
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
 }
