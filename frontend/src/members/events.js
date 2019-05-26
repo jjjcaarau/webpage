@@ -72,7 +72,7 @@ const event_types = [
 
 const TrainerEventAdd = {
     oninit: function(vnode) {
-        vnode.attrs.transmitter.add = () => {
+        vnode.attrs.transmitter.add = () =>
             m.request({
                 method: 'POST',
                 url: "/events/create_json",
@@ -85,7 +85,6 @@ const TrainerEventAdd = {
                     date: getToday(),
                 }
             })
-        }
         vnode.state.class = 'Promotion'
         vnode.state.division = 'Jujitsu'
         vnode.state.comment = ''
@@ -122,7 +121,7 @@ const TrainerEventAdd = {
 
 const BoardEventAdd = {
     oninit: function(vnode) {
-        vnode.attrs.transmitter.add = () => {
+        vnode.attrs.transmitter.add = () =>
             m.request({
                 method: 'POST',
                 url: "/events/create_json",
@@ -135,7 +134,6 @@ const BoardEventAdd = {
                     date: vnode.state.date,
                 }
             })
-        }
         vnode.state.date = getToday()
         vnode.state.class = 'Promotion'
         vnode.state.comment = ''
@@ -169,7 +167,7 @@ const BoardEventAdd = {
 
 const HonoraryEventAdd = {
     oninit: function(vnode) {
-        vnode.attrs.transmitter.add = () => {
+        vnode.attrs.transmitter.add = () =>
             m.request({
                 method: 'POST',
                 url: "/events/create_json",
@@ -182,7 +180,6 @@ const HonoraryEventAdd = {
                     date: getToday(),
                 }
             })
-        }
         vnode.state.comment = ''
         vnode.state.member = vnode.attrs.member;
     },
@@ -201,7 +198,7 @@ const HonoraryEventAdd = {
 
 const KyuEventAdd = {
     oninit: function(vnode) {
-        vnode.attrs.transmitter.add = () => {
+        vnode.attrs.transmitter.add = () => 
             m.request({
                 method: 'POST',
                 url: "/events/create_json",
@@ -213,7 +210,6 @@ const KyuEventAdd = {
                     date: vnode.state.date,
                 }
             })
-        }
         vnode.state.date = getToday()
         vnode.state.division = 'Jujitsu'
         vnode.state.grade = 'Kyu5'
@@ -319,12 +315,15 @@ export const MemberEvents = {
                 })(),
                 m('button.form-control.btn-success', {
                     onclick: (e) => {
+                        vnode.state.error = ''
                         e.preventDefault()
                         vnode.state.transmitter.add()
-                        location.reload()
+                        .then(() => location.reload())
+                        .catch(() => vnode.state.error = 'Fehler beim Hinzufügen.')
                     }
                 }, 'Hinzufügen')
-            ])
+            ]),
+            m('span.text-danger', vnode.state.error)
         ]
     }
 }

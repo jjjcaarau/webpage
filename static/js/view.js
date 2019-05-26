@@ -1878,7 +1878,7 @@ var event_types = ['Trainer', 'CoTrainer', 'Board', 'Honorary', 'Kyu'];
 var TrainerEventAdd = {
   oninit: function oninit(vnode) {
     vnode.attrs.transmitter.add = function () {
-      _mithril.default.request({
+      return _mithril.default.request({
         method: 'POST',
         url: "/events/create_json",
         data: {
@@ -1923,7 +1923,7 @@ var TrainerEventAdd = {
 var BoardEventAdd = {
   oninit: function oninit(vnode) {
     vnode.attrs.transmitter.add = function () {
-      _mithril.default.request({
+      return _mithril.default.request({
         method: 'POST',
         url: "/events/create_json",
         data: {
@@ -1967,7 +1967,7 @@ var BoardEventAdd = {
 var HonoraryEventAdd = {
   oninit: function oninit(vnode) {
     vnode.attrs.transmitter.add = function () {
-      _mithril.default.request({
+      return _mithril.default.request({
         method: 'POST',
         url: "/events/create_json",
         data: {
@@ -1999,7 +1999,7 @@ var HonoraryEventAdd = {
 var KyuEventAdd = {
   oninit: function oninit(vnode) {
     vnode.attrs.transmitter.add = function () {
-      _mithril.default.request({
+      return _mithril.default.request({
         method: 'POST',
         url: "/events/create_json",
         data: {
@@ -2102,11 +2102,15 @@ var MemberEvents = {
       }
     }(), (0, _mithril.default)('button.form-control.btn-success', {
       onclick: function onclick(e) {
+        vnode.state.error = '';
         e.preventDefault();
-        vnode.state.transmitter.add();
-        location.reload();
+        vnode.state.transmitter.add().then(function () {
+          return location.reload();
+        }).catch(function () {
+          return vnode.state.error = 'Fehler beim Hinzufügen.';
+        });
       }
-    }, 'Hinzufügen')])];
+    }, 'Hinzufügen')]), (0, _mithril.default)('span.text-danger', vnode.state.error)];
   }
 };
 exports.MemberEvents = MemberEvents;
