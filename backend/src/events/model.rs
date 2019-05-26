@@ -35,7 +35,7 @@ pub enum EventClass {
     Demotion,
 }
 
-#[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug, Copy, Clone)]
 #[derivative(Default(bound=""))]
 pub enum EventDivision {
     #[derivative(Default)]

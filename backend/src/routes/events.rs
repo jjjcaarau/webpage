@@ -1,10 +1,6 @@
-use rocket_contrib::templates::Template;
 use rocket_contrib::json::Json;
-use rocket::request::Form;
-use rocket::http::Status;
 use chrono::NaiveDate;
 use crate::events::model::{
-    Event,
     NewEvent,
     JsonEvent,
 };

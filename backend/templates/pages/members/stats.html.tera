@@ -13,10 +13,14 @@
             </div>
         </div>
     </div>
-    <div class="row align-items-center equal">
-        <h3>Paying members: {{ paying_members }}</h3>
-        <h3>Paying kids: {{ paying_kids }}</h3>
-        <h3>Paying students: {{ paying_students }}</h3>
+    <div class="row">
+        <div class="col">
+            <h3>Paying members: {{ paying_members }}</h3>
+            <br>
+            <h3>Paying kids: {{ paying_kids }}</h3>
+            <br>
+            <h3>Paying students: {{ paying_students }}</h3>
+        </div>
     </div>
 </div>
 {% endblock %}

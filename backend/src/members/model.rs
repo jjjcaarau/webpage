@@ -1,6 +1,8 @@
 use crate::schema::*;
 
-#[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug)]
+use crate::events::model::EventDivision;
+
+#[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug, Copy, Clone)]
 #[derivative(Default(bound=""))]
 pub enum MemberType {
     #[derivative(Default)]
@@ -97,6 +99,48 @@ impl NewMember {
     pub fn new() -> Self {
         Self {
             ..Default::default()
+        }
+    }
+}
+
+pub enum Division {
+    Judo,
+    JuJitsu,
+}
+
+impl From<EventDivision> for Division {
+    fn from(division: EventDivision) -> Self {
+        match division {
+            EventDivision::Judo => Division::Judo,
+            EventDivision::Jujitsu => Division::JuJitsu,
+            EventDivision::Club => panic!("This is a bug. Please report it.")
+        }
+    }
+}
+
+pub enum Tag {
+    Trainer(Division),
+    CoTrainer(Division),
+    Honorary,
+    Board,
+    Kid,
+    Student,
+    Resigned,
+    Active,
+    Passive,
+    Parent,
+    Kyu(Division, u8),
+}
+
+impl From<MemberType> for Tag {
+    fn from(member_type: MemberType) -> Self {
+        match member_type {
+            MemberType::Active => Tag::Active,
+            MemberType::Passive => Tag::Passive,
+            MemberType::Parent => Tag::Parent,
+            MemberType::Honorary => Tag::Honorary,
+            MemberType::Student => Tag::Student,
+            MemberType::Kid => Tag::Kid,
         }
     }
 }

@@ -2,6 +2,7 @@ use super::model::{
     Member,
     NewMember,
     MemberType,
+    Tag,
 };
 use crate::schema::{
     members,
@@ -14,7 +15,6 @@ use crate::events::model::{
     EventType,
 };
 use diesel::prelude::*;
-use diesel::SaveChangesDsl;
 
 #[derive(Debug)]
 pub enum Error {
@@ -28,9 +28,8 @@ impl From<diesel::result::Error> for Error {
     }
 }
 
-pub fn list_all(
-    connection: &SqliteConnection,
-) -> Result<Vec<(Member, Vec<Event>, Vec<Member>)>, diesel::result::Error> {
+/// Fetches all known members from the DB.
+pub fn list_all(connection: &SqliteConnection) -> Result<Vec<(Member, Vec<Event>, Vec<Member>)>, diesel::result::Error> {
     let member_list = members::table
         .order_by(members::columns::first_name)
         .load::<Member>(connection)?;
@@ -54,10 +53,8 @@ pub fn list_all(
     Ok(itertools::izip!(member_list.into_iter(), event_list, family_list).collect::<Vec<_>>())
 }
 
-pub fn get(
-    connection: &SqliteConnection,
-    id: i32,
-) -> Result<(Member, Vec<Event>, Vec<Member>), Error> {
+/// Fetches an existing member from the DB.
+pub fn get(connection: &SqliteConnection, id: i32) -> Result<(Member, Vec<Event>, Vec<Member>), Error> {
     let member = {
         let mut members = members::table
             .filter(members::columns::id.eq(id))
@@ -82,6 +79,7 @@ pub fn get(
 
 }
 
+/// Creates a new member in the DB.
 pub fn create(connection: &SqliteConnection, new_member: NewMember) {
     diesel::insert_into(members::table)
         .values(&new_member)
@@ -103,10 +101,15 @@ pub fn update_family(connection: &SqliteConnection, member_id: i32, family_id: O
         .filter(members::columns::id.eq(member_id))
         .set(members::columns::family_id.eq(family_id))
         .execute(connection);
-    if let Ok(num_rows) = result {
-        Ok(())
-    } else {
-        Err(Error::NotFound)
+    match result {
+        Ok(num_rows) => {
+            if num_rows == 1 {
+                Ok(())
+            } else {
+                Err(Error::NotFound)
+            }
+        },
+        Err(err) => Err(Error::Diesel(err)),
     }
 }
 
@@ -117,6 +120,7 @@ pub struct Stats {
     paying_students: usize,
 }
 
+/// Returns a struct of global club stats.
 pub fn get_stats(connection: &SqliteConnection) -> Stats {
     let member_list = members::table
         .order_by(members::columns::first_name)
@@ -128,9 +132,18 @@ pub fn get_stats(connection: &SqliteConnection) -> Stats {
 
     let zipped_members = itertools::izip!(member_list.into_iter(), event_list).collect::<Vec<_>>();
 
-    let paying_members = zipped_members.iter().filter(|m| m.0.member_type == MemberType::Active && is_paying(&m.1)).count();
-    let paying_kids = zipped_members.iter().filter(|m| m.0.member_type == MemberType::Kid && is_paying(&m.1)).count();
-    let paying_students = zipped_members.iter().filter(|m| m.0.member_type == MemberType::Student && is_paying(&m.1)).count();
+    let paying_members = zipped_members
+        .iter()
+        .filter(|m| m.0.member_type == MemberType::Active && is_paying(&get_tags(&m.0, &m.1)))
+        .count();
+    let paying_kids = zipped_members
+        .iter()
+        .filter(|m| m.0.member_type == MemberType::Kid && is_paying(&get_tags(&m.0, &m.1)))
+        .count();
+    let paying_students = zipped_members
+        .iter()
+        .filter(|m| m.0.member_type == MemberType::Student && is_paying(&get_tags(&m.0, &m.1)))
+        .count();
 
     Stats {
         paying_members,
@@ -139,11 +152,29 @@ pub fn get_stats(connection: &SqliteConnection) -> Stats {
     }
 }
 
-fn is_paying(events: &Vec<Event>) -> bool {
+/// Returns whether a member has to pay fees.
+fn is_paying(tags: &Vec<Tag>) -> bool {
+    for tag in tags {
+        match tag {
+            Tag::Honorary => return false,
+            Tag::Resigned => return false,
+            Tag::Board => return false,
+            Tag::Trainer(_) => return false,
+            Tag::CoTrainer(_) => return false,
+            _ => ()
+        }
+    }
+    return true;
+}
+
+/// Returns all tags a member is associated with.
+fn get_tags(member: &Member, events: &Vec<Event>) -> Vec<Tag> {
     let mut club_events = Vec::new();
     let mut board_events = Vec::new();
     let mut trainer_events = Vec::new();
     let mut cotrainer_events = Vec::new();
+
+    let mut result = vec![];
 
     for event in events {
         // Find club events.
@@ -152,49 +183,53 @@ fn is_paying(events: &Vec<Event>) -> bool {
         }
 
         // Check if honorary member.
-        if (event.event_type == EventType::Honorary && event.division == EventDivision::Club && event.class == EventClass::Promotion) {
-            return false;
+        if event.event_type == EventType::Honorary
+        && event.division == EventDivision::Club
+        && event.class == EventClass::Promotion {
+            result.push(Tag::Honorary);
         }
 
         // Get board member events.
-        if(event.event_type == EventType::Board) {
+        if event.event_type == EventType::Board {
             board_events.push(event)
         }
 
         // Get trainer events.
-        if(event.event_type == EventType::Trainer) {
+        if event.event_type == EventType::Trainer {
             trainer_events.push(event)
         }
 
-        // Get co trainer events.
-        if(event.event_type == EventType::CoTrainer) {
+        // Get cotrainer events.
+        if event.event_type == EventType::CoTrainer {
             cotrainer_events.push(event)
         }
     }
 
     // Check if resigned
     club_events.sort_by(|a, b| b.date.partial_cmp(&a.date).expect("Buggedi bug bug."));
-    if(club_events.len() > 0) {
+    if club_events.len() > 0 {
         let last = club_events[0];
         if last.class == EventClass::Demotion {
-            return false;
+            result.push(Tag::Resigned);
+        } else {
+            result.push(member.member_type.into());
         }
     }
 
     board_events.sort_by(|a, b| b.date.partial_cmp(&a.date).expect("Buggedi bug bug."));
     if board_events.len() > 0 && board_events[0].class == EventClass::Promotion {
-        return false;
+        result.push(Tag::Board);
     }
 
     trainer_events.sort_by(|a, b| b.date.partial_cmp(&a.date).expect("Buggedi bug bug."));
     if trainer_events.len() > 0 && trainer_events[0].class == EventClass::Promotion {
-        return false;
+        result.push(Tag::Trainer(trainer_events[0].division.into()));
     }
 
     cotrainer_events.sort_by(|a, b| b.date.partial_cmp(&a.date).expect("Buggedi bug bug."));
     if cotrainer_events.len() > 0 && cotrainer_events[0].class == EventClass::Promotion {
-        return false;
+        result.push(Tag::CoTrainer(cotrainer_events[0].division.into()));
     }
 
-    return true;
+    result
 }

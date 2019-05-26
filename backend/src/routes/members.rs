@@ -1,7 +1,5 @@
 use rocket_contrib::templates::Template;
 use rocket_contrib::json::Json;
-use rocket::request::Form;
-use rocket::http::Status;
 use chrono::NaiveDate;
 use crate::members::model::{
     Member,
@@ -13,7 +11,6 @@ use crate::events::model::{
 };
 use crate::members::actions::{
     Error,
-    Stats,
     get_stats,
 };
 
@@ -68,7 +65,7 @@ pub fn update_json(member: Json<JsonMember>) {
 
     let member = member.0;
     let birthday = NaiveDate::parse_from_str(member.birthday.as_ref(), "%Y-%m-%d").unwrap_or(NaiveDate::from_ymd(1970, 1, 1));
-    let result = if member.id == 0 {
+    let _result = if member.id == 0 {
         let member = NewMember {
             family_id: None,
             first_name: member.first_name,
