@@ -59,64 +59,73 @@ pub fn view_json(id: i32) -> Json<ViewResult> {
     }
 }
 
+#[derive(Serialize)]
+pub struct UpdateResponse {
+    id: i32,
+}
+
 #[post("/update_json", format = "json", data = "<member>")]
-pub fn update_json(member: Json<JsonMember>) {
+pub fn update_json(member: Json<JsonMember>) -> Json<UpdateResponse> {
     let connection = crate::db::establish_connection();
 
     let member = member.0;
     let birthday = NaiveDate::parse_from_str(member.birthday.as_ref(), "%Y-%m-%d").unwrap_or(NaiveDate::from_ymd(1970, 1, 1));
-    let _result = if member.id == 0 {
+    let result = if member.id == 0 {
         let member = NewMember {
             family_id: None,
             first_name: member.first_name,
-            middle_name: member.middle_name,
+            middle_name: member.middle_name.unwrap_or("".to_string()),
             last_name: member.last_name,
             sex: member.sex,
             birthday: birthday,
-            email: member.email,
-            phone_p: member.phone_p,
-            phone_w: member.phone_w,
-            mobile: member.mobile,
+            email: member.email.unwrap_or("".to_string()),
+            phone_p: member.phone_p.unwrap_or("".to_string()),
+            phone_w: member.phone_w.unwrap_or("".to_string()),
+            mobile: member.mobile.unwrap_or("".to_string()),
             postcode: member.postcode,
             city: member.city,
             address: member.address,
             address_no: member.address_no,
-            comment: member.comment,
+            comment: member.comment.unwrap_or("".to_string()),
             email_allowed: member.email_allowed,
-            passport_no: member.passport_no,
+            passport_no: member.passport_no.unwrap_or("".to_string()),
             member_type: member.member_type,
-            honorary_member_reason: member.honorary_member_reason,
+            honorary_member_reason: member.honorary_member_reason.unwrap_or("".to_string()),
             needs_mark_jujitsu: member.needs_mark_jujitsu,
             needs_mark_judo: member.needs_mark_judo,
         };
-        crate::members::actions::create(&connection, member)
+        crate::members::actions::create(&connection, &member).map(|m| m.id)
     } else {
         let member = Member {
             id: member.id,
             family_id: member.family_id,
             first_name: member.first_name,
-            middle_name: member.middle_name,
+            middle_name: member.middle_name.unwrap_or("".to_string()),
             last_name: member.last_name,
             sex: member.sex,
             birthday: birthday,
-            email: member.email,
-            phone_p: member.phone_p,
-            phone_w: member.phone_w,
-            mobile: member.mobile,
+            email: member.email.unwrap_or("".to_string()),
+            phone_p: member.phone_p.unwrap_or("".to_string()),
+            phone_w: member.phone_w.unwrap_or("".to_string()),
+            mobile: member.mobile.unwrap_or("".to_string()),
             postcode: member.postcode,
             city: member.city,
             address: member.address,
             address_no: member.address_no,
-            comment: member.comment,
+            comment: member.comment.unwrap_or("".to_string()),
             email_allowed: member.email_allowed,
-            passport_no: member.passport_no,
+            passport_no: member.passport_no.unwrap_or("".to_string()),
             member_type: member.member_type,
-            honorary_member_reason: member.honorary_member_reason,
+            honorary_member_reason: member.honorary_member_reason.unwrap_or("".to_string()),
             needs_mark_jujitsu: member.needs_mark_jujitsu,
             needs_mark_judo: member.needs_mark_judo,
         };
-        crate::members::actions::update(&connection, member)
+        crate::members::actions::update(&connection, &member).map(|_| member.id)
     };
+
+    let id = result.expect("This is a bug. Please report it.");
+
+    Json(UpdateResponse { id })
 }
 
 #[derive(Serialize, Deserialize)]

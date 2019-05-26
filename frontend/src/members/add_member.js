@@ -70,14 +70,14 @@ export const AddMember = {
                                                     family_id: vnode.attrs.member.id, 
                                                 },
                                             })
-                                            .then(() => location.reload())
+                                            .then(() => vnode.attrs.reloader())
                                             .catch(e => {
                                                 vnode.state.error = 'Ein Fehler beim Hinzufügen ist aufgetreten.'
                                             }),
                                             500
                                         )
                                     } else {
-                                        location.reload()
+                                        vnode.attrs.reloader()
                                     }
                                 }
                             }, member[0].first_name + ' ' + member[0].last_name)

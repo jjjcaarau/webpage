@@ -34,9 +34,13 @@ const updateMember = vnode => {
         url: '/members/update_json',
         data: vnode.state.member,
     })
-    .then(_ => {
+    .then(r => {
         vnode.state.working = false
-        location.reload()
+        if(vnode.state.member.id == 0) {
+            let params = window.location.href.split('/');
+            params[params.length - 1] = r.id
+            window.location.href = params.join('/')
+        }
     })
     .catch(_ => {
         vnode.state.error = 'Ein Fehler beim Speichern ist aufgetreten.'
@@ -46,34 +50,20 @@ const updateMember = vnode => {
 
 export const MemberDetail = {
     oninit: function(vnode) {
-        vnode.state.member = {};
-        vnode.state.events = [];
-        vnode.state.family = [];
+        vnode.state.member = vnode.attrs.member;
         vnode.state.working = false
         vnode.state.error = ''
-        let params = window.location.href.split('/');
-        let param = params[params.length - 1];
-        vnode.state.id = param;
-
-        m.request({
-            method: 'GET',
-            url: "/members/view_json/" + vnode.state.id,
-        })
-        .then(function(result) {
-            vnode.state.member = result.member[0];
-            vnode.state.events = result.member[1];
-            vnode.state.family = result.member[2];
-        })
     },
+    onbeforeupdate: (vnode) => vnode.state.member = vnode.attrs.member,
     view: function(vnode) {
         let member = vnode.state.member;
         return [
             m('.row', m('.col', [
                 m('h3', 'Info'),
                 m('form', [
-                    input(member, 'first_name', 'Vorname'),
+                    input(member, 'first_name', 'Vorname*'),
                     input(member, 'middle_name', 'Zweitname(n)'),
-                    input(member, 'last_name', 'Nachname(n)'),
+                    input(member, 'last_name', 'Nachname(n)*'),
                     m('.row.form-group', [
                         m('label.col-lg-2.col-md-3.col-sm-4.col-form-label', 'Geschlecht'),
                         m('select.col-lg-10.col-md-9.col-sm-8.form-control', {
@@ -84,17 +74,16 @@ export const MemberDetail = {
                             m('option[value=M]', 'Männlich'),
                         ]),
                     ]),
-                    input(member, 'birthday', 'Geburtstag', '[0-9]{4}-[0-9]{2}-[0-9]{2}'),
-                    input(member, 'email', 'Vorname'),
+                    input(member, 'birthday', 'Geburtstag*', '[0-9]{4}-[0-9]{2}-[0-9]{2}'),
                     checkbox(member, 'email_allowed', 'Möchte Emails'),
-                    input(member, 'email', 'Vorname'),
+                    input(member, 'email', 'Email'),
                     input(member, 'phone_p', 'Telefon (P)'),
                     input(member, 'phone_w', 'Telefon (G)'),
                     input(member, 'mobile', 'Mobiltelefon'),
-                    input(member, 'address', 'Strasse'),
-                    input(member, 'address_no', 'Hausnummer'),
-                    input(member, 'postcode', 'PLZ'),
-                    input(member, 'city', 'Wohnort'),
+                    input(member, 'address', 'Strasse*'),
+                    input(member, 'address_no', 'Hausnummer*'),
+                    input(member, 'postcode', 'PLZ*'),
+                    input(member, 'city', 'Wohnort*'),
                     m('.row.form-group', [
                         m('label.col-lg-2.col-md-3.col-sm-4.col-form-label', 'Bemerkungen'),
                         m('textarea[name=comment].col-lg-10.col-md-9.col-sm-8.form-control[placeholder="Bemerkungen"]', {

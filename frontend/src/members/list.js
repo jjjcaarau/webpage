@@ -29,6 +29,16 @@ var MembersList = {
         return [
             m('div.col-12', m('form',
                 m('.form-group', [
+                    m('button.btn.btn-success[type=text]', {
+                        onclick: (e) => {
+                            e.preventDefault();
+                            window.location = '/members/view/0'
+                        }
+                    }, [m('i.fas.fa-plus'), ' Neues Mitglied hinzufügen.'])
+                ])
+            )),
+            m('div.col-12', m('form',
+                m('.form-group', [
                     m('input[type=text].form-control[placeholder="Suche nach Vor- oder Nachname"]', {
                         value: vnode.state.q,
                         oninput: function(e) {

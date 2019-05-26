@@ -297,33 +297,35 @@ export const MemberEvents = {
                     ])
                 ])
             ])),
-            m('h5', 'Neues Ereignis eintragen'),
-            m('form.form-inline', [
-                m('select.form-control', {
-                    onchange: e => vnode.state.type = e.target.value,
-                    value: vnode.state.type
-                }, event_types.map(event_type => m('option', { value: event_type }, eventTypeString(event_type)))),
-                ' : ',
-                (() => {
-                    switch(vnode.state.type) {
-                        case 'Trainer': return m(TrainerEventAdd, { transmitter: vnode.state.transmitter, member, type: 'Trainer' })
-                        case 'CoTrainer': return m(TrainerEventAdd, { transmitter: vnode.state.transmitter, member, type: 'CoTrainer' })
-                        case 'Board': return m(BoardEventAdd, { transmitter: vnode.state.transmitter, member })
-                        case 'Honorary': return m(HonoraryEventAdd, { transmitter: vnode.state.transmitter, member })
-                        case 'Kyu': return m(KyuEventAdd, { transmitter: vnode.state.transmitter, member })
-                    }
-                })(),
-                m('button.form-control.btn-success', {
-                    onclick: (e) => {
-                        vnode.state.error = ''
-                        e.preventDefault()
-                        vnode.state.transmitter.add()
-                        .then(() => location.reload())
-                        .catch(() => vnode.state.error = 'Fehler beim Hinzufügen.')
-                    }
-                }, 'Hinzufügen')
-            ]),
-            m('span.text-danger', vnode.state.error)
+            member.id != 0 ? [
+                m('h5', 'Neues Ereignis eintragen'),
+                m('form.form-inline', [
+                    m('select.form-control', {
+                        onchange: e => vnode.state.type = e.target.value,
+                        value: vnode.state.type
+                    }, event_types.map(event_type => m('option', { value: event_type }, eventTypeString(event_type)))),
+                    ' : ',
+                    (() => {
+                        switch(vnode.state.type) {
+                            case 'Trainer': return m(TrainerEventAdd, { transmitter: vnode.state.transmitter, member, type: 'Trainer' })
+                            case 'CoTrainer': return m(TrainerEventAdd, { transmitter: vnode.state.transmitter, member, type: 'CoTrainer' })
+                            case 'Board': return m(BoardEventAdd, { transmitter: vnode.state.transmitter, member })
+                            case 'Honorary': return m(HonoraryEventAdd, { transmitter: vnode.state.transmitter, member })
+                            case 'Kyu': return m(KyuEventAdd, { transmitter: vnode.state.transmitter, member })
+                        }
+                    })(),
+                    m('button.form-control.btn-success', {
+                        onclick: (e) => {
+                            vnode.state.error = ''
+                            e.preventDefault()
+                            vnode.state.transmitter.add()
+                            .then(() => location.reload())
+                            .catch(() => vnode.state.error = 'Fehler beim Hinzufügen.')
+                        }
+                    }, 'Hinzufügen')
+                ]),
+                m('span.text-danger', vnode.state.error)
+            ] : ''
         ]
     }
 }

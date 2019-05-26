@@ -26,7 +26,6 @@ export const Family = {
     },
     view: vnode => {
         let family = vnode.state.family;
-        let member = vnode.state.member;
 
         return m('.row', m('.col', [
             m('h3', 'Familie'),
@@ -57,7 +56,7 @@ export const Family = {
                                         family_id: undefined,
                                     },
                                 })
-                                .then(() => location.reload())
+                                .then(() => vnode.attrs.reloader())
                                 .catch(() => vnode.state.loading = false)
                             }
                         }, m('i.fas.fa-unlink'))),
@@ -66,7 +65,7 @@ export const Family = {
             ])
             : 'Keine bekannten Familienmitglieder',
 
-            m(AddMember, { member: vnode.state.member, family, members: vnode.state.members }),
+            m(AddMember, { member: vnode.state.member, family, members: vnode.state.members, reloader: vnode.attrs.reloader }),
         ]))
     }
 }

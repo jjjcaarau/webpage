@@ -9,33 +9,39 @@ import { Badges } from '/badges'
 
 export const MemberView = {
     oninit: function(vnode) {
-        vnode.state.member = {};
+        vnode.state.member = { id: 0, sex: 'F', member_type: 'Active', email_allowed: false, needs_mark_jujitsu: false, needs_mark_judo: false };
         vnode.state.events = [];
         vnode.state.family = [];
         let params = window.location.href.split('/');
         let param = params[params.length - 1];
-        vnode.state.id = param;
+        vnode.state.id = parseInt(param);
 
-        m.request({
-            method: 'GET',
-            url: "/members/view_json/" + vnode.state.id,
-        })
-        .then(function(result) {
-            vnode.state.member = result.member[0];
-            vnode.state.events = result.member[1];
-            vnode.state.family = result.member[2];
-        })
+        vnode.state.reloader = () => {
+            if(vnode.state.id != 0) {
+                m.request({
+                    method: 'GET',
+                    url: "/members/view_json/" + vnode.state.id,
+                })
+                .then(function(result) {
+                    vnode.state.member = result.member[0];
+                    vnode.state.events = result.member[1];
+                    vnode.state.family = result.member[2];
+                })
+            }
+        }
+        vnode.state.reloader()
     },
     view: function(vnode) {
         let member = vnode.state.member;
         let events = vnode.state.events;
         let family = vnode.state.family;
+        let reloader = vnode.state.reloader;
         return [
             m('a[href=/members/list]', '< Zurück zur Liste'),
-            m(MemberDetail, { member }),
-            m(Badges, { events, member }),
-            m(Family, { member, family }),
-            m(MemberEvents, { events, member }),
+            m(MemberDetail, { member, reloader }),
+            m(Badges, { events, member, reloader }),
+            m(Family, { family, member, reloader }),
+            m(MemberEvents, { events, member, reloader }),
         ]
     }
 }

@@ -80,19 +80,19 @@ pub fn get(connection: &SqliteConnection, id: i32) -> Result<(Member, Vec<Event>
 }
 
 /// Creates a new member in the DB.
-pub fn create(connection: &SqliteConnection, new_member: NewMember) {
+pub fn create(connection: &SqliteConnection, new_member: &NewMember) -> Result<Member, diesel::result::Error> {
     diesel::insert_into(members::table)
-        .values(&new_member)
+        .values(new_member)
         .execute(connection)
         .expect("Error saving new member.");
+    members::table.order(members::columns::id.desc()).first(connection)
 }
 
 /// Updates a member model in the DB.
-pub fn update(connection: &SqliteConnection, member: Member) {
-    diesel::update(&member)
-        .set(&member)
-        .execute(connection)
-        .expect("Error updating member.");
+pub fn update(connection: &SqliteConnection, member: &Member) -> Result<(), diesel::result::Error>{
+    diesel::update(member)
+        .set(member)
+        .execute(connection).map(|_| ())
 }
 
 /// Updates the `family_id` of the Member with the given `member_id` to the given `family_id` in the DB.
