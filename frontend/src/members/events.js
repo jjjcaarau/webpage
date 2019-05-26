@@ -1,6 +1,8 @@
 import m from 'mithril'
+import { getToday } from './helpers';
 
-function event_string(event) {
+/// Returns a proper description string for a given event.
+const eventString = event => {
     switch(event.event_type) {
         case 'Trainer': {
             switch(event.class) {
@@ -48,7 +50,8 @@ function event_string(event) {
     }
 }
 
-function event_type_string(event) {
+/// Returns the event name string for a given event type.
+const eventTypeString = event => {
     switch(event) {
         case 'Trainer': return 'Trainer'
         case 'CoTrainer': return 'Co-Trainer'
@@ -58,7 +61,8 @@ function event_type_string(event) {
     }
 }
 
-let event_types = [
+/// All possible event types.
+const event_types = [
     'Trainer',
     'CoTrainer',
     'Board',
@@ -66,17 +70,7 @@ let event_types = [
     'Kyu',
 ]
 
-function get_today() {
-    var today = new Date()
-    var dd = String(today.getDate()).padStart(2, '0')
-    var mm = String(today.getMonth() + 1).padStart(2, '0')
-    var yyyy = today.getFullYear()
-
-    today = yyyy + '-' + mm + '-' + dd
-    return today
-}
-
-var TrainerEventAdd = {
+const TrainerEventAdd = {
     oninit: function(vnode) {
         vnode.attrs.transmitter.add = () => {
             m.request({
@@ -88,7 +82,7 @@ var TrainerEventAdd = {
                     class: vnode.state.class,
                     division: vnode.state.division,
                     comment: vnode.state.comment,
-                    date: get_today(),
+                    date: getToday(),
                 }
             })
         }
@@ -110,6 +104,7 @@ var TrainerEventAdd = {
                 m('option[value=Promotion]', 'Beförderung'),
                 m('option[value=Demotion]', 'Rücktritt'),
             ]),
+            ' zum Trainer ',
             m('select.form-control', {
                 onchange: e => vnode.state.division = e.target.value,
                 value: vnode.state.division,
@@ -125,7 +120,7 @@ var TrainerEventAdd = {
     }
 }
 
-var BoardEventAdd = {
+const BoardEventAdd = {
     oninit: function(vnode) {
         vnode.attrs.transmitter.add = () => {
             m.request({
@@ -137,10 +132,11 @@ var BoardEventAdd = {
                     class: vnode.state.class,
                     division: 'Club',
                     comment: vnode.state.comment,
-                    date: get_today(),
+                    date: vnode.state.date,
                 }
             })
         }
+        vnode.state.date = getToday()
         vnode.state.class = 'Promotion'
         vnode.state.comment = ''
         vnode.state.member = vnode.attrs.member;
@@ -157,15 +153,21 @@ var BoardEventAdd = {
                 m('option[value=Promotion]', 'Wahl'),
                 m('option[value=Demotion]', 'Rücktritt'),
             ]),
-            m('input.form-control[type=text][placeholder=Kommentar]', {
+            ' als ',
+            m('input.form-control[type=text][placeholder=Funktion]', {
                 onchange: e => vnode.state.comment = e.target.value,
                 value: vnode.state.comment,
+            }),
+            ' am ',
+            m('input.form-control[type=text][placeholder=Datum(YYYY-MM-DD)][pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"].', {
+                onchange: e => vnode.state.date = e.target.value,
+                value: vnode.state.date,
             }),
         ]
     }
 }
 
-var HonoraryEventAdd = {
+const HonoraryEventAdd = {
     oninit: function(vnode) {
         vnode.attrs.transmitter.add = () => {
             m.request({
@@ -177,7 +179,7 @@ var HonoraryEventAdd = {
                     class: 'Promotion',
                     division: 'Club',
                     comment: vnode.state.comment,
-                    date: get_today(),
+                    date: getToday(),
                 }
             })
         }
@@ -197,7 +199,7 @@ var HonoraryEventAdd = {
     }
 }
 
-var KyuEventAdd = {
+const KyuEventAdd = {
     oninit: function(vnode) {
         vnode.attrs.transmitter.add = () => {
             m.request({
@@ -212,7 +214,7 @@ var KyuEventAdd = {
                 }
             })
         }
-        vnode.state.date = get_today()
+        vnode.state.date = getToday()
         vnode.state.division = 'Jujitsu'
         vnode.state.grade = 'Kyu5'
         vnode.state.member = vnode.attrs.member;
@@ -222,13 +224,7 @@ var KyuEventAdd = {
     },
     view: function(vnode) {
         return [
-            m('select.form-control', {
-                onchange: e => vnode.state.division = e.target.value,
-                value: vnode.state.division,
-            }, [
-                m('option[value=Jujitsu]', 'Ju Jitsu'),
-                m('option[value=Judo]', 'Judo'),
-            ]),
+            ' zum ',
             m('select.form-control', {
                 onchange: e => vnode.state.grade = e.target.value,
                 value: vnode.state.grade,
@@ -249,6 +245,15 @@ var KyuEventAdd = {
                 m('option[value=Dan9]', '9. Dan'),
                 m('option[value=Dan10]', '10. Dan'),
             ]),
+            ' im ',
+            m('select.form-control', {
+                onchange: e => vnode.state.division = e.target.value,
+                value: vnode.state.division,
+            }, [
+                m('option[value=Jujitsu]', 'Ju Jitsu'),
+                m('option[value=Judo]', 'Judo'),
+            ]),
+            ' am ',
             m('input.form-control[type=text][placeholder=Datum(YYYY-MM-DD)][pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"].', {
                 onchange: e => vnode.state.date = e.target.value,
                 value: vnode.state.date,
@@ -287,7 +292,7 @@ export const MemberEvents = {
                                 m('tr', {
                                     class: event.class == 'Promotion' ? 'bg-success' : 'bg-danger'
                                 }, [
-                                    m('td', event_string(event)),
+                                    m('td', eventString(event)),
                                     m('td', event.date),
                                     m('td', event.comment),
                                 ]),
@@ -296,11 +301,13 @@ export const MemberEvents = {
                     ])
                 ])
             ])),
+            m('h5', 'Neues Ereignis eintragen'),
             m('form.form-inline', [
                 m('select.form-control', {
                     onchange: e => vnode.state.type = e.target.value,
                     value: vnode.state.type
-                }, event_types.map(event_type => m('option', { value: event_type }, event_type_string(event_type)))),
+                }, event_types.map(event_type => m('option', { value: event_type }, eventTypeString(event_type)))),
+                ' : ',
                 (() => {
                     switch(vnode.state.type) {
                         case 'Trainer': return m(TrainerEventAdd, { transmitter: vnode.state.transmitter, member, type: 'Trainer' })

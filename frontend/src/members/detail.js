@@ -34,10 +34,11 @@ const updateMember = vnode => {
         url: '/members/update_json',
         data: vnode.state.member,
     })
-    .then(function(result) {
+    .then(_ => {
         vnode.state.working = false
+        location.reload()
     })
-    .catch((e) => {
+    .catch(_ => {
         vnode.state.error = 'Ein Fehler beim Speichern ist aufgetreten.'
         vnode.state.working = false
     })
@@ -66,12 +67,10 @@ export const MemberDetail = {
     },
     view: function(vnode) {
         let member = vnode.state.member;
-        let events = vnode.state.events;
-        let family = vnode.state.family;
         return [
             m('.row', m('.col', [
                 m('h3', 'Info'),
-                m('form#update-member', [
+                m('form', [
                     input(member, 'first_name', 'Vorname'),
                     input(member, 'middle_name', 'Zweitname(n)'),
                     input(member, 'last_name', 'Nachname(n)'),
@@ -114,6 +113,7 @@ export const MemberDetail = {
                         }, [
                             m('option[value=Active]', 'Aktiv'),
                             m('option[value=Passive]', 'Passiv'),
+                            m('option[value=Parent]', 'Vormund'),
                             m('option[value=Honorary]', 'Ehrenmitglied'),
                             m('option[value=Student]', 'Student'),
                             m('option[value=Kid]', 'Kind'),

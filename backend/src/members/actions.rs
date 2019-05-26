@@ -77,31 +77,28 @@ pub fn get(
 }
 
 pub fn create(connection: &SqliteConnection, new_member: NewMember) {
-    let _ = diesel::insert_into(members::table)
+    diesel::insert_into(members::table)
         .values(&new_member)
         .execute(connection)
         .expect("Error saving new member.");
 }
 
+/// Updates a member model in the DB.
 pub fn update(connection: &SqliteConnection, member: Member) {
-    let _ = diesel::update(&member)
+    diesel::update(&member)
         .set(&member)
         .execute(connection)
         .expect("Error updating member.");
 }
 
+/// Updates the `family_id` of the Member with the given `member_id` to the given `family_id` in the DB.
 pub fn update_family(connection: &SqliteConnection, member_id: i32, family_id: Option<i32>) -> Result<(), Error> {
-    let mut member = members::table
+    println!("{:?} -> {:?}", member_id, family_id);
+    let result = diesel::update(members::table)
         .filter(members::columns::id.eq(member_id))
-        .load::<Member>(connection)?;
-    if member.len() == 1 {
-        let mut member = member.remove(0);
-        println!("{} -> {:?}", member.id, family_id);
-        member.family_id = family_id;
-        diesel::update(&member)
-            .set(&member)
-            .execute(connection)
-            .expect("Error updating member.");
+        .set(members::columns::family_id.eq(family_id))
+        .execute(connection);
+    if let Ok(num_rows) = result {
         Ok(())
     } else {
         Err(Error::NotFound)

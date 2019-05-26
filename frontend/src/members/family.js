@@ -1,10 +1,16 @@
 import m from 'mithril'
-import { Search } from './add_member'
+import { AddMember } from './add_member'
+import { isPrincipal } from './helpers'
 
+/// A component to display the entire family of a member.
+///
+/// Attrs: { member: Member, family: [Member] }
 export const Family = {
-    oninit: function(vnode) {
+    oninit: vnode => {
         vnode.state.member = vnode.attrs.member;
         vnode.state.family = vnode.attrs.family;
+
+        // Needed so the onclick event on the 'Unlink' button does not also trigger a forward to the unlinked member page.
         vnode.state.loading = false;
 
         vnode.state.members = []
@@ -12,15 +18,13 @@ export const Family = {
             method: 'GET',
             url: "/members/list_json",
         })
-        .then(function(result) {
-            vnode.state.members = result
-        })
+        .then(result => vnode.state.members = result)
     },
-    onbeforeupdate: function(vnode) {
+    onbeforeupdate: vnode => {
         vnode.state.member = vnode.attrs.member;
         vnode.state.family = vnode.attrs.family;
     },
-    view: function(vnode) {
+    view: vnode => {
         let family = vnode.state.family;
         let member = vnode.state.member;
 
@@ -29,10 +33,9 @@ export const Family = {
             family && family.length > 0
                 ? m('table.table.table-hover.col-12', [
                 m('thead', m('tr', [
-                    m('th', 'First Name'),
-                    m('th', 'Last Name'),
+                    m('th', 'Vorname'),
+                    m('th', 'Nachname'),
                     m('th', 'Email'),
-                    member.id == member.family_id ? m('th', '') : '',
                 ])),
                 m('tbody', family.map(function(f) {
                     return m('tr.family-row', {
@@ -40,13 +43,12 @@ export const Family = {
                             if(!vnode.state.loading) { window.location = '/members/view/' + f.id }
                         }
                     }, [
-                        m('td', f.id == f.family_id ? m('span.badge.badge-warning', f.first_name) : f.first_name),
+                        m('td', isPrincipal(f) ? m('span.badge.badge-warning', f.first_name) : f.first_name),
                         m('td', f.last_name),
                         m('td', f.email),
-                        member.id == member.family_id ? m('td', m('button.form-control.btn.btn-danger[type=text]', {
+                        m('td', m('button.btn.btn-danger[type=text]', {
                             onclick: () => {
                                 vnode.state.loading = true
-                                console.log(f.id)
                                 m.request({
                                     method: 'POST',
                                     url: '/members/update_family_json',
@@ -55,15 +57,16 @@ export const Family = {
                                         family_id: undefined,
                                     },
                                 })
-                                //.then(() => location.reload())
+                                .then(() => location.reload())
                                 .catch(() => vnode.state.loading = false)
                             }
-                        }, 'Unlink')) : '',
+                        }, m('i.fas.fa-unlink'))),
                     ])
                 }))
             ])
             : 'Keine bekannten Familienmitglieder',
-            m(Search, { member: vnode.state.member, family, members: vnode.state.members }),
+
+            m(AddMember, { member: vnode.state.member, family, members: vnode.state.members }),
         ]))
     }
 }

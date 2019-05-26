@@ -1376,7 +1376,79 @@ m.vnode = Vnode
 if (typeof module !== "undefined") module["exports"] = m
 else window.m = m
 }());
-},{}],"detail.js":[function(require,module,exports) {
+},{}],"../../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+var bundleURL = null;
+
+function getBundleURLCached() {
+  if (!bundleURL) {
+    bundleURL = getBundleURL();
+  }
+
+  return bundleURL;
+}
+
+function getBundleURL() {
+  // Attempt to find the URL of the current script and use that as the base URL
+  try {
+    throw new Error();
+  } catch (err) {
+    var matches = ('' + err.stack).match(/(https?|file|ftp|chrome-extension|moz-extension):\/\/[^)\n]+/g);
+
+    if (matches) {
+      return getBaseURL(matches[0]);
+    }
+  }
+
+  return '/';
+}
+
+function getBaseURL(url) {
+  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)\/[^/]+$/, '$1') + '/';
+}
+
+exports.getBundleURL = getBundleURLCached;
+exports.getBaseURL = getBaseURL;
+},{}],"../../node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
+var bundle = require('./bundle-url');
+
+function updateLink(link) {
+  var newLink = link.cloneNode();
+
+  newLink.onload = function () {
+    link.remove();
+  };
+
+  newLink.href = link.href.split('?')[0] + '?' + Date.now();
+  link.parentNode.insertBefore(newLink, link.nextSibling);
+}
+
+var cssTimeout = null;
+
+function reloadCSS() {
+  if (cssTimeout) {
+    return;
+  }
+
+  cssTimeout = setTimeout(function () {
+    var links = document.querySelectorAll('link[rel="stylesheet"]');
+
+    for (var i = 0; i < links.length; i++) {
+      if (bundle.getBaseURL(links[i].href) === bundle.getBundleURL()) {
+        updateLink(links[i]);
+      }
+    }
+
+    cssTimeout = null;
+  }, 50);
+}
+
+module.exports = reloadCSS;
+},{"./bundle-url":"../../node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"scss/main.scss":[function(require,module,exports) {
+var reloadCSS = require('_css_loader');
+
+module.hot.dispose(reloadCSS);
+module.hot.accept(reloadCSS);
+},{"_css_loader":"../../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"detail.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1422,9 +1494,10 @@ var updateMember = function updateMember(vnode) {
     method: 'POST',
     url: '/members/update_json',
     data: vnode.state.member
-  }).then(function (result) {
+  }).then(function (_) {
     vnode.state.working = false;
-  }).catch(function (e) {
+    location.reload();
+  }).catch(function (_) {
     vnode.state.error = 'Ein Fehler beim Speichern ist aufgetreten.';
     vnode.state.working = false;
   });
@@ -1452,9 +1525,7 @@ var MemberDetail = {
   },
   view: function view(vnode) {
     var member = vnode.state.member;
-    var events = vnode.state.events;
-    var family = vnode.state.family;
-    return [(0, _mithril.default)('.row', (0, _mithril.default)('.col', [(0, _mithril.default)('h3', 'Info'), (0, _mithril.default)('form#update-member', [input(member, 'first_name', 'Vorname'), input(member, 'middle_name', 'Zweitname(n)'), input(member, 'last_name', 'Nachname(n)'), (0, _mithril.default)('.row.form-group', [(0, _mithril.default)('label.col-lg-2.col-md-3.col-sm-4.col-form-label', 'Geschlecht'), (0, _mithril.default)('select.col-lg-10.col-md-9.col-sm-8.form-control', {
+    return [(0, _mithril.default)('.row', (0, _mithril.default)('.col', [(0, _mithril.default)('h3', 'Info'), (0, _mithril.default)('form', [input(member, 'first_name', 'Vorname'), input(member, 'middle_name', 'Zweitname(n)'), input(member, 'last_name', 'Nachname(n)'), (0, _mithril.default)('.row.form-group', [(0, _mithril.default)('label.col-lg-2.col-md-3.col-sm-4.col-form-label', 'Geschlecht'), (0, _mithril.default)('select.col-lg-10.col-md-9.col-sm-8.form-control', {
       onchange: function onchange(e) {
         return member.sex = e.target.value;
       },
@@ -1469,7 +1540,7 @@ var MemberDetail = {
         return member.member_type = e.target.value;
       },
       value: member.member_type
-    }, [(0, _mithril.default)('option[value=Active]', 'Aktiv'), (0, _mithril.default)('option[value=Passive]', 'Passiv'), (0, _mithril.default)('option[value=Honorary]', 'Ehrenmitglied'), (0, _mithril.default)('option[value=Student]', 'Student'), (0, _mithril.default)('option[value=Kid]', 'Kind')])])]), (0, _mithril.default)('.row', [(0, _mithril.default)('.col-1', [!vnode.state.working ? (0, _mithril.default)('button[type="submit"].btn.btn-primary', {
+    }, [(0, _mithril.default)('option[value=Active]', 'Aktiv'), (0, _mithril.default)('option[value=Passive]', 'Passiv'), (0, _mithril.default)('option[value=Parent]', 'Vormund'), (0, _mithril.default)('option[value=Honorary]', 'Ehrenmitglied'), (0, _mithril.default)('option[value=Student]', 'Student'), (0, _mithril.default)('option[value=Kid]', 'Kind')])])]), (0, _mithril.default)('.row', [(0, _mithril.default)('.col-1', [!vnode.state.working ? (0, _mithril.default)('button[type="submit"].btn.btn-primary', {
       onclick: function onclick(e) {
         e.preventDefault();
         updateMember(vnode);
@@ -1484,7 +1555,7 @@ exports.MemberDetail = MemberDetail;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Search = void 0;
+exports.AddMember = void 0;
 
 var _mithril = _interopRequireDefault(require("mithril"));
 
@@ -1499,7 +1570,7 @@ var filterMembers = function filterMembers(vnode, input) {
     };
     var fuse = new Fuse(vnode.state.members, options);
     vnode.state.filteredMembers = fuse.search(input).filter(function (m) {
-      return vnode.attrs.member.id != m[0].id && !vnode.attrs.family.some(function (m2) {
+      return vnode.attrs.member.id != m[0].id && !m[0].family_id && !vnode.attrs.family.some(function (m2) {
         return m2.id == m[0].id;
       });
     }).slice(0, 10);
@@ -1508,7 +1579,7 @@ var filterMembers = function filterMembers(vnode, input) {
   }
 };
 
-var Search = {
+var AddMember = {
   oninit: function oninit(vnode) {
     vnode.state.error = '';
     vnode.state.members = vnode.attrs.members;
@@ -1520,7 +1591,7 @@ var Search = {
     filterMembers(vnode, vnode.state.q);
   },
   view: function view(vnode) {
-    return vnode.attrs.member.member_type == 'Active' ? [(0, _mithril.default)('.row.form-group', [(0, _mithril.default)('input[type=text].form-control.col-12[placeholder=Name]', {
+    return [['Active', 'Parent', 'Passiv', 'Honorary'].includes(vnode.attrs.member.member_type) ? [(0, _mithril.default)('h5', 'Neues Familienmitglied zur Familie hinzufügen'), (0, _mithril.default)('.form-group', [(0, _mithril.default)('input[type=text].form-control.col-12[placeholder=Name]', {
       value: vnode.state.q,
       oninput: function oninput(e) {
         vnode.state.q = e.target.value;
@@ -1529,6 +1600,7 @@ var Search = {
     }), (0, _mithril.default)('ul.list-group.col-12', vnode.state.filteredMembers ? vnode.state.filteredMembers.map(function (member) {
       return (0, _mithril.default)('li.list-group-item.member-search-item', {
         onclick: function onclick(e) {
+          vnode.state.error = '';
           var pmatriarch = vnode.attrs.family.filter(function (m) {
             return m.id == m.family_id;
           })[0];
@@ -1554,7 +1626,7 @@ var Search = {
                   family_id: vnode.attrs.member.id
                 }
               }).then(function () {
-                return document.reload();
+                return location.reload();
               }).catch(function (e) {
                 vnode.state.error = 'Ein Fehler beim Hinzufügen ist aufgetreten.';
               });
@@ -1564,11 +1636,36 @@ var Search = {
           }
         }
       }, member[0].first_name + ' ' + member[0].last_name);
-    }) : []), (0, _mithril.default)('.col-12', (0, _mithril.default)('span.text-danger', vnode.state.error))])] : '';
+    }) : []), (0, _mithril.default)('.col-12', (0, _mithril.default)('span.text-danger', vnode.state.error))])] : ''];
   }
 };
-exports.Search = Search;
-},{"mithril":"../../node_modules/mithril/mithril.js"}],"family.js":[function(require,module,exports) {
+exports.AddMember = AddMember;
+},{"mithril":"../../node_modules/mithril/mithril.js"}],"helpers.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getToday = exports.isPrincipal = void 0;
+
+var isPrincipal = function isPrincipal(member) {
+  return member.id == member.family_id;
+}; /// Returns todays date.
+
+
+exports.isPrincipal = isPrincipal;
+
+var getToday = function getToday() {
+  var today = new Date();
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0');
+  var yyyy = today.getFullYear();
+  today = yyyy + '-' + mm + '-' + dd;
+  return today;
+};
+
+exports.getToday = getToday;
+},{}],"family.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1580,12 +1677,18 @@ var _mithril = _interopRequireDefault(require("mithril"));
 
 var _add_member = require("./add_member");
 
+var _helpers = require("./helpers");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/// A component to display the entire family of a member.
+///
+/// Attrs: { member: Member, family: [Member] }
 var Family = {
   oninit: function oninit(vnode) {
     vnode.state.member = vnode.attrs.member;
-    vnode.state.family = vnode.attrs.family;
+    vnode.state.family = vnode.attrs.family; // Needed so the onclick event on the 'Unlink' button does not also trigger a forward to the unlinked member page.
+
     vnode.state.loading = false;
     vnode.state.members = [];
 
@@ -1593,7 +1696,7 @@ var Family = {
       method: 'GET',
       url: "/members/list_json"
     }).then(function (result) {
-      vnode.state.members = result;
+      return vnode.state.members = result;
     });
   },
   onbeforeupdate: function onbeforeupdate(vnode) {
@@ -1603,17 +1706,16 @@ var Family = {
   view: function view(vnode) {
     var family = vnode.state.family;
     var member = vnode.state.member;
-    return (0, _mithril.default)('.row', (0, _mithril.default)('.col', [(0, _mithril.default)('h3', 'Familie'), family && family.length > 0 ? (0, _mithril.default)('table.table.table-hover.col-12', [(0, _mithril.default)('thead', (0, _mithril.default)('tr', [(0, _mithril.default)('th', 'First Name'), (0, _mithril.default)('th', 'Last Name'), (0, _mithril.default)('th', 'Email'), member.id == member.family_id ? (0, _mithril.default)('th', '') : ''])), (0, _mithril.default)('tbody', family.map(function (f) {
+    return (0, _mithril.default)('.row', (0, _mithril.default)('.col', [(0, _mithril.default)('h3', 'Familie'), family && family.length > 0 ? (0, _mithril.default)('table.table.table-hover.col-12', [(0, _mithril.default)('thead', (0, _mithril.default)('tr', [(0, _mithril.default)('th', 'Vorname'), (0, _mithril.default)('th', 'Nachname'), (0, _mithril.default)('th', 'Email')])), (0, _mithril.default)('tbody', family.map(function (f) {
       return (0, _mithril.default)('tr.family-row', {
         onclick: function onclick() {
           if (!vnode.state.loading) {
             window.location = '/members/view/' + f.id;
           }
         }
-      }, [(0, _mithril.default)('td', f.id == f.family_id ? (0, _mithril.default)('span.badge.badge-warning', f.first_name) : f.first_name), (0, _mithril.default)('td', f.last_name), (0, _mithril.default)('td', f.email), member.id == member.family_id ? (0, _mithril.default)('td', (0, _mithril.default)('button.form-control.btn.btn-danger[type=text]', {
+      }, [(0, _mithril.default)('td', (0, _helpers.isPrincipal)(f) ? (0, _mithril.default)('span.badge.badge-warning', f.first_name) : f.first_name), (0, _mithril.default)('td', f.last_name), (0, _mithril.default)('td', f.email), (0, _mithril.default)('td', (0, _mithril.default)('button.btn.btn-danger[type=text]', {
         onclick: function onclick() {
           vnode.state.loading = true;
-          console.log(f.id);
 
           _mithril.default.request({
             method: 'POST',
@@ -1622,13 +1724,14 @@ var Family = {
               member_id: f.id,
               family_id: undefined
             }
-          }) //.then(() => location.reload())
-          .catch(function () {
+          }).then(function () {
+            return location.reload();
+          }).catch(function () {
             return vnode.state.loading = false;
           });
         }
-      }, 'Unlink')) : '']);
-    }))]) : 'Keine bekannten Familienmitglieder', (0, _mithril.default)(_add_member.Search, {
+      }, (0, _mithril.default)('i.fas.fa-unlink')))]);
+    }))]) : 'Keine bekannten Familienmitglieder', (0, _mithril.default)(_add_member.AddMember, {
       member: vnode.state.member,
       family: family,
       members: vnode.state.members
@@ -1636,7 +1739,7 @@ var Family = {
   }
 };
 exports.Family = Family;
-},{"mithril":"../../node_modules/mithril/mithril.js","./add_member":"add_member.js"}],"events.js":[function(require,module,exports) {
+},{"mithril":"../../node_modules/mithril/mithril.js","./add_member":"add_member.js","./helpers":"helpers.js"}],"events.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1646,9 +1749,12 @@ exports.MemberEvents = void 0;
 
 var _mithril = _interopRequireDefault(require("mithril"));
 
+var _helpers = require("./helpers");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function event_string(event) {
+/// Returns a proper description string for a given event.
+var eventString = function eventString(event) {
   switch (event.event_type) {
     case 'Trainer':
       {
@@ -1745,9 +1851,10 @@ function event_string(event) {
     default:
       return 'Unbekanntes Ereignis';
   }
-}
+}; /// Returns the event name string for a given event type.
 
-function event_type_string(event) {
+
+var eventTypeString = function eventTypeString(event) {
   switch (event) {
     case 'Trainer':
       return 'Trainer';
@@ -1764,19 +1871,10 @@ function event_type_string(event) {
     case 'Kyu':
       return 'Gurtprüfung';
   }
-}
+}; /// All possible event types.
+
 
 var event_types = ['Trainer', 'CoTrainer', 'Board', 'Honorary', 'Kyu'];
-
-function get_today() {
-  var today = new Date();
-  var dd = String(today.getDate()).padStart(2, '0');
-  var mm = String(today.getMonth() + 1).padStart(2, '0');
-  var yyyy = today.getFullYear();
-  today = yyyy + '-' + mm + '-' + dd;
-  return today;
-}
-
 var TrainerEventAdd = {
   oninit: function oninit(vnode) {
     vnode.attrs.transmitter.add = function () {
@@ -1789,7 +1887,7 @@ var TrainerEventAdd = {
           class: vnode.state.class,
           division: vnode.state.division,
           comment: vnode.state.comment,
-          date: get_today()
+          date: (0, _helpers.getToday)()
         }
       });
     };
@@ -1809,7 +1907,7 @@ var TrainerEventAdd = {
         return vnode.state.class = e.target.value;
       },
       value: vnode.state.class
-    }, [(0, _mithril.default)('option[value=Promotion]', 'Beförderung'), (0, _mithril.default)('option[value=Demotion]', 'Rücktritt')]), (0, _mithril.default)('select.form-control', {
+    }, [(0, _mithril.default)('option[value=Promotion]', 'Beförderung'), (0, _mithril.default)('option[value=Demotion]', 'Rücktritt')]), ' zum Trainer ', (0, _mithril.default)('select.form-control', {
       onchange: function onchange(e) {
         return vnode.state.division = e.target.value;
       },
@@ -1834,11 +1932,12 @@ var BoardEventAdd = {
           class: vnode.state.class,
           division: 'Club',
           comment: vnode.state.comment,
-          date: get_today()
+          date: vnode.state.date
         }
       });
     };
 
+    vnode.state.date = (0, _helpers.getToday)();
     vnode.state.class = 'Promotion';
     vnode.state.comment = '';
     vnode.state.member = vnode.attrs.member;
@@ -1852,11 +1951,16 @@ var BoardEventAdd = {
         return vnode.state.class = e.target.value;
       },
       value: vnode.state.class
-    }, [(0, _mithril.default)('option[value=Promotion]', 'Wahl'), (0, _mithril.default)('option[value=Demotion]', 'Rücktritt')]), (0, _mithril.default)('input.form-control[type=text][placeholder=Kommentar]', {
+    }, [(0, _mithril.default)('option[value=Promotion]', 'Wahl'), (0, _mithril.default)('option[value=Demotion]', 'Rücktritt')]), ' als ', (0, _mithril.default)('input.form-control[type=text][placeholder=Funktion]', {
       onchange: function onchange(e) {
         return vnode.state.comment = e.target.value;
       },
       value: vnode.state.comment
+    }), ' am ', (0, _mithril.default)('input.form-control[type=text][placeholder=Datum(YYYY-MM-DD)][pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"].', {
+      onchange: function onchange(e) {
+        return vnode.state.date = e.target.value;
+      },
+      value: vnode.state.date
     })];
   }
 };
@@ -1872,7 +1976,7 @@ var HonoraryEventAdd = {
           class: 'Promotion',
           division: 'Club',
           comment: vnode.state.comment,
-          date: get_today()
+          date: (0, _helpers.getToday)()
         }
       });
     };
@@ -1908,7 +2012,7 @@ var KyuEventAdd = {
       });
     };
 
-    vnode.state.date = get_today();
+    vnode.state.date = (0, _helpers.getToday)();
     vnode.state.division = 'Jujitsu';
     vnode.state.grade = 'Kyu5';
     vnode.state.member = vnode.attrs.member;
@@ -1917,17 +2021,17 @@ var KyuEventAdd = {
     vnode.state.member = vnode.attrs.member;
   },
   view: function view(vnode) {
-    return [(0, _mithril.default)('select.form-control', {
-      onchange: function onchange(e) {
-        return vnode.state.division = e.target.value;
-      },
-      value: vnode.state.division
-    }, [(0, _mithril.default)('option[value=Jujitsu]', 'Ju Jitsu'), (0, _mithril.default)('option[value=Judo]', 'Judo')]), (0, _mithril.default)('select.form-control', {
+    return [' zum ', (0, _mithril.default)('select.form-control', {
       onchange: function onchange(e) {
         return vnode.state.grade = e.target.value;
       },
       value: vnode.state.grade
-    }, [(0, _mithril.default)('option[value=Kyu1]', '1. Kyu'), (0, _mithril.default)('option[value=Kyu2]', '2. Kyu'), (0, _mithril.default)('option[value=Kyu3]', '3. Kyu'), (0, _mithril.default)('option[value=Kyu4]', '4. Kyu'), (0, _mithril.default)('option[value=Kyu5]', '5. Kyu'), (0, _mithril.default)('option[value=Dan1]', '1. Dan'), (0, _mithril.default)('option[value=Dan2]', '2. Dan'), (0, _mithril.default)('option[value=Dan3]', '3. Dan'), (0, _mithril.default)('option[value=Dan4]', '4. Dan'), (0, _mithril.default)('option[value=Dan5]', '5. Dan'), (0, _mithril.default)('option[value=Dan6]', '6. Dan'), (0, _mithril.default)('option[value=Dan7]', '7. Dan'), (0, _mithril.default)('option[value=Dan8]', '8. Dan'), (0, _mithril.default)('option[value=Dan9]', '9. Dan'), (0, _mithril.default)('option[value=Dan10]', '10. Dan')]), (0, _mithril.default)('input.form-control[type=text][placeholder=Datum(YYYY-MM-DD)][pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"].', {
+    }, [(0, _mithril.default)('option[value=Kyu1]', '1. Kyu'), (0, _mithril.default)('option[value=Kyu2]', '2. Kyu'), (0, _mithril.default)('option[value=Kyu3]', '3. Kyu'), (0, _mithril.default)('option[value=Kyu4]', '4. Kyu'), (0, _mithril.default)('option[value=Kyu5]', '5. Kyu'), (0, _mithril.default)('option[value=Dan1]', '1. Dan'), (0, _mithril.default)('option[value=Dan2]', '2. Dan'), (0, _mithril.default)('option[value=Dan3]', '3. Dan'), (0, _mithril.default)('option[value=Dan4]', '4. Dan'), (0, _mithril.default)('option[value=Dan5]', '5. Dan'), (0, _mithril.default)('option[value=Dan6]', '6. Dan'), (0, _mithril.default)('option[value=Dan7]', '7. Dan'), (0, _mithril.default)('option[value=Dan8]', '8. Dan'), (0, _mithril.default)('option[value=Dan9]', '9. Dan'), (0, _mithril.default)('option[value=Dan10]', '10. Dan')]), ' im ', (0, _mithril.default)('select.form-control', {
+      onchange: function onchange(e) {
+        return vnode.state.division = e.target.value;
+      },
+      value: vnode.state.division
+    }, [(0, _mithril.default)('option[value=Jujitsu]', 'Ju Jitsu'), (0, _mithril.default)('option[value=Judo]', 'Judo')]), ' am ', (0, _mithril.default)('input.form-control[type=text][placeholder=Datum(YYYY-MM-DD)][pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"].', {
       onchange: function onchange(e) {
         return vnode.state.date = e.target.value;
       },
@@ -1952,8 +2056,8 @@ var MemberEvents = {
     return [(0, _mithril.default)('.row', (0, _mithril.default)('.col', [(0, _mithril.default)('h3', 'Verlauf'), (0, _mithril.default)('table.table.table-hover', [(0, _mithril.default)('thead', (0, _mithril.default)('tr', [(0, _mithril.default)('th', 'Was'), (0, _mithril.default)('th', 'Datum'), (0, _mithril.default)('th', 'Kommentar')])), (0, _mithril.default)('tbody', [events.slice(0).reverse().map(function (event) {
       return [(0, _mithril.default)('tr', {
         class: event.class == 'Promotion' ? 'bg-success' : 'bg-danger'
-      }, [(0, _mithril.default)('td', event_string(event)), (0, _mithril.default)('td', event.date), (0, _mithril.default)('td', event.comment)])];
-    })])])])), (0, _mithril.default)('form.form-inline', [(0, _mithril.default)('select.form-control', {
+      }, [(0, _mithril.default)('td', eventString(event)), (0, _mithril.default)('td', event.date), (0, _mithril.default)('td', event.comment)])];
+    })])])])), (0, _mithril.default)('h5', 'Neues Ereignis eintragen'), (0, _mithril.default)('form.form-inline', [(0, _mithril.default)('select.form-control', {
       onchange: function onchange(e) {
         return vnode.state.type = e.target.value;
       },
@@ -1961,8 +2065,8 @@ var MemberEvents = {
     }, event_types.map(function (event_type) {
       return (0, _mithril.default)('option', {
         value: event_type
-      }, event_type_string(event_type));
-    })), function () {
+      }, eventTypeString(event_type));
+    })), ' : ', function () {
       switch (vnode.state.type) {
         case 'Trainer':
           return (0, _mithril.default)(TrainerEventAdd, {
@@ -2006,7 +2110,7 @@ var MemberEvents = {
   }
 };
 exports.MemberEvents = MemberEvents;
-},{"mithril":"../../node_modules/mithril/mithril.js"}],"badges.js":[function(require,module,exports) {
+},{"mithril":"../../node_modules/mithril/mithril.js","./helpers":"helpers.js"}],"badges.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2226,6 +2330,8 @@ exports.MemberView = void 0;
 
 var _mithril = _interopRequireDefault(require("mithril"));
 
+require("./scss/main.scss");
+
 var _detail = require("/detail");
 
 var _family = require("/family");
@@ -2277,7 +2383,7 @@ exports.MemberView = MemberView;
 window.onload = function () {
   _mithril.default.mount(document.getElementById('mount'), MemberView);
 };
-},{"mithril":"../../node_modules/mithril/mithril.js","/detail":"detail.js","/family":"family.js","/events":"events.js","/badges":"badges.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"mithril":"../../node_modules/mithril/mithril.js","./scss/main.scss":"scss/main.scss","/detail":"detail.js","/family":"family.js","/events":"events.js","/badges":"badges.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -2305,7 +2411,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "45583" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "37181" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

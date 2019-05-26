@@ -1,5 +1,7 @@
 import m from 'mithril'
 
+import './scss/main.scss'
+
 import { MemberDetail } from '/detail'
 import { Family } from '/family'
 import { MemberEvents } from '/events'
