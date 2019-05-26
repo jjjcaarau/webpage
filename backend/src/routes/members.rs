@@ -11,7 +11,11 @@ use crate::members::model::{
 use crate::events::model::{
     Event,
 };
-use crate::members::actions::Error;
+use crate::members::actions::{
+    Error,
+    Stats,
+    get_stats,
+};
 
 #[derive(Serialize)]
 struct ListResult {
@@ -33,6 +37,12 @@ pub fn list() -> Result<Template, diesel::result::Error> {
 #[get("/view/<id>")]
 pub fn view(id: i32) -> Template {
     Template::render("pages/members/view", std::collections::HashMap::<i32,i32>::new())
+}
+
+#[get("/stats")]
+pub fn stats() -> Template {
+    let connection = crate::db::establish_connection();
+    Template::render("pages/members/stats", get_stats(&connection))
 }
 
 #[get("/list_json")]

@@ -1,12 +1,18 @@
 use super::model::{
     Member,
     NewMember,
+    MemberType,
 };
 use crate::schema::{
     members,
     events,
 };
-use crate::events::model::Event;
+use crate::events::model::{
+    Event,
+    EventClass,
+    EventDivision,
+    EventType,
+};
 use diesel::prelude::*;
 use diesel::SaveChangesDsl;
 
@@ -93,7 +99,6 @@ pub fn update(connection: &SqliteConnection, member: Member) {
 
 /// Updates the `family_id` of the Member with the given `member_id` to the given `family_id` in the DB.
 pub fn update_family(connection: &SqliteConnection, member_id: i32, family_id: Option<i32>) -> Result<(), Error> {
-    println!("{:?} -> {:?}", member_id, family_id);
     let result = diesel::update(members::table)
         .filter(members::columns::id.eq(member_id))
         .set(members::columns::family_id.eq(family_id))
@@ -103,4 +108,93 @@ pub fn update_family(connection: &SqliteConnection, member_id: i32, family_id: O
     } else {
         Err(Error::NotFound)
     }
+}
+
+#[derive(Serialize)]
+pub struct Stats {
+    paying_members: usize,
+    paying_kids: usize,
+    paying_students: usize,
+}
+
+pub fn get_stats(connection: &SqliteConnection) -> Stats {
+    let member_list = members::table
+        .order_by(members::columns::first_name)
+        .load::<Member>(connection).expect("Load of member list failed.");
+    let event_list = Event::belonging_to(&member_list)
+        .order_by(events::columns::date)
+        .load::<Event>(connection).expect("Load of event list failed.")
+        .grouped_by(&member_list);
+
+    let zipped_members = itertools::izip!(member_list.into_iter(), event_list).collect::<Vec<_>>();
+
+    let paying_members = zipped_members.iter().filter(|m| m.0.member_type == MemberType::Active && is_paying(&m.1)).count();
+    let paying_kids = zipped_members.iter().filter(|m| m.0.member_type == MemberType::Kid && is_paying(&m.1)).count();
+    let paying_students = zipped_members.iter().filter(|m| m.0.member_type == MemberType::Student && is_paying(&m.1)).count();
+
+    Stats {
+        paying_members,
+        paying_kids,
+        paying_students,
+    }
+}
+
+fn is_paying(events: &Vec<Event>) -> bool {
+    let mut club_events = Vec::new();
+    let mut board_events = Vec::new();
+    let mut trainer_events = Vec::new();
+    let mut cotrainer_events = Vec::new();
+
+    for event in events {
+        // Find club events.
+        if event.event_type == EventType::Club && event.division == EventDivision::Club {
+            club_events.push(event);
+        }
+
+        // Check if honorary member.
+        if (event.event_type == EventType::Honorary && event.division == EventDivision::Club && event.class == EventClass::Promotion) {
+            return false;
+        }
+
+        // Get board member events.
+        if(event.event_type == EventType::Board) {
+            board_events.push(event)
+        }
+
+        // Get trainer events.
+        if(event.event_type == EventType::Trainer) {
+            trainer_events.push(event)
+        }
+
+        // Get co trainer events.
+        if(event.event_type == EventType::CoTrainer) {
+            cotrainer_events.push(event)
+        }
+    }
+
+    // Check if resigned
+    club_events.sort_by(|a, b| b.date.partial_cmp(&a.date).expect("Buggedi bug bug."));
+    if(club_events.len() > 0) {
+        let last = club_events[0];
+        if last.class == EventClass::Demotion {
+            return false;
+        }
+    }
+
+    board_events.sort_by(|a, b| b.date.partial_cmp(&a.date).expect("Buggedi bug bug."));
+    if board_events.len() > 0 && board_events[0].class == EventClass::Promotion {
+        return false;
+    }
+
+    trainer_events.sort_by(|a, b| b.date.partial_cmp(&a.date).expect("Buggedi bug bug."));
+    if trainer_events.len() > 0 && trainer_events[0].class == EventClass::Promotion {
+        return false;
+    }
+
+    cotrainer_events.sort_by(|a, b| b.date.partial_cmp(&a.date).expect("Buggedi bug bug."));
+    if cotrainer_events.len() > 0 && cotrainer_events[0].class == EventClass::Promotion {
+        return false;
+    }
+
+    return true;
 }

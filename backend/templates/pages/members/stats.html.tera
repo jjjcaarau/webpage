@@ -1,0 +1,22 @@
+{% extends 'layout' %}
+{% block includes %}
+    <script type="text/javascript" src="/static/js/extern/fuse.min.js" defer></script>
+    <script type="text/javascript" src="/static/js/view.js" defer></script>
+    <link rel="stylesheet" href="/static/css/pages/members/view.css">
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <div class="text-center">
+                <h1 class="content-title">Members View</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row align-items-center equal">
+        <h3>Paying members: {{ paying_members }}</h3>
+        <h3>Paying kids: {{ paying_kids }}</h3>
+        <h3>Paying students: {{ paying_students }}</h3>
+    </div>
+</div>
+{% endblock %}

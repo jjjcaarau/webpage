@@ -35,6 +35,7 @@ fn main() {
             crate::routes::members::view,
             crate::routes::members::update_json,
             crate::routes::members::update_family_json,
+            crate::routes::members::stats,
         ])
         .mount("/events", routes![
             crate::routes::events::create_json,
