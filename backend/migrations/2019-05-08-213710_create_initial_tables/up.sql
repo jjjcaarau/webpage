@@ -17,10 +17,8 @@ CREATE TABLE members (
     comment TEXT NOT NULL,
     email_allowed BOOLEAN NOT NULL,
     passport_no TEXT NOT NULL,
-    member_type TEXT CHECK(member_type IN ('active', 'passive', 'parent', 'honorary', 'student', 'kid')) NOT NULL,
-    honorary_member_reason TEXT NOT NULL,
-    needs_mark_jujitsu BOOLEAN NOT NULL,
-    needs_mark_judo BOOLEAN NOT NULL
+    member_type TEXT CHECK(member_type IN ('active', 'passive', 'parent', 'student', 'kid')) NOT NULL,
+    needs_mark BOOLEAN NOT NULL
 );
 
 CREATE TABLE courses (

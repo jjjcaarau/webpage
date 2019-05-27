@@ -16,7 +16,6 @@ function member_type(member) {
         case 'Active': return 'Aktiv'
         case 'Passive': return 'Passiv'
         case 'Parent': return 'Vormund'
-        case 'Honorary': return 'Ehrenmitglied'
         case 'Student': return 'Student'
         case 'Kid': return 'Kind'
     }

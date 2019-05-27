@@ -33,7 +33,7 @@ export const AddMember = {
     },
     view: vnode => {
         return [
-            ['Active', 'Parent', 'Passiv', 'Honorary'].includes(vnode.attrs.member.member_type)
+            ['Active', 'Parent', 'Passiv'].includes(vnode.attrs.member.member_type)
                 ? [
                     m('h5', 'Neues Familienmitglied zur Familie hinzufügen'),
                     m('.form-group', [

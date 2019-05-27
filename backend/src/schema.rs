@@ -39,9 +39,7 @@ table! {
         email_allowed -> Bool,
         passport_no -> Text,
         member_type -> crate::members::model::MemberTypeMapping,
-        honorary_member_reason -> Text,
-        needs_mark_jujitsu -> Bool,
-        needs_mark_judo -> Bool,
+        needs_mark -> Bool,
     }
 }
 

@@ -16,9 +16,7 @@ with open('members.json', 'r') as file:
             passport_no = entry['jujitsu_passport_nr']
         
         member_type = None
-        if entry['honorary_member'] == '1':
-            member_type = 'honorary'
-        elif entry['member_type'] == 'Vollmitglied' or entry['membership'] == '_Aktivmitglieder (Jiu)':
+        if entry['member_type'] == 'Vollmitglied' or entry['membership'] == '_Aktivmitglieder (Jiu)':
             member_type = 'active'
         elif entry['membership'] == '_Passivmitglieder':
             member_type = 'passive'
@@ -53,9 +51,7 @@ with open('members.json', 'r') as file:
                 entry['email_allowed'] == '1',
                 passport_no,
                 member_type,
-                entry['honorary_member_extra'],
-                entry['needs_mark_jujitsu'] == '1',
-                entry['needs_mark_judo'] == '1'
+                entry['needs_mark_jujitsu'] == '1' or entry['needs_mark_judo'] == '1',
             ]
         )
 
@@ -89,6 +85,8 @@ with open('members.json', 'r') as file:
                 None,
             )
         )
+
+        # Add Kyus
         for division in ['judo', 'jujitsu']:
             for kyu in range(1, 6):
                 kyu = str(kyu)
@@ -119,61 +117,116 @@ with open('members.json', 'r') as file:
                         )
                     )
 
-        # Thomas Meister
-        if entry['id'] == '493':
-            transformed_events.append(
-            (
-                entry['id'],
-                'trainer',
-                'promotion',
-                'jujitsu',
-                '2002-01-01',
-                None,
-            )
-        )
-            transformed_events.append(
-            (
-                entry['id'],
-                'board',
-                'promotion',
-                'club',
-                '2004-01-01',
-                'TK Ju Jitsu',
-            )
-        )
+        # Honorary member
+        if entry['honorary_member'] == '1':
+            date = entry['nomination_honorary_member']
+            if date == '0000-00-00' or date == None:
+                date = '1970-01-01'
 
-        # Joëlle Claire Fischer
-        if entry['id'] == '458':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'honorary',
+                    'promotion',
+                    'club',
+                    date,
+                    entry['honorary_member_extra'],
+                )
+            )
+
+        # Trainer Ju Jitsu
+        if 'Ju Jitsu (Trainer)' in entry['trainer_role']:
+            date = entry['nomination_trainer']
+            if date == '0000-00-00' or date == None:
+                date = '1970-01-01'
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'promotion',
+                    'jujitsu',
+                    date,
+                    None
+                )
+            )
+
+        # Co-Trainer Ju Jitsu
+        if 'Ju Jitsu (Co-Trainer)' in entry['trainer_role']:
+            date = entry['nomination_trainer']
+            if date == '0000-00-00' or date == None:
+                date = '1970-01-01'
+
             transformed_events.append(
                 (
                     entry['id'],
                     'co_trainer',
                     'promotion',
                     'jujitsu',
-                    '2016-12-17',
+                    date,
+                    None
+                )
+            )
+
+        # Co-Trainer Judo
+        if 'Judo (Co-Trainer)' in entry['trainer_role']:
+            date = entry['nomination_trainer']
+            if date == '0000-00-00' or date == None:
+                date = '1970-01-01'
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'co_trainer',
+                    'promotion',
+                    'judo',
+                    date,
+                    None
+                )
+            )
+
+        # Trainer Judo
+        if 'Judo (Trainer)' in entry['trainer_role']:
+            date = entry['nomination_trainer']
+            if date == '0000-00-00' or date == None:
+                date = '1970-01-01'
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'promotion',
+                    'judo',
+                    date,
                     None,
                 )
             )
+
+        # Board Member
+        if entry['board_role'] != '':
+            date = entry['nomination_board_role']
+            if date == '0000-00-00' or date == None:
+                date = '1970-01-01'
+
             transformed_events.append(
                 (
                     entry['id'],
                     'board',
                     'promotion',
-                    'club',
-                    '2012-03-30',
-                    'Aktuar',
+                    'judo',
+                    date,
+                    entry['board_role'],
                 )
             )
-            transformed_events.append(
-                (
-                    entry['id'],
-                    'board',
-                    'promotion',
-                    'club',
-                    '2018-03-23',
-                    'Vizepräsidentin',
-                )
-            )
+
+        if entry['comment'] != '':
+            print('Comment ' + entry['first_name'] + ' ' + entry['last_name'] + ': ' + entry['comment'])
+
+        if entry['jugendundsport_courses_judo'] != '':
+            print('J+S Judo ' + entry['first_name'] + ' ' + entry['last_name'] + ': ' + entry['jugendundsport_courses_judo'])
+
+        if entry['jugendundsport_courses_jujitsu'] != '':
+            print('J+S Ju Jitsu ' + entry['first_name'] + ' ' + entry['last_name'] + ': ' + entry['jugendundsport_courses_jujitsu'])
 
     # Track families
     # Haller family (set all to Urs)
@@ -217,10 +270,8 @@ INSERT INTO members (
     email_allowed,
     passport_no,
     member_type,
-    honorary_member_reason,
-    needs_mark_jujitsu,
-    needs_mark_judo
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    needs_mark
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, transformed_member)
 
     c.executemany(r"""

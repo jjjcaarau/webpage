@@ -90,9 +90,7 @@ pub fn update_json(member: Json<JsonMember>) -> Json<UpdateResponse> {
             email_allowed: member.email_allowed,
             passport_no: member.passport_no.unwrap_or("".to_string()),
             member_type: member.member_type,
-            honorary_member_reason: member.honorary_member_reason.unwrap_or("".to_string()),
-            needs_mark_jujitsu: member.needs_mark_jujitsu,
-            needs_mark_judo: member.needs_mark_judo,
+            needs_mark: member.needs_mark,
         };
         crate::members::actions::create(&connection, &member).map(|m| m.id)
     } else {
@@ -116,9 +114,7 @@ pub fn update_json(member: Json<JsonMember>) -> Json<UpdateResponse> {
             email_allowed: member.email_allowed,
             passport_no: member.passport_no.unwrap_or("".to_string()),
             member_type: member.member_type,
-            honorary_member_reason: member.honorary_member_reason.unwrap_or("".to_string()),
-            needs_mark_jujitsu: member.needs_mark_jujitsu,
-            needs_mark_judo: member.needs_mark_judo,
+            needs_mark: member.needs_mark,
         };
         crate::members::actions::update(&connection, &member).map(|_| member.id)
     };

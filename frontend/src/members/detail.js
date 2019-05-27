@@ -103,7 +103,6 @@ export const MemberDetail = {
                             m('option[value=Active]', 'Aktiv'),
                             m('option[value=Passive]', 'Passiv'),
                             m('option[value=Parent]', 'Vormund'),
-                            m('option[value=Honorary]', 'Ehrenmitglied'),
                             m('option[value=Student]', 'Student'),
                             m('option[value=Kid]', 'Kind'),
                         ]),

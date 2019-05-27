@@ -9,7 +9,6 @@ pub enum MemberType {
     Active,
     Passive,
     Parent,
-    Honorary,
     Student,
     Kid,
 }
@@ -36,9 +35,7 @@ pub struct Member {
     pub email_allowed: bool,
     pub passport_no: String,
     pub member_type: MemberType,
-    pub honorary_member_reason: String,
-    pub needs_mark_jujitsu: bool,
-    pub needs_mark_judo: bool,
+    pub needs_mark: bool,
 }
 
 #[derive(Insertable, Derivative, Associations)]
@@ -64,9 +61,7 @@ pub struct NewMember {
     pub email_allowed: bool,
     pub passport_no: String,
     pub member_type: MemberType,
-    pub honorary_member_reason: String,
-    pub needs_mark_jujitsu: bool,
-    pub needs_mark_judo: bool,
+    pub needs_mark: bool,
 }
 
 #[derive(Default, Serialize, Deserialize)]
@@ -90,9 +85,7 @@ pub struct JsonMember {
     pub email_allowed: bool,
     pub passport_no: Option<String>,
     pub member_type: MemberType,
-    pub honorary_member_reason: Option<String>,
-    pub needs_mark_jujitsu: bool,
-    pub needs_mark_judo: bool,
+    pub needs_mark: bool,
 }
 
 impl NewMember {
@@ -138,7 +131,6 @@ impl From<MemberType> for Tag {
             MemberType::Active => Tag::Active,
             MemberType::Passive => Tag::Passive,
             MemberType::Parent => Tag::Parent,
-            MemberType::Honorary => Tag::Honorary,
             MemberType::Student => Tag::Student,
             MemberType::Kid => Tag::Kid,
         }
