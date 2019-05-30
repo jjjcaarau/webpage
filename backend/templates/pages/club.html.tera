@@ -24,7 +24,7 @@
     <div class="row">
         <div class="col-12">
             <iframe id="dojo-map"
-                    src="http://maps.google.ch/maps/ms?f=q&hl=de&geocode=&ie=UTF8&s=AARTsJoSjvsVGLfhuS7r9Wms4Za4iRn3Sg&msa=0&msid=115603747001830587834.00045818962747412af75&ll=47.400673,8.063235&spn=0.013072,0.023603&z=15&output=embed"
+                    src="https://maps.google.ch/maps/ms?f=q&hl=de&geocode=&ie=UTF8&s=AARTsJoSjvsVGLfhuS7r9Wms4Za4iRn3Sg&msa=0&msid=115603747001830587834.00045818962747412af75&ll=47.400673,8.063235&spn=0.013072,0.023603&z=15&output=embed"
                     frameborder="0" llowfullscreen></iframe>
         </div>
     </div>
