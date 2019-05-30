@@ -9,7 +9,7 @@ import { Badges } from '/badges'
 
 export const MemberView = {
     oninit: function(vnode) {
-        vnode.state.member = { id: 0, sex: 'F', member_type: 'Active', email_allowed: false, needs_mark_jujitsu: false, needs_mark_judo: false };
+        vnode.state.member = { id: 0, sex: 'F', member_type: 'Active', email_allowed: false, needs_mark: false };
         vnode.state.events = [];
         vnode.state.family = [];
         let params = window.location.href.split('/');
