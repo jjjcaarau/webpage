@@ -14,9 +14,13 @@ with open('members.json', 'r') as file:
             passport_no = entry['judo_passport_nr']
         else:
             passport_no = entry['jujitsu_passport_nr']
-        
+
         member_type = None
-        if entry['membership'] == '_Passivmitglieder':
+        if entry['membership'] == '_Externe':
+            member_type = 'extern'
+        elif entry['membership'] == '_Externe (old)':
+            member_type = 'extern'
+        elif entry['membership'] == '_Passivmitglieder':
             member_type = 'passive'
         elif entry['member_type'] == 'Vollmitglied' or entry['membership'] == '_Aktivmitglieder (Jiu)':
             member_type = 'active'
@@ -48,18 +52,18 @@ with open('members.json', 'r') as file:
 
         date = entry['join_date']
         if date == '0000-00-00' or date == None:
-                date = '1970-01-01'
-
-        transformed_events.append(
-            (
-                entry['id'],
-                'club',
-                'promotion',
-                'club',
-                date,
-                None,
+            pass
+        else:
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'club',
+                    'promotion',
+                    'club',
+                    date,
+                    None,
+                )
             )
-        )
 
         # Add Kyus
         for division in ['judo', 'jujitsu']:
@@ -434,7 +438,7 @@ with open('members.json', 'r') as file:
                     'trainer',
                     'demotion',
                     'jujitsu',
-                    '2013-31-12',
+                    '2013-12-31',
                     None,
                 )
             )
@@ -810,6 +814,9 @@ with open('members.json', 'r') as file:
         elif entry['id'] == '843':
             entry['comment'] = ''
 
+        elif entry['id'] == '1079':
+            entry['last_name'] = 'Martin'
+
         # elif entry['id'] == '843':
         #     transformed_member.append(
         #         [
@@ -854,30 +861,31 @@ with open('members.json', 'r') as file:
             #     print('J+S Ju Jitsu ' + entry['id'] + ' ' + entry['first_name'] + ' ' + entry['last_name'] + ': ' + entry['jugendundsport_courses_jujitsu'])
 
         # Add modified member entry to DB
-        transformed_member.append(
-            [
-                entry['id'],
-                None,
-                entry['first_name'],
-                entry['middle_name'],
-                entry['last_name'],
-                entry['sex'],
-                entry['birthday'],
-                entry['email'],
-                entry['home_phone'],
-                entry['work_phone'],
-                entry['cellular'],
-                entry['zip'],
-                entry['city'],
-                entry['address'],
-                entry['address_no'],
-                entry['comment'],
-                entry['email_allowed'] == '1',
-                passport_no,
-                member_type,
-                entry['needs_mark_jujitsu'] == '1' or entry['needs_mark_judo'] == '1',
-            ]
-        )
+        if entry['id'] not in ['991']:
+            transformed_member.append(
+                [
+                    entry['id'],
+                    None,
+                    entry['first_name'],
+                    entry['middle_name'],
+                    entry['last_name'],
+                    entry['sex'],
+                    entry['birthday'],
+                    entry['email'],
+                    entry['home_phone'],
+                    entry['work_phone'],
+                    entry['cellular'],
+                    entry['zip'],
+                    entry['city'],
+                    entry['address'],
+                    entry['address_no'],
+                    entry['comment'],
+                    entry['email_allowed'] == '1',
+                    passport_no,
+                    member_type,
+                    entry['needs_mark_jujitsu'] == '1' or entry['needs_mark_judo'] == '1',
+                ]
+            )
 
     # Track families
     # Haller family (set all to Urs)

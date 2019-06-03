@@ -1,7 +1,7 @@
 use crate::schema::*;
 use crate::members::model::Member;
 
-#[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug, Clone)]
 #[derivative(Default(bound=""))]
 pub enum EventType {
     #[derivative(Default)]
@@ -27,7 +27,7 @@ pub enum EventType {
     Dan10,
 }
 
-#[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug, Clone)]
 #[derivative(Default(bound=""))]
 pub enum EventClass {
     #[derivative(Default)]
@@ -44,7 +44,7 @@ pub enum EventDivision {
     Jujitsu,
 }
 
-#[derive(Queryable, Identifiable, AsChangeset, Associations, Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Queryable, Identifiable, AsChangeset, Associations, Serialize, Deserialize, PartialEq, Debug, Clone)]
 #[belongs_to(Member, foreign_key = "member_id")]
 #[table_name="events"]
 pub struct Event {

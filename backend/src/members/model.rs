@@ -14,7 +14,7 @@ pub enum MemberType {
     Extern,
 }
 
-#[derive(Queryable, Identifiable, AsChangeset, Associations, Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Queryable, Identifiable, AsChangeset, Associations, Serialize, Deserialize, PartialEq, Debug, Clone)]
 #[belongs_to(Member, foreign_key = "family_id")]
 pub struct Member {
     pub id: i32,
