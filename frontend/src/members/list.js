@@ -37,7 +37,7 @@ var MembersList = {
                     }, [m('i.fas.fa-plus'), ' Neues Mitglied hinzufügen.'])
                 ])
             )),
-            m('div.col-12', m('form',
+            m('div.col-12', m('',
                 m('.form-group', [
                     m('input[type=text].form-control[placeholder="Suche nach Vor- oder Nachname"]', {
                         value: vnode.state.q,
