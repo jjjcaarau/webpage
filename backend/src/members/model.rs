@@ -11,6 +11,7 @@ pub enum MemberType {
     Parent,
     Student,
     Kid,
+    Extern,
 }
 
 #[derive(Queryable, Identifiable, AsChangeset, Associations, Serialize, Deserialize, PartialEq, Debug)]
@@ -122,6 +123,7 @@ pub enum Tag {
     Active,
     Passive,
     Parent,
+    Extern,
     Kyu(Division, u8),
 }
 
@@ -133,6 +135,7 @@ impl From<MemberType> for Tag {
             MemberType::Parent => Tag::Parent,
             MemberType::Student => Tag::Student,
             MemberType::Kid => Tag::Kid,
+            MemberType::Extern => Tag::Extern,
         }
     }
 }

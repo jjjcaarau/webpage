@@ -105,6 +105,7 @@ export const MemberDetail = {
                             m('option[value=Parent]', 'Vormund'),
                             m('option[value=Student]', 'Student'),
                             m('option[value=Kid]', 'Kind'),
+                            m('option[value=Extern]', 'Extern'),
                         ]),
                     ]),
                 ]),

@@ -17,7 +17,7 @@ CREATE TABLE members (
     comment TEXT NOT NULL,
     email_allowed BOOLEAN NOT NULL,
     passport_no TEXT NOT NULL,
-    member_type TEXT CHECK(member_type IN ('active', 'passive', 'parent', 'student', 'kid')) NOT NULL,
+    member_type TEXT CHECK(member_type IN ('active', 'passive', 'parent', 'student', 'kid', 'extern')) NOT NULL,
     needs_mark BOOLEAN NOT NULL
 );
 

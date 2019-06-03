@@ -91,6 +91,8 @@ export const Badges = {
             } else {
                 badges.push({ type: 'success', text: member_type(member.member_type) })
             }
+        } else {
+            badges.push({ type: 'secondary', text: member_type(member.member_type) })
         }
 
         // Get latest board promotional event.
