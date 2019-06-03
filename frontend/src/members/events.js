@@ -31,6 +31,9 @@ const eventString = event => {
         case 'Honorary': {
             return 'Ernennung zum Ehrenmitglied'
         }
+        case 'Js': {
+            return 'J+S Kurs (' + event.division + ')'
+        }
         case 'Kyu1': return 'Erhalt 1. Kyu ' + event.division
         case 'Kyu2': return 'Erhalt 2. Kyu ' + event.division
         case 'Kyu3': return 'Erhalt 3. Kyu ' + event.division

@@ -36,6 +36,7 @@ CREATE TABLE events (
         'club',
         'board',
         'honorary',
+        'js',
         'kyu1',
         'kyu2',
         'kyu3',

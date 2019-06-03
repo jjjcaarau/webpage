@@ -18,6 +18,7 @@ function member_type(member) {
         case 'Parent': return 'Vormund'
         case 'Student': return 'Student'
         case 'Kid': return 'Kind'
+        case 'Extern': return 'Extern'
     }
 }
 
@@ -44,6 +45,7 @@ export const Badges = {
         let board_events = []
         let trainer_events = []
         let cotrainer_events = []
+        let js_events = []
 
         events.forEach(function(event) {
             // Find club events.
@@ -80,6 +82,11 @@ export const Badges = {
             if(event.event_type == 'CoTrainer') {
                 cotrainer_events.push(event)
             }
+
+            // Get j & s events.
+            if(event.event_type == 'Js') {
+                js_events.push(event)
+            }
         });
 
         // Check member status (resigned, active, kid, student, etc.)
@@ -111,6 +118,12 @@ export const Badges = {
         cotrainer_events.sort((a, b) => new Date(b.date) - new Date(a.date))
         if(cotrainer_events.length > 0 && cotrainer_events[0].class == 'Promotion') {
             badges.push({ type: 'info', text: 'Co-Trainer' })
+        }
+
+        // Get latest cotrainer promotional event.
+        js_events.sort((a, b) => new Date(b.date) - new Date(a.date))
+        if(js_events.length > 0 && js_events[js_events.length - 1].class == 'Promotion') {
+            badges.push({ type: 'info', text: 'J+S(' + js_events[js_events.length - 1].division + '):' + js_events[js_events.length-1].comment })
         }
 
         // Get current judo belt.

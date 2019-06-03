@@ -10,6 +10,7 @@ pub enum EventType {
     Club,
     Board,
     Honorary,
+    Js,
     Kyu1,
     Kyu2,
     Kyu3,
