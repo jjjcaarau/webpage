@@ -30,31 +30,6 @@ with open('members.json', 'r') as file:
         if entry['birthday'] == '0000-00-00':
             entry['birthday'] = '1970-01-01'
 
-        transformed_member.append(
-            [
-                entry['id'],
-                None,
-                entry['first_name'],
-                entry['middle_name'],
-                entry['last_name'],
-                entry['sex'],
-                entry['birthday'],
-                entry['email'],
-                entry['home_phone'],
-                entry['work_phone'],
-                entry['cellular'],
-                entry['zip'],
-                entry['city'],
-                entry['address'],
-                entry['address_no'],
-                entry['comment'],
-                entry['email_allowed'] == '1',
-                passport_no,
-                member_type,
-                entry['needs_mark_jujitsu'] == '1' or entry['needs_mark_judo'] == '1',
-            ]
-        )
-
         if entry['membership'] == '_Ausgetreten':
             date = entry['resignation']
             if date == '0000-00-00' or date == None:
@@ -659,17 +634,15 @@ with open('members.json', 'r') as file:
             entry['comment'] = ''
 
         elif entry['id'] == '458':
-            event = [event for event in transformed_events if event[0] == '458' and event[1] == 'board'][0]
+            id, event = [(id, event) for (id, event) in enumerate(transformed_events) if event[0] == '458' and event[1] == 'board'][0]
 
-            transformed_events.append(
-                (
-                    event[0],
-                    event[1],
-                    event[2],
-                    event[3],
-                    '2018-03-23',
-                    event[5],
-                )
+            transformed_events[id] = (
+                event[0],
+                event[1],
+                event[2],
+                event[3],
+                '2018-03-23',
+                event[5],
             )
 
             transformed_events.append(
@@ -750,9 +723,20 @@ with open('members.json', 'r') as file:
                     'trainer',
                     'demotion',
                     'jujitsu',
-                    '2012-12-31',
+                    '2013-12-31',
                     None,
                 )
+            )
+
+            id, event = [(id, event) for (id, event) in enumerate(transformed_events) if event[0] == '514' and event[1] == 'board'][0]
+
+            transformed_events[id] = (
+                event[0],
+                event[1],
+                event[2],
+                event[3],
+                '2012-03-23',
+                event[5],
             )
 
             transformed_events.append(
@@ -763,28 +747,6 @@ with open('members.json', 'r') as file:
                     'club',
                     '2008-03-28',
                     'Vizepräsident',
-                )
-            )
-
-            transformed_events.append(
-                (
-                    entry['id'],
-                    'board',
-                    'demotion',
-                    'club',
-                    '2012-03-23',
-                    None,
-                )
-            )
-
-            transformed_events.append(
-                (
-                    entry['id'],
-                    'board',
-                    'promotion',
-                    'club',
-                    '2012-03-23',
-                    'Aktuar',
                 )
             )
 
@@ -890,6 +852,32 @@ with open('members.json', 'r') as file:
 
             # if entry['jugendundsport_courses_jujitsu'] != '':
             #     print('J+S Ju Jitsu ' + entry['id'] + ' ' + entry['first_name'] + ' ' + entry['last_name'] + ': ' + entry['jugendundsport_courses_jujitsu'])
+
+        # Add modified member entry to DB
+        transformed_member.append(
+            [
+                entry['id'],
+                None,
+                entry['first_name'],
+                entry['middle_name'],
+                entry['last_name'],
+                entry['sex'],
+                entry['birthday'],
+                entry['email'],
+                entry['home_phone'],
+                entry['work_phone'],
+                entry['cellular'],
+                entry['zip'],
+                entry['city'],
+                entry['address'],
+                entry['address_no'],
+                entry['comment'],
+                entry['email_allowed'] == '1',
+                passport_no,
+                member_type,
+                entry['needs_mark_jujitsu'] == '1' or entry['needs_mark_judo'] == '1',
+            ]
+        )
 
     # Track families
     # Haller family (set all to Urs)
