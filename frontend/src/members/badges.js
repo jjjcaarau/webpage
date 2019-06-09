@@ -39,11 +39,6 @@ export const Badges = {
 
         let badges = []
 
-        console.log(tags);
-        // Trainer(Division),
-        // CoTrainer(Division),
-        // Grade(Grade),
-
         tags.forEach(tag => {
             switch(tag) {
                 case 'Active':
