@@ -1,4 +1,32 @@
-var filterMembers = function(vnode, input) {
+function fallbackCopyTextToClipboard(text) {
+    var textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+        var successful = document.execCommand('copy');
+        var msg = successful ? 'successful' : 'unsuccessful';
+        console.log('Fallback: Copying text command was ' + msg);
+    } catch (err) {
+        console.error('Fallback: Oops, unable to copy', err);
+    }
+
+    document.body.removeChild(textArea);
+}
+
+function copyTextToClipboard(text) {
+    if (!navigator.clipboard) {
+        fallbackCopyTextToClipboard(text);
+        return;
+    }
+    navigator.clipboard.writeText(text).catch(function(err) {
+        console.error('Async: Could not copy text: ', err);
+    });
+}
+
+const filterMembers = function(vnode, input) {
     let filters =
         vnode.state.kids
      && vnode.state.judo
@@ -65,6 +93,8 @@ var filterMembers = function(vnode, input) {
         }
         return undefined
     }).filter(m => m !== undefined)
+
+    vnode.state.mails = vnode.state.filteredMembers.map(m => m[0].email).join(',')
 }
 
 var MembersList = {
@@ -77,6 +107,7 @@ var MembersList = {
         vnode.state.active = true
         vnode.state.resigned = true
         vnode.state.extern = true
+        vnode.state.mails = ''
 
         m.request({
             method: 'GET',
@@ -89,7 +120,7 @@ var MembersList = {
     },
     view: function(vnode) {
         return [
-            m('div.col-12', m('form',
+            m('div.col-9', m('form',
                 m('.form-group', [
                     m('button.btn.btn-success[type=text]', {
                         onclick: (e) => {
@@ -99,6 +130,16 @@ var MembersList = {
                     }, [m('i.fas.fa-plus'), ' Neues Mitglied hinzufügen.'])
                 ])
             )),
+            m('div.col-3', m('p.text-right', [
+                m('a[href=#]', {
+                    onclick: e => {
+                        e.preventDefault()
+                        copyTextToClipboard(vnode.state.mails)
+                    }
+                }, 'Email-Liste kopieren ...'),
+                m('br'),
+                m('a', { href: 'mailto:' + vnode.state.mails }, 'Email an Liste schreiben ...'),
+            ])),
             m('div.col-12', m('',
                 m('.form-group', [
                     m('input[type=text].form-control[placeholder="Suche nach Vor- oder Nachname"]', {
