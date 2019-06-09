@@ -92,8 +92,7 @@ export const MemberDetail = {
                         })
                     ]),
                     input(member, 'passport_no', 'Passnummer'),
-                    checkbox(member, 'needs_mark_jujitsu', 'Jahresmarke (Ju Jitsu) benötigt'),
-                    checkbox(member, 'needs_mark_judo', 'Jahresmarke (Judo) benötigt'),
+                    checkbox(member, 'needs_mark', 'Jahresmarke benötigt'),
                     m('.row.form-group', [
                         m('label.col-lg-2.col-md-3.col-sm-4.col-form-label', 'Mitglieds-Art'),
                         m('select.col-lg-10.col-md-9.col-sm-8.form-control', {
