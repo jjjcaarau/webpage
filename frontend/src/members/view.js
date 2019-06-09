@@ -12,6 +12,7 @@ export const MemberView = {
         vnode.state.member = { id: 0, sex: 'F', member_type: 'Active', email_allowed: false, needs_mark: false };
         vnode.state.events = [];
         vnode.state.family = [];
+        vnode.state.tags = [];
         let params = window.location.href.split('/');
         let param = params[params.length - 1];
         vnode.state.id = parseInt(param);
@@ -26,6 +27,7 @@ export const MemberView = {
                     vnode.state.member = result.member[0];
                     vnode.state.events = result.member[1];
                     vnode.state.family = result.member[2];
+                    vnode.state.tags = result.member[3];
                 })
             }
         }
@@ -35,11 +37,12 @@ export const MemberView = {
         let member = vnode.state.member;
         let events = vnode.state.events;
         let family = vnode.state.family;
+        let tags = vnode.state.tags;
         let reloader = vnode.state.reloader;
         return [
             m('a[href=/members/list]', '< Zurück zur Liste'),
             m(MemberDetail, { member, reloader }),
-            m(Badges, { events, member, reloader }),
+            m(Badges, { events, member, tags, reloader }),
             m(Family, { family, member, reloader }),
             m(MemberEvents, { events, member, reloader }),
         ]

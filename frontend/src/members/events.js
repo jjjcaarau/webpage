@@ -85,9 +85,10 @@ const TrainerEventAdd = {
                     class: vnode.state.class,
                     division: vnode.state.division,
                     comment: vnode.state.comment,
-                    date: getToday(),
+                    date: vnode.state.date,
                 }
             })
+        vnode.state.date = getToday()
         vnode.state.class = 'Promotion'
         vnode.state.division = 'Jujitsu'
         vnode.state.comment = ''
@@ -106,7 +107,7 @@ const TrainerEventAdd = {
                 m('option[value=Promotion]', 'Beförderung'),
                 m('option[value=Demotion]', 'Rücktritt'),
             ]),
-            ' zum Trainer ',
+            ' Trainer ',
             m('select.form-control', {
                 onchange: e => vnode.state.division = e.target.value,
                 value: vnode.state.division,
@@ -114,6 +115,11 @@ const TrainerEventAdd = {
                 m('option[value=Jujitsu]', 'Ju Jitsu'),
                 m('option[value=Judo]', 'Judo'),
             ]),
+            ' am ',
+            m('input.form-control[type=text][placeholder=Datum(YYYY-MM-DD)][pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"].', {
+                onchange: e => vnode.state.date = e.target.value,
+                value: vnode.state.date,
+            }),
             m('input.form-control[type=text][placeholder=Kommentar]', {
                 onchange: e => vnode.state.comment = e.target.value,
                 value: vnode.state.comment,
@@ -180,9 +186,10 @@ const HonoraryEventAdd = {
                     class: 'Promotion',
                     division: 'Club',
                     comment: vnode.state.comment,
-                    date: getToday(),
+                    date: vnode.state.date,
                 }
             })
+        vnode.state.date = getToday()
         vnode.state.comment = ''
         vnode.state.member = vnode.attrs.member;
     },
@@ -191,9 +198,15 @@ const HonoraryEventAdd = {
     },
     view: function(vnode) {
         return [
+            ' weil ',
             m('input.form-control[type=text][placeholder=Grund]', {
                 onchange: e => vnode.state.comment = e.target.value,
                 value: vnode.state.comment,
+            }),
+            ' am ',
+            m('input.form-control[type=text][placeholder=Datum(YYYY-MM-DD)][pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"].', {
+                onchange: e => vnode.state.date = e.target.value,
+                value: vnode.state.date,
             }),
         ]
     }
