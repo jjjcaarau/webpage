@@ -5,6 +5,7 @@ use crate::members::model::{
     Member,
     NewMember,
     JsonMember,
+    Tag,
 };
 use crate::events::model::{
     Event,
@@ -16,12 +17,12 @@ use crate::members::actions::{
 
 #[derive(Serialize)]
 struct ListResult {
-    members: Vec<(Member, Vec<Event>, Vec<Member>)>,
+    members: Vec<(Member, Vec<Event>, Vec<Member>, Vec<Tag>)>,
 }
 
 #[derive(Serialize)]
 pub struct ViewResult {
-    member: (Member, Vec<Event>, Vec<Member>),
+    member: (Member, Vec<Event>, Vec<Member>, Vec<Tag>),
 }
 
 #[get("/list")]
@@ -43,7 +44,7 @@ pub fn stats() -> Template {
 }
 
 #[get("/list_json")]
-pub fn list_json() -> Json<Vec<(Member, Vec<Event>, Vec<Member>)>> {
+pub fn list_json() -> Json<Vec<(Member, Vec<Event>, Vec<Member>, Vec<Tag>)>> {
     let connection = crate::db::establish_connection();
     Json(crate::members::actions::list_all(&connection).unwrap())
 }

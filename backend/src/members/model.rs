@@ -96,6 +96,7 @@ impl NewMember {
     }
 }
 
+#[derive(Serialize)]
 pub enum Division {
     Judo,
     JuJitsu,
@@ -111,6 +112,13 @@ impl From<EventDivision> for Division {
     }
 }
 
+#[derive(Serialize)]
+pub enum Grade {
+    Kyu(Division, u8),
+    Dan(Division, u8),
+}
+
+#[derive(Serialize)]
 pub enum Tag {
     Trainer(Division),
     CoTrainer(Division),
@@ -122,7 +130,7 @@ pub enum Tag {
     Active,
     Passive,
     Parent,
-    Kyu(Division, u8),
+    Grade(Grade),
 }
 
 impl From<MemberType> for Tag {

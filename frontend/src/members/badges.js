@@ -2,11 +2,11 @@ import m from 'mithril'
 
 function belt_color(number) {
     switch(number) {
-        case '5': return 'yellow'
-        case '4': return 'orange'
-        case '3': return 'green'
-        case '2': return 'blue'
-        case '1': return 'brown'
+        case 5: return 'yellow'
+        case 4: return 'orange'
+        case 3: return 'green'
+        case 2: return 'blue'
+        case 1: return 'brown'
         default: return 'black'
     }
 }
@@ -25,106 +25,67 @@ export const Badges = {
     oninit: function(vnode) {
         vnode.state.events = vnode.attrs.events;
         vnode.state.member = vnode.attrs.member;
+        vnode.state.tags = vnode.attrs.tags;
     },
     onbeforeupdate: function(vnode) {
         vnode.state.events = vnode.attrs.events;
         vnode.state.member = vnode.attrs.member;
+        vnode.state.tags = vnode.attrs.tags;
     },
     view: function(vnode) {
         let member = vnode.state.member;
         let events = vnode.state.events;
+        let tags = vnode.state.tags;
 
         let badges = []
 
-        let honorary_badge = false;
-        let current_grade = []
-        current_grade['Judo'] = false
-        current_grade['Jujitsu'] = false
-        let club_events = []
-        let board_events = []
-        let trainer_events = []
-        let cotrainer_events = []
+        console.log(tags);
+        // Trainer(Division),
+        // CoTrainer(Division),
+        // Grade(Grade),
 
-        events.forEach(function(event) {
-            // Find club events.
-            if (event.event_type == 'Club' && event.division == 'Club') {
-                club_events.push(event)
+        tags.forEach(tag => {
+            switch(tag) {
+                case 'Active':
+                    badges.push({ type: 'success', text: 'Aktiv' })
+                    break
+                case 'Resigned':
+                    badges.push({ type: 'danger', text: 'Ausgetreten' })
+                    break
+                case 'Passive':
+                    badges.push({ type: 'success', text: 'Passiv' })
+                    break
+                case 'Student':
+                    badges.push({ type: 'success', text: 'Passiv' })
+                    break
+                case 'Parent':
+                    badges.push({ type: 'success', text: 'Passiv' })
+                    break
+                case 'Kid':
+                    badges.push({ type: 'success', text: 'Passiv' })
+                    break
+                case 'Honorary':
+                    badges.push({ type: 'light', text: 'Ehrenmitglied' })
+                    break
+                case 'Board':
+                    badges.push({ type: 'warning', text: 'Vorstand' })
+                    break
             }
-
-            // Find all kyus.
-            if ((event.event_type.includes('Kyu') || event.event_type.includes('Dan')) && event.class == 'Promotion') {
-                let grade_num = event.event_type.substring(event.event_type.length - 1)
-                let grade = grade_num
-                          + '. '
-                          + event.event_type.substring(0, event.event_type.length - 1);
-
-                current_grade[event.division] = { color: belt_color(event.event_type.includes('Dan') ? 0 : grade_num), grade, date: event.date };
+            if(tag.Trainer) {
+                badges.push({ type: 'primary', text: 'Trainer' })
             }
-
-            // Check if honorary member.
-            if (event.event_type == 'Honorary' && event.division == 'Club' && event.class == 'Promotion') {
-                honorary_badge = true;
+            if(tag.CoTrainer) {
+                badges.push({ type: 'info', text: 'Co-Trainer' })
             }
-
-            // Get board member events.
-            if(event.event_type == 'Board') {
-                board_events.push(event)
+            if(tag.Grade) {
+                if(tag.Grade.Dan) {
+                    badges.push({ type: 'belt-black', text: tag.Grade.Dan[1] + '. Dan ' + tag.Grade.Dan[0] })
+                }
+                if(tag.Grade.Kyu) {
+                    badges.push({ type: 'belt-' + belt_color(tag.Grade.Kyu[1]), text: tag.Grade.Kyu[1] + '. Kyu ' + tag.Grade.Kyu[0] })
+                }
             }
-
-            // Get trainer events.
-            if(event.event_type == 'Trainer') {
-                trainer_events.push(event)
-            }
-
-            // Get co trainer events.
-            if(event.event_type == 'CoTrainer') {
-                cotrainer_events.push(event)
-            }
-        });
-
-        // Check member status (resigned, active, kid, student, etc.)
-        club_events.sort((a, b) => new Date(b.date) - new Date(a.date))
-        if(club_events.length > 0) {
-            let last = club_events[0]
-            if(last.class == 'Demotion') {
-                badges.push({ type: 'danger', text: 'Ausgetreten am ' + last.date, class: 'Demotion' })
-            } else {
-                badges.push({ type: 'success', text: member_type(member.member_type) })
-            }
-        }
-
-        // Get latest board promotional event.
-        board_events.sort((a, b) => new Date(b.date) - new Date(a.date))
-        if(board_events.length > 0 && board_events[0].class == 'Promotion') {
-            badges.push({ type: 'warning', text: 'Vorstand' })
-        }
-        
-        // Get latest trainer promotional event.
-        trainer_events.sort((a, b) => new Date(b.date) - new Date(a.date))
-        if(trainer_events.length > 0 && trainer_events[0].class == 'Promotion') {
-            badges.push({ type: 'primary', text: 'Trainer' })
-        }
-
-        // Get latest cotrainer promotional event.
-        cotrainer_events.sort((a, b) => new Date(b.date) - new Date(a.date))
-        if(cotrainer_events.length > 0 && cotrainer_events[0].class == 'Promotion') {
-            badges.push({ type: 'info', text: 'Co-Trainer' })
-        }
-
-        // Get current judo belt.
-        if(current_grade['Judo']) {
-            badges.push({ type: 'belt-' + current_grade['Judo'].color, text: current_grade['Judo'].grade + ' Judo' })
-        }
-
-        // Get current jujitsu belt.
-        if(current_grade['Jujitsu']) {
-            badges.push({ type: 'belt-' + current_grade['Jujitsu'].color, text: current_grade['Jujitsu'].grade + ' Jujitsu' })
-        }
-
-        // Get honorary member status.
-        if(honorary_badge) {
-            badges.push({ type: 'light', text: 'Ehrenmitglied' })
-        }
+        })
 
         // PMatriarch
         if(member.id == member.family_id) {
