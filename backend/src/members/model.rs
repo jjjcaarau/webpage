@@ -11,9 +11,10 @@ pub enum MemberType {
     Parent,
     Student,
     Kid,
+    Extern,
 }
 
-#[derive(Queryable, Identifiable, AsChangeset, Associations, Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Queryable, Identifiable, AsChangeset, Associations, Serialize, Deserialize, PartialEq, Debug, Clone)]
 #[belongs_to(Member, foreign_key = "family_id")]
 pub struct Member {
     pub id: i32,
@@ -127,7 +128,7 @@ pub enum Tag {
     Kid,
     Student,
     Resigned,
-    External,
+    Extern,
     Active,
     Passive,
     Parent,
@@ -142,6 +143,7 @@ impl From<MemberType> for Tag {
             MemberType::Parent => Tag::Parent,
             MemberType::Student => Tag::Student,
             MemberType::Kid => Tag::Kid,
+            MemberType::Extern => Tag::Extern,
         }
     }
 }

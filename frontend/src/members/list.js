@@ -6,7 +6,7 @@ var filterMembers = function(vnode, input) {
      && vnode.state.passive
      && vnode.state.active
      && vnode.state.resigned
-     && vnode.state.external
+     && vnode.state.extern
 
     if(input && input != '') {
         var options = {
@@ -43,12 +43,14 @@ var filterMembers = function(vnode, input) {
         ).length > 0) {
             return m
         }
+        if(vnode.state.extern && tags.filter(t => t == 'Extern').length > 0) {
+            return m
+        }
         return undefined
     }).filter(m => m !== undefined)
 
     vnode.state.filteredMembers = vnode.state.filteredMembers.map(m => {
         let tags = m[3]
-        console.log(tags)
         if(vnode.state.active && tags.filter(t => t == 'Active').length > 0) {
             return m
         }
@@ -58,7 +60,7 @@ var filterMembers = function(vnode, input) {
         if(vnode.state.resigned && tags.filter(t => t == 'Resigned').length > 0) {
             return m
         }
-        if(vnode.state.external && tags.filter(t => t == 'External').length > 0) {
+        if(vnode.state.extern && tags.filter(t => t == 'Extern').length > 0) {
             return m
         }
         return undefined
@@ -74,7 +76,7 @@ var MembersList = {
         vnode.state.passive = true
         vnode.state.active = true
         vnode.state.resigned = true
-        vnode.state.external = true
+        vnode.state.extern = true
 
         m.request({
             method: 'GET',
@@ -97,7 +99,7 @@ var MembersList = {
                     }, [m('i.fas.fa-plus'), ' Neues Mitglied hinzufügen.'])
                 ])
             )),
-            m('div.col-12', m('form',
+            m('div.col-12', m('',
                 m('.form-group', [
                     m('input[type=text].form-control[placeholder="Suche nach Vor- oder Nachname"]', {
                         value: vnode.state.q,
@@ -110,7 +112,7 @@ var MembersList = {
             )),
             m('div.col-12',
                 m('.row.form-group', [
-                    m('.col-3', m('label[for=field-kids]', 'Kinder')),
+                    m('.col-2', m('label[for=field-kids]', 'Kinder')),
                     m('.form-check.col-1', [
                         m('input[type=checkbox].form-check-input' + (vnode.state.kids ? '[checked]' : ''), {
                             placeholder: 'Kinder',
@@ -121,7 +123,7 @@ var MembersList = {
                             },
                         }),
                     ]),
-                    m('.col-3', m('label[for=field-judo]', 'Judo')),
+                    m('.col-2', m('label[for=field-judo]', 'Judo')),
                     m('.form-check.col-1', [
                         m('input[type=checkbox].form-check-input' + (vnode.state.judo ? '[checked]' : ''), {
                             placeholder: 'Judo',
@@ -132,13 +134,25 @@ var MembersList = {
                             },
                         }),
                     ]),
-                    m('.col-3', m('label[for=field-jujitsu]', 'Ju Jitsu')),
+                    m('.col-2', m('label[for=field-jujitsu]', 'Ju Jitsu')),
                     m('.form-check.col-1', [
                         m('input[type=checkbox].form-check-input' + (vnode.state.jujitsu ? '[checked]' : ''), {
                             placeholder: 'Ju Jitsu',
                             id: 'field-jujitsu',
                             onchange: (e) => {
                                 vnode.state.jujitsu = !vnode.state.jujitsu
+                                filterMembers(vnode, vnode.state.q)
+                            },
+                        }),
+                    ]),
+                    m('.col-2', m('label[for=field-resigned]', 'Extern')),
+                    m('.form-check.col-1', [
+                        m('input[type=checkbox].form-check-input', {
+                            placeholder: 'Extern',
+                            id: 'field-external',
+                            checked: vnode.state.extern,
+                            onchange: (e) => {
+                                vnode.state.extern = !vnode.state.extern
                                 filterMembers(vnode, vnode.state.q)
                             },
                         }),
@@ -180,11 +194,12 @@ var MembersList = {
                     ]),
                     m('.col-2', m('label[for=field-resigned]', 'Extern')),
                     m('.form-check.col-1', [
-                        m('input[type=checkbox].form-check-input' + (vnode.state.external ? '[checked]' : ''), {
+                        m('input[type=checkbox].form-check-input', {
                             placeholder: 'Extern',
-                            id: 'field-external',
+                            id: 'field-external2',
+                            checked: vnode.state.extern,
                             onchange: (e) => {
-                                vnode.state.external = !vnode.state.external
+                                vnode.state.extern = !vnode.state.extern
                                 filterMembers(vnode, vnode.state.q)
                             },
                         }),

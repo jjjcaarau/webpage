@@ -14,12 +14,16 @@ with open('members.json', 'r') as file:
             passport_no = entry['judo_passport_nr']
         else:
             passport_no = entry['jujitsu_passport_nr']
-        
+
         member_type = None
-        if entry['member_type'] == 'Vollmitglied' or entry['membership'] == '_Aktivmitglieder (Jiu)':
-            member_type = 'active'
+        if entry['membership'] == '_Externe':
+            member_type = 'extern'
+        elif entry['membership'] == '_Externe (old)':
+            member_type = 'extern'
         elif entry['membership'] == '_Passivmitglieder':
             member_type = 'passive'
+        elif entry['member_type'] == 'Vollmitglied' or entry['membership'] == '_Aktivmitglieder (Jiu)':
+            member_type = 'active'
         elif entry['member_type'] == 'Student / Junior':
             member_type = 'student'
         elif entry['member_type'] == 'Kind' or entry['member_type'] == 'Kind (1 pro Familie)' or entry['member_type'] == 'Kind (2 pro Familie)':
@@ -29,31 +33,6 @@ with open('members.json', 'r') as file:
 
         if entry['birthday'] == '0000-00-00':
             entry['birthday'] = '1970-01-01'
-
-        transformed_member.append(
-            [
-                entry['id'],
-                None,
-                entry['first_name'],
-                entry['middle_name'],
-                entry['last_name'],
-                entry['sex'],
-                entry['birthday'],
-                entry['email'],
-                entry['home_phone'],
-                entry['work_phone'],
-                entry['cellular'],
-                entry['zip'],
-                entry['city'],
-                entry['address'],
-                entry['address_no'],
-                entry['comment'],
-                entry['email_allowed'] == '1',
-                passport_no,
-                member_type,
-                entry['needs_mark_jujitsu'] == '1' or entry['needs_mark_judo'] == '1',
-            ]
-        )
 
         if entry['membership'] == '_Ausgetreten':
             date = entry['resignation']
@@ -73,18 +52,18 @@ with open('members.json', 'r') as file:
 
         date = entry['join_date']
         if date == '0000-00-00' or date == None:
-                date = '1970-01-01'
-
-        transformed_events.append(
-            (
-                entry['id'],
-                'club',
-                'promotion',
-                'club',
-                date,
-                None,
+            pass
+        else:
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'club',
+                    'promotion',
+                    'club',
+                    date,
+                    None,
+                )
             )
-        )
 
         # Add Kyus
         for division in ['judo', 'jujitsu']:
@@ -213,20 +192,883 @@ with open('members.json', 'r') as file:
                     entry['id'],
                     'board',
                     'promotion',
-                    'judo',
+                    'club',
                     date,
                     entry['board_role'],
                 )
             )
 
-        if entry['comment'] != '':
-            print('Comment ' + entry['first_name'] + ' ' + entry['last_name'] + ': ' + entry['comment'])
+        if entry['id'] == '1064':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'club',
+                    'promotion',
+                    'club',
+                    '2004-01-01',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'club',
+                    'demotion',
+                    'club',
+                    '2008-12-31',
+                    None,
+                )
+            )
+
+            entry['comment'] = ''
+
+        elif entry['id'] == '1042':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'club',
+                    'promotion',
+                    'club',
+                    '2017-11-09',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'club',
+                    'demotion',
+                    'club',
+                    '2017-11-20',
+                    None,
+                )
+            )
+
+            entry['comment'] = ''
+
+        elif entry['id'] == '889':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'club',
+                    'promotion',
+                    'club',
+                    '2012-11-10',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'club',
+                    'demotion',
+                    'club',
+                    '2012-12-01',
+                    None,
+                )
+            )
+
+            entry['comment'] = ''
+
+        elif entry['id'] == '837':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'club',
+                    'promotion',
+                    'club',
+                    '2011-09-01',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'club',
+                    'demotion',
+                    'club',
+                    '2015-12-31',
+                    None,
+                )
+            )
+
+            entry['comment'] = ''
+
+        elif entry['id'] == '896':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'board',
+                    'promotion',
+                    'club',
+                    '2018-03-23',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'board',
+                    'demotion',
+                    'club',
+                    '2019-03-22',
+                    None,
+                )
+            )
+
+            entry['comment'] = ''
+
+        elif entry['id'] == '849':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'co_trainer',
+                    'promotion',
+                    'judo',
+                    '2017-01-01',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'co_trainer',
+                    'demotion',
+                    'judo',
+                    '2018-07-01',
+                    None,
+                )
+            )
+
+            entry['comment'] = ''
+
+        elif entry['id'] == '669':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'promotion',
+                    'judo',
+                    '2006-01-01',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'demotion',
+                    'judo',
+                    '2016-09-01',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'board',
+                    'promotion',
+                    'club',
+                    '2012-03-23',
+                    'Vizepräsident',
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'board',
+                    'demotion',
+                    'club',
+                    '2018-03-01',
+                    None,
+                )
+            )
+
+            entry['comment'] = ''
+
+        elif entry['id'] == '672':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'club',
+                    'promotion',
+                    'club',
+                    '2014-12-09',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'club',
+                    'demotion',
+                    'club',
+                    '2017-01-01',
+                    None,
+                )
+            )
+
+            entry['comment'] = ''
+
+        elif entry['id'] == '465':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'promotion',
+                    'jujitsu',
+                    '1994-01-01',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'demotion',
+                    'jujitsu',
+                    '2013-12-31',
+                    None,
+                )
+            )
+
+        elif entry['id'] == '481':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'promotion',
+                    'jujitsu',
+                    '1998-01-01',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'demotion',
+                    'jujitsu',
+                    '2007-12-31',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'board',
+                    'promotion',
+                    'club',
+                    '2002-03-23',
+                    'Präsident',
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'board',
+                    'demotion',
+                    'club',
+                    '2008-03-28',
+                    None,
+                )
+            )
+
+            entry['comment'] = ''
+
+        elif entry['id'] == '484':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'promotion',
+                    'jujitsu',
+                    '2013-03-12',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'demotion',
+                    'jujitsu',
+                    '2017-12-31',
+                    None,
+                )
+            )
+
+            entry['comment'] = ''
+
+        elif entry['id'] == '494':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'promotion',
+                    'jujitsu',
+                    '2000-01-01',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'demotion',
+                    'jujitsu',
+                    '2017-12-31',
+                    None,
+                )
+            )
+
+            entry['comment'] = ''
+
+        elif entry['id'] == '499':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'promotion',
+                    'jujitsu',
+                    '2014-02-25',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'demotion',
+                    'jujitsu',
+                    '2017-12-31',
+                    None,
+                )
+            )
+
+            entry['comment'] = ''
+
+        elif entry['id'] == '460':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'promotion',
+                    'jujitsu',
+                    '1999-09-01',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'demotion',
+                    'jujitsu',
+                    '2011-12-31',
+                    None,
+                )
+            )
+
+            entry['comment'] = ''
+
+        elif entry['id'] == '453':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'promotion',
+                    'jujitsu',
+                    '2005-06-01',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'demotion',
+                    'jujitsu',
+                    '2017-12-31',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'board',
+                    'promotion',
+                    'club',
+                    '2005-03-23',
+                    'Aktuar',
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'board',
+                    'demotion',
+                    'club',
+                    '2013-03-22',
+                    None,
+                )
+            )
+
+            entry['comment'] = ''
+
+        elif entry['id'] == '458':
+            id, event = [(id, event) for (id, event) in enumerate(transformed_events) if event[0] == '458' and event[1] == 'board'][0]
+
+            transformed_events[id] = (
+                event[0],
+                event[1],
+                event[2],
+                event[3],
+                '2018-03-23',
+                event[5],
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'board',
+                    'promotion',
+                    'club',
+                    '2012-03-30',
+                    'Aktuar',
+                )
+            )
+
+            entry['comment'] = ''
+
+        elif entry['id'] == '461':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'co_trainer',
+                    'promotion',
+                    'jujitsu',
+                    '2000-11-01',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'co_trainer',
+                    'demotion',
+                    'jujitsu',
+                    '2005-12-31',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'board',
+                    'promotion',
+                    'club',
+                    '2005-03-23',
+                    'Vizepräsident',
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'board',
+                    'demotion',
+                    'club',
+                    '2009-03-27',
+                    None,
+                )
+            )
+
+            entry['comment'] = ''
+
+        elif entry['id'] == '514':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'promotion',
+                    'jujitsu',
+                    '2007-04-15',
+                    None,
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'trainer',
+                    'demotion',
+                    'jujitsu',
+                    '2013-12-31',
+                    None,
+                )
+            )
+
+            id, event = [(id, event) for (id, event) in enumerate(transformed_events) if event[0] == '514' and event[1] == 'board'][0]
+
+            transformed_events[id] = (
+                event[0],
+                event[1],
+                event[2],
+                event[3],
+                '2012-03-23',
+                event[5],
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'board',
+                    'promotion',
+                    'club',
+                    '2008-03-28',
+                    'Vizepräsident',
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'board',
+                    'demotion',
+                    'club',
+                    '2018-03-23',
+                    None,
+                )
+            )
+
+            entry['comment'] = ''
+
+        if entry['id'] == '461':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'js',
+                    'promotion',
+                    'jujitsu',
+                    '1970-01-01',
+                    'Grundausbildung',
+                )
+            )
+
+        elif entry['id'] == '460':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'js',
+                    'promotion',
+                    'jujitsu',
+                    '1970-01-01',
+                    'Grundausbildung',
+                )
+            )
+
+        elif entry['id'] == '513':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'js',
+                    'promotion',
+                    'jujitsu',
+                    '1970-01-01',
+                    'Grundausbildung',
+                )
+            )
+
+        elif entry['id'] == '494':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'js',
+                    'promotion',
+                    'jujitsu',
+                    '1970-01-01',
+                    'Grundausbildung',
+                )
+            )
+
+        elif entry['id'] == '493':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'js',
+                    'promotion',
+                    'jujitsu',
+                    '1970-01-01',
+                    'Grundausbildung',
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'js',
+                    'promotion',
+                    'jujitsu',
+                    '1970-01-01',
+                    'Weiterbildung 1',
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'js',
+                    'promotion',
+                    'jujitsu',
+                    '1970-01-01',
+                    'Weiterbildung 2',
+                )
+            )
+
+        elif entry['id'] == '465':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'js',
+                    'promotion',
+                    'jujitsu',
+                    '1970-01-01',
+                    'Grundausbildung',
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'js',
+                    'promotion',
+                    'jujitsu',
+                    '1970-01-01',
+                    'Weiterbildung 1',
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'js',
+                    'promotion',
+                    'jujitsu',
+                    '1970-01-01',
+                    'Weiterbildung 2',
+                )
+            )
+
+        elif entry['id'] == '520':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'js',
+                    'promotion',
+                    'jujitsu',
+                    '1970-01-01',
+                    'Grundausbildung',
+                )
+            )
+
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'js',
+                    'promotion',
+                    'judo',
+                    '1970-01-01',
+                    'Grundausbildung',
+                )
+            )
+
+        elif entry['id'] == '719':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'js',
+                    'promotion',
+                    'judo',
+                    '1970-01-01',
+                    'Grundausbildung',
+                )
+            )
+
+        elif entry['id'] == '669':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'js',
+                    'promotion',
+                    'judo',
+                    '1970-01-01',
+                    'Grundausbildung',
+                )
+            )
+
+        elif entry['id'] == '670':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'js',
+                    'promotion',
+                    'judo',
+                    '1970-01-01',
+                    'Grundausbildung',
+                )
+            )
+
+        elif entry['id'] == '1072':
+            transformed_events.append(
+                (
+                    entry['id'],
+                    'js',
+                    'promotion',
+                    'judo',
+                    '1970-01-01',
+                    'Grundausbildung',
+                )
+            )
+
+        elif entry['id'] == '816':
+            entry['member_type'] = 'extern'
+
+        elif entry['id'] == '817':
+            entry['member_type'] = 'extern'
+
+        elif entry['id'] == '819':
+            entry['member_type'] = 'extern'
+
+        elif entry['id'] == '822':
+            entry['member_type'] = 'extern'
+
+        elif entry['id'] == '917':
+            entry['member_type'] = 'extern'
+
+        elif entry['id'] == '832':
+            entry['member_type'] = 'extern'
+
+        elif entry['id'] == '916':
+            entry['member_type'] = 'extern'
+
+        elif entry['id'] == '522':
+            entry['member_type'] = 'passiv'
+            entry['comment'] = ''
+
+        elif entry['id'] == '1047':
+            entry['comment'] = ''
+            entry['email'] = 'coflytiti@yahoo.com'
+
+        elif entry['id'] == '1010':
+            entry['comment'] = ''
+
+        elif entry['id'] == '992':
+            entry['comment'] = ''
+
+        elif entry['id'] == '1010':
+            entry['comment'] = ''
+
+        elif entry['id'] == '870':
+            entry['comment'] = ''
+
+        elif entry['id'] == '868':
+            entry['comment'] = ''
+
+        elif entry['id'] == '843':
+            entry['comment'] = ''
+
+        elif entry['id'] == '1079':
+            entry['last_name'] = 'Martin'
+
+        # elif entry['id'] == '843':
+        #     transformed_member.append(
+        #         [
+        #             1099,
+        #             1099,
+        #             'Sophie',
+        #             '',
+        #             'Moor',
+        #             'F',
+        #             '01-01-1970',
+        #             'sophie_moor@yahoo.com',
+        #             '',
+        #             '',
+        #             '076 / 476 87 58',
+        #             5024,
+        #             'Küttigen',
+        #             'Hüslimattweg',
+        #             '6',
+        #             '',
+        #             1,
+        #             '',
+        #             'parent',
+        #             entry['needs_mark_jujitsu'] == '1' or entry['needs_mark_judo'] == '1',
+        #         ]
+        #     )
+        #     entry['family_id'] = 1099
+
+        # elif entry['id'] not in [
+        #     '1026', '925', '917', '870', '845', '832', '916', '822', '819', '817', '816', '794',
+        #     '734', '620', '521', '520', '376', '373', '464', '462', '474', '479', '482', '491',
+        #     '489', '498', '503', '506', '509', '511', '797', '495'
+        # ]
 
         if entry['jugendundsport_courses_judo'] != '':
-            print('J+S Judo ' + entry['first_name'] + ' ' + entry['last_name'] + ': ' + entry['jugendundsport_courses_judo'])
+            print('J+S Judo ' + entry['id'] + ' ' + entry['first_name'] + ' ' + entry['last_name'] + ': ' + entry['jugendundsport_courses_judo'])
 
         if entry['jugendundsport_courses_jujitsu'] != '':
-            print('J+S Ju Jitsu ' + entry['first_name'] + ' ' + entry['last_name'] + ': ' + entry['jugendundsport_courses_jujitsu'])
+            print('J+S Ju Jitsu ' + entry['id'] + ' ' + entry['first_name'] + ' ' + entry['last_name'] + ': ' + entry['jugendundsport_courses_jujitsu'])
+
+        # Add modified member entry to DB
+        if entry['id'] not in ['991']:
+            transformed_member.append(
+                [
+                    entry['id'],
+                    None,
+                    entry['first_name'],
+                    entry['middle_name'],
+                    entry['last_name'],
+                    entry['sex'],
+                    entry['birthday'],
+                    entry['email'],
+                    entry['home_phone'],
+                    entry['work_phone'],
+                    entry['cellular'],
+                    entry['zip'],
+                    entry['city'],
+                    entry['address'],
+                    entry['address_no'],
+                    entry['comment'],
+                    entry['email_allowed'] == '1',
+                    passport_no,
+                    member_type,
+                    entry['needs_mark_jujitsu'] == '1' or entry['needs_mark_judo'] == '1',
+                ]
+            )
 
     # Track families
     # Haller family (set all to Urs)

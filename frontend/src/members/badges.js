@@ -18,6 +18,7 @@ function member_type(member) {
         case 'Parent': return 'Vormund'
         case 'Student': return 'Student'
         case 'Kid': return 'Kind'
+        case 'Extern': return 'Extern'
     }
 }
 
@@ -64,6 +65,9 @@ export const Badges = {
                     break
                 case 'Board':
                     badges.push({ type: 'warning', text: 'Vorstand' })
+                    break
+                case 'Extern':
+                    badges.push({ type: 'secondary', text: 'Extern' })
                     break
             }
             if(tag.Trainer) {

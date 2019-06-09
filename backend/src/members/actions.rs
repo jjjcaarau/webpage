@@ -124,9 +124,11 @@ pub fn update_family(connection: &SqliteConnection, member_id: i32, family_id: O
 
 #[derive(Serialize)]
 pub struct Stats {
-    paying_members: usize,
+    number_of_paying_members: usize,
+    paying_members: Vec<(Member, Vec<Event>)>,
     paying_kids: usize,
-    paying_students: usize,
+    number_of_paying_students: usize,
+    paying_students: Vec<(Member, Vec<Event>)>,
 }
 
 /// Returns a struct of global club stats.
@@ -142,21 +144,25 @@ pub fn get_stats(connection: &SqliteConnection) -> Stats {
     let zipped_members = itertools::izip!(member_list.into_iter(), event_list).collect::<Vec<_>>();
 
     let paying_members = zipped_members
-        .iter()
+        .clone()
+        .into_iter()
         .filter(|m| m.0.member_type == MemberType::Active && is_paying(&get_tags(&m.0, &m.1)))
-        .count();
+        .collect::<Vec<_>>();
     let paying_kids = zipped_members
         .iter()
         .filter(|m| m.0.member_type == MemberType::Kid && is_paying(&get_tags(&m.0, &m.1)))
         .count();
     let paying_students = zipped_members
-        .iter()
+        .clone()
+        .into_iter()
         .filter(|m| m.0.member_type == MemberType::Student && is_paying(&get_tags(&m.0, &m.1)))
-        .count();
+        .collect::<Vec<_>>();
 
     Stats {
+        number_of_paying_members: paying_members.len(),
         paying_members,
         paying_kids,
+        number_of_paying_students: paying_students.len(),
         paying_students,
     }
 }
@@ -269,6 +275,8 @@ fn get_tags(member: &Member, events: &Vec<Event>) -> Vec<Tag> {
         } else {
             result.push(member.member_type.into());
         }
+    } else {
+        result.push(member.member_type.into());
     }
 
     board_events.sort_by(|a, b| b.date.partial_cmp(&a.date).expect("Buggedi bug bug."));
