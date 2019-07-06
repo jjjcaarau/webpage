@@ -3,7 +3,7 @@
     <script type="text/javascript" src="/static/js/extern/mithril.min.js" defer></script>
     <script type="text/javascript" src="/static/js/extern/fuse.min.js" defer></script>
     <script type="text/javascript" src="/static/js/list.js" defer></script>
-    <link rel="stylesheet" href="/static/css/pages/jujitsu.css">
+    <link rel="stylesheet" href="/static/js/scss/list.css">
 {% endblock %}
 
 {% block content %}

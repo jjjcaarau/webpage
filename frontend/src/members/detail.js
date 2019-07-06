@@ -91,6 +91,8 @@ export const MemberDetail = {
                             oninput: (e) => member.comment = e.target.value,
                         })
                     ]),
+                    checkbox(member, 'section_jujitsu', 'Sektion Ju Jitsu'),
+                    checkbox(member, 'section_judo', 'Sektion Judo'),
                     input(member, 'passport_no', 'Passnummer'),
                     checkbox(member, 'needs_mark', 'Jahresmarke benötigt'),
                     m('.row.form-group', [

@@ -6,8 +6,8 @@
   ],
   "license": "MIT",
   "scripts": {
-    "watch": "parcel watch --public-url /static/js --cache-dir build/cache -d ../static/js src/members/list.js src/members/view.js",
-    "build": "parcel build --public-url /static/js --cache-dir build/cache -d ../static/js src/members/list.js src/members/view.js"
+    "watch": "parcel watch --public-url /static/js --cache-dir build/cache -d ../static/js src/members/list.js src/members/view.js src/members/scss/list.scss",
+    "build": "parcel build --public-url /static/js --cache-dir build/cache -d ../static/js src/members/list.js src/members/view.js src/members/scss/list.scss"
   },
   "devDependencies": {
     "bootstrap": "^4.3.1",
@@ -15,6 +15,7 @@
     "sass": "^1.20.1"
   },
   "dependencies": {
+    "construct-ui": "^0.2.0",
     "mithril": "^1.1.6",
     "mithril-stream": "^2.0.0",
     "polythene-css": "^1.5.4",

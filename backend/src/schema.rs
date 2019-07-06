@@ -40,6 +40,8 @@ table! {
         passport_no -> Text,
         member_type -> crate::members::model::MemberTypeMapping,
         needs_mark -> Bool,
+        section_jujitsu -> Bool,
+        section_judo -> Bool,
     }
 }
 

@@ -92,6 +92,8 @@ pub fn update_json(member: Json<JsonMember>) -> Json<UpdateResponse> {
             passport_no: member.passport_no.unwrap_or("".to_string()),
             member_type: member.member_type,
             needs_mark: member.needs_mark,
+            section_jujitsu: member.section_jujitsu,
+            section_judo: member.section_judo,
         };
         crate::members::actions::create(&connection, &member).map(|m| m.id)
     } else {
@@ -116,6 +118,8 @@ pub fn update_json(member: Json<JsonMember>) -> Json<UpdateResponse> {
             passport_no: member.passport_no.unwrap_or("".to_string()),
             member_type: member.member_type,
             needs_mark: member.needs_mark,
+            section_jujitsu: member.section_jujitsu,
+            section_judo: member.section_judo,
         };
         crate::members::actions::update(&connection, &member).map(|_| member.id)
     };

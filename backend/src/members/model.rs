@@ -37,6 +37,8 @@ pub struct Member {
     pub passport_no: String,
     pub member_type: MemberType,
     pub needs_mark: bool,
+    pub section_jujitsu: bool,
+    pub section_judo: bool,
 }
 
 #[derive(Insertable, Derivative, Associations)]
@@ -63,6 +65,8 @@ pub struct NewMember {
     pub passport_no: String,
     pub member_type: MemberType,
     pub needs_mark: bool,
+    pub section_jujitsu: bool,
+    pub section_judo: bool,
 }
 
 #[derive(Default, Serialize, Deserialize)]
@@ -87,6 +91,8 @@ pub struct JsonMember {
     pub passport_no: Option<String>,
     pub member_type: MemberType,
     pub needs_mark: bool,
+    pub section_jujitsu: bool,
+    pub section_judo: bool,
 }
 
 impl NewMember {

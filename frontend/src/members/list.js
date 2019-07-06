@@ -26,69 +26,92 @@ function copyTextToClipboard(text) {
     });
 }
 
-const filterMembers = function(vnode, input) {
-    let filters =
-        vnode.state.kids
-     && vnode.state.judo
-     && vnode.state.jujitsu
-     && vnode.state.passive
-     && vnode.state.active
-     && vnode.state.resigned
-     && vnode.state.extern
+const filterMembers = function(vnode) {
+    
+    // 'section' ['judo', 'ju jitsu', 'jujitsu']
+    // 'type' ['aktiv', 'passiv', 'kind' 'ausgetreten', 'extern']
+    // 'vorname', 'nachname'
+    
+    let filters = vnode.state.tags.map(
+        t => t
+            .trim()
+            .split(':')
+            .map(t => t.trim())
+        )
 
-    if(input && input != '') {
+    let firstName = undefined
+    let secondName = undefined
+    let idx = filters.findIndex(f => f[0] == 'vorname' || f[0] == 'v')
+    if (idx > -1) {
+        firstName = filters.splice(idx, 1)[0]
+    }
+    idx = filters.findIndex(f => f[0] == 'nachname' || f[0] == 'n')
+    if (idx > -1) {
+        secondName = filters.splice(idx, 1)[0]
+    }
+
+    if(firstName) {
         var options = {
-            keys: ['0.first_name', '0.last_name', '0.email_1'],
+            keys: ['0.first_name'],
             threshold: 0.00,
             tokenize: true,
         }
         var fuse = new Fuse(vnode.state.members, options)
-        vnode.state.filteredMembers = fuse.search(input)
+        vnode.state.filteredMembers = fuse.search(firstName[1])
     } else {
         vnode.state.filteredMembers = vnode.state.members
     }
 
-    vnode.state.filteredMembers = vnode.state.filteredMembers.map(m => {
-        let tags = m[3]
-        if(vnode.state.kids && tags.filter(t => t == 'Kid').length > 0) {
-            return m
+    if(secondName) {
+        var options = {
+            keys: ['0.last_name'],
+            threshold: 0.00,
+            tokenize: true,
         }
-        if(
-            vnode.state.judo
-            && tags.filter(t => t.Grade && (
-                (t.Grade.Dan && t.Grade.Dan[0] == 'Judo')
-            || (t.Grade.Kyu && t.Grade.Kyu[0] == 'Judo')
-            )
-        ).length > 0) {
-            return m
-        }
-        if(
-            vnode.state.jujitsu
-            && tags.filter(t => t.Grade && (
-                (t.Grade.Dan && t.Grade.Dan[0] == 'JuJitsu')
-            || (t.Grade.Kyu && t.Grade.Kyu[0] == 'JuJitsu')
-            )
-        ).length > 0) {
-            return m
-        }
-        if(vnode.state.extern && tags.filter(t => t == 'Extern').length > 0) {
-            return m
-        }
-        return undefined
-    }).filter(m => m !== undefined)
+        var fuse = new Fuse(vnode.state.members, options)
+        vnode.state.filteredMembers = fuse.search(secondName[1])
+    } else {
+        vnode.state.filteredMembers = vnode.state.filteredMembers
+    }
 
+    let len = filters.length
     vnode.state.filteredMembers = vnode.state.filteredMembers.map(m => {
-        let tags = m[3]
-        if(vnode.state.active && tags.filter(t => t == 'Active').length > 0) {
-            return m
-        }
-        if(vnode.state.passive && tags.filter(t => t == 'Passive').length > 0) {
-            return m
-        }
-        if(vnode.state.resigned && tags.filter(t => t == 'Resigned').length > 0) {
-            return m
-        }
-        if(vnode.state.extern && tags.filter(t => t == 'Extern').length > 0) {
+        let count = filters
+            .map(f => {
+                if (f[0] == 'sektion' || f[0] == 's') {
+                    if(f[1] == 'jujitsu' || f[1] == 'ju jitsu' || f[1] == 'jj') {
+                        return m[0].section_jujitsu
+                    }
+                    if(f[1] == 'judo', f[1] == 'j') {
+                        return m[0].section_judo
+                    }
+                    return true
+                }
+
+                if (f[0] == 'typ' || f[0] == 't') {
+                    let tags = m[3]
+
+                    if(f[1] == 'aktiv' || f[1] == 'a') {
+                        return tags.filter(t => t == 'Active').length > 0
+                    }
+                    if(f[1] == 'passiv' || f[1] == 'p') {
+                        return tags.filter(t => t == 'Passive').length > 0
+                    }
+                    if(f[1] == 'kind' || f[1] == 'k') {
+                        return tags.filter(t => t == 'Kid').length > 0
+                    }
+                    if(f[1] == 'ausgetreten' || f[1] == 'r') {
+                        return tags.filter(t => t == 'Resigned').length > 0
+                    }
+                    if(f[1] == 'extern' || f[1] == 'e') {
+                        return tags.filter(t => t == 'Extern').length > 0
+                    }
+                    return true
+                }
+            })
+            .reduce((accumulator, currentValue) => accumulator + currentValue, 0)
+
+        if(count == len) {
             return m
         }
         return undefined
@@ -96,6 +119,8 @@ const filterMembers = function(vnode, input) {
 
     vnode.state.mails = vnode.state.filteredMembers.map(m => m[0].email).join(',')
 }
+
+import { TagInput, Tag, Icon, Icons, Intent, Size } from 'construct-ui'
 
 var MembersList = {
     oninit: function(vnode) {
@@ -108,6 +133,7 @@ var MembersList = {
         vnode.state.resigned = true
         vnode.state.extern = true
         vnode.state.mails = ''
+        vnode.state.tags = []
 
         m.request({
             method: 'GET',
@@ -119,6 +145,7 @@ var MembersList = {
         })
     },
     view: function(vnode) {
+        const isEmpty = this.tags.length === 0;
         return [
             m('div.col-9', m('form',
                 m('.form-group', [
@@ -140,113 +167,44 @@ var MembersList = {
                 m('br'),
                 m('a', { href: 'mailto:' + vnode.state.mails }, 'Email an Liste schreiben ...'),
             ])),
-            m('div.col-12', m('',
-                m('.form-group', [
-                    m('input[type=text].form-control[placeholder="Suche nach Vor- oder Nachname"]', {
-                        value: vnode.state.q,
-                        oninput: function(e) {
-                            vnode.state.q = e.target.value;
-                            filterMembers(vnode, vnode.state.q);
-                        }
-                    })
-                ])
-            )),
+            // 'section' ['judo', 'ju jitsu', 'jujitsu']
+            // 'type' ['aktiv', 'passiv', 'kind' 'ausgetreten', 'extern']
+            // 'vorname', 'nachname'
             m('div.col-12',
-                m('.row.form-group', [
-                    m('.col-2', m('label[for=field-kids]', 'Kinder')),
-                    m('.form-check.col-1', [
-                        m('input[type=checkbox].form-check-input' + (vnode.state.kids ? '[checked]' : ''), {
-                            placeholder: 'Kinder',
-                            id: 'field-kids',
-                            onchange: (e) => {
-                                vnode.state.kids = !vnode.state.kids
-                                filterMembers(vnode, vnode.state.q)
-                            },
-                        }),
-                    ]),
-                    m('.col-2', m('label[for=field-judo]', 'Judo')),
-                    m('.form-check.col-1', [
-                        m('input[type=checkbox].form-check-input' + (vnode.state.judo ? '[checked]' : ''), {
-                            placeholder: 'Judo',
-                            id: 'field-judo',
-                            onchange: (e) => {
-                                vnode.state.judo = !vnode.state.judo
-                                filterMembers(vnode, vnode.state.q)
-                            },
-                        }),
-                    ]),
-                    m('.col-2', m('label[for=field-jujitsu]', 'Ju Jitsu')),
-                    m('.form-check.col-1', [
-                        m('input[type=checkbox].form-check-input' + (vnode.state.jujitsu ? '[checked]' : ''), {
-                            placeholder: 'Ju Jitsu',
-                            id: 'field-jujitsu',
-                            onchange: (e) => {
-                                vnode.state.jujitsu = !vnode.state.jujitsu
-                                filterMembers(vnode, vnode.state.q)
-                            },
-                        }),
-                    ]),
-                    m('.col-2', m('label[for=field-resigned]', 'Extern')),
-                    m('.form-check.col-1', [
-                        m('input[type=checkbox].form-check-input', {
-                            placeholder: 'Extern',
-                            id: 'field-external',
-                            checked: vnode.state.extern,
-                            onchange: (e) => {
-                                vnode.state.extern = !vnode.state.extern
-                                filterMembers(vnode, vnode.state.q)
-                            },
-                        }),
-                    ])
-                ]),
-                m('.row.form-group', [
-                    m('.col-2', m('label[for=field-active]', 'Aktiv')),
-                    m('.form-check.col-1', [
-                        m('input[type=checkbox].form-check-input' + (vnode.state.active ? '[checked]' : ''), {
-                            placeholder: 'Aktiv',
-                            id: 'field-active',
-                            onchange: (e) => {
-                                vnode.state.active = !vnode.state.active
-                                filterMembers(vnode, vnode.state.q)
-                            },
-                        }),
-                    ]),
-                    m('.col-2', m('label[for=field-passive]', 'Passiv')),
-                    m('.form-check.col-1', [
-                        m('input[type=checkbox].form-check-input' + (vnode.state.passive ? '[checked]' : ''), {
-                            placeholder: 'Passiv',
-                            id: 'field-passive',
-                            onchange: (e) => {
-                                vnode.state.passive = !vnode.state.passive
-                                filterMembers(vnode, vnode.state.q)
-                            },
-                        }),
-                    ]),
-                    m('.col-2', m('label[for=field-resigned]', 'Ausgetreten')),
-                    m('.form-check.col-1', [
-                        m('input[type=checkbox].form-check-input' + (vnode.state.resigned ? '[checked]' : ''), {
-                            placeholder: 'Ausgetreten',
-                            id: 'field-resigned',
-                            onchange: (e) => {
-                                vnode.state.resigned = !vnode.state.resigned
-                                filterMembers(vnode, vnode.state.q)
-                            },
-                        }),
-                    ]),
-                    m('.col-2', m('label[for=field-resigned]', 'Extern')),
-                    m('.form-check.col-1', [
-                        m('input[type=checkbox].form-check-input', {
-                            placeholder: 'Extern',
-                            id: 'field-external2',
-                            checked: vnode.state.extern,
-                            onchange: (e) => {
-                                vnode.state.extern = !vnode.state.extern
-                                filterMembers(vnode, vnode.state.q)
-                            },
-                        }),
-                    ])
-                ])
+                m(
+                    '',
+                    [
+                        'Filter sind einzugeben mit dem Format ', m('b', 'filter:wert'), '. Zum Beispiel ', m('b', 'sektion:jujitsu'), ' oder ', m('b', 's:jj'), '.',
+                        m('br'),
+                        'Mögliche Filter sind, wobei mögliche Werte in eckigen Klammern und Kürzel in runden Klammern sind:',
+                        m('ul', [
+                            m('li', 'sektion(s):[judo(j), jujitsu(jj)]'),
+                            m('li', 'typ(t):[aktiv(a), passiv(p), kind(k), ausgetreten(r), extern(e)]'),
+                            m('li', 'vorname(v)[beliebiger wert]'),
+                            m('li', 'nachname(n)[beliebiger wert]'),
+                        ])
+                    ]
+                )
             ),
+            m('div.col-12', [
+                m(TagInput, {
+                    addOnBlur: this.addOnBlur,
+                    tags: this.tags.map(tag => m(Tag, {
+                        label: tag,
+                        onRemove: () => this.removeTag(vnode, tag)
+                    })),
+                    disabled: false,
+                    intent: Intent.DEFAULT,
+                    size: Size.DEFAULT,
+                    contentLeft: m(Icon, { name: Icons.SEARCH }),
+                    contentRight: isEmpty ? '' : m(Icon, {
+                        name: Icons.X,
+                        onclick: v => this.clear(vnode, v)
+                        }),
+                    class: 'search-input',
+                    onAdd: v => this.onAdd(vnode, v),
+                }),
+            ]),
             m('div.col-12', [
                 m('table.table.table-hover.col-12', [
                     m('thead', m('tr', [
@@ -280,6 +238,20 @@ var MembersList = {
                 ])
             ])
         ]
+    },
+    onAdd(vnode, value) {
+        vnode.state.tags.push(value)
+        filterMembers(vnode)
+    },
+    removeTag(vnode, tag) {
+        const index = vnode.state.tags.indexOf(tag)
+        vnode.state.tags.splice(index, 1)
+
+        filterMembers(vnode)
+    },
+    clear(vnode){
+        vnode.state.tags = []
+        filterMembers(vnode)
     }
 }
 
