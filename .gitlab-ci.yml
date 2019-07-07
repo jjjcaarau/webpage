@@ -37,16 +37,6 @@ copy:frontend:
         - rsync -a static/ deploy@new.jjjcaarau.ch:/var/www/jjjcaarau-webpage/static
         - ssh deploy@new.jjjcaarau.ch 'sudo chown -R deploy:www-data /var/www/jjjcaarau-webpage/*'
 
-reload:frontend:
-    stage: reload
-    image: node:12.4.0-stretch
-    only:
-        - master
-    script:
-        - ssh deploy@new.jjjcaarau.ch 'sudo systemctl daemon-reload'
-        - ssh deploy@new.jjjcaarau.ch 'sudo service jjjcaarau.ch restart'
-
-
 build:backend:
     stage: build
     image: rustlang/rust:nightly
@@ -70,9 +60,11 @@ migrations:backend:
     script:
         - ssh deploy@new.jjjcaarau.ch '/home/deploy/.cargo/bin/diesel migration run --database-url /var/www/jjjcaarau-webpage/db.sqlite3' --migration-dir /var/www/jjjcaarau-webpage/migrations
 
-reload:backend:
+reload:
     stage: reload
     image: rustlang/rust:nightly
+    only:
+        - master
     script:
         - ssh deploy@new.jjjcaarau.ch 'sudo systemctl daemon-reload'
         - ssh deploy@new.jjjcaarau.ch 'sudo service jjjcaarau.ch restart'
