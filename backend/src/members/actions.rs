@@ -36,7 +36,7 @@ pub fn list_all(connection: &SqliteConnection) -> Result<Vec<(Member, Vec<Event>
         .order_by(members::columns::first_name)
         .load::<Member>(connection)?;
     let event_list = Event::belonging_to(&member_list)
-        .order_by(events::columns::date)
+        .order_by((events::columns::date, events::columns::id))
         .load::<Event>(connection)?
         .grouped_by(&member_list);
     let family_list = members::table
@@ -73,7 +73,7 @@ pub fn get(connection: &SqliteConnection, id: i32) -> Result<(Member, Vec<Event>
         }
     };
     let event_list = Event::belonging_to(&member)
-        .order_by(events::columns::date)
+        .order((events::columns::date, events::columns::id))
         .load::<Event>(connection)?;
     let family_list = members::table
         .filter({
