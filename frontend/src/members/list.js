@@ -119,6 +119,17 @@ const filterMembers = function(vnode) {
                     }
                     return false
                 }
+
+                let name = f[0].toLowerCase().split(' ')
+                if(m[0].first_name.toLowerCase().includes(name[0])) {
+                    if(name.length > 1) {
+                        return m[0].last_name.toLowerCase().includes(name[name.length - 1])
+                    } else {
+                        return true
+                    }
+                } else {
+                    return false
+                }
             })
             .reduce((accumulator, currentValue) => accumulator + currentValue, 0)
 
