@@ -26,7 +26,7 @@ copy:frontend:
     only:
         - master
     script:
-        - rsync -a dist/ deploy@new.jjjcaarau.ch:/var/www/jjjcaarau-webpage/static
+        - rsync -a static/ deploy@new.jjjcaarau.ch:/var/www/jjjcaarau-webpage/static
         - ssh deploy@new.jjjcaarau.ch 'sudo chown -R deploy:www-data /var/www/jjjcaarau-webpage/*'
 
 reload:frontend:
@@ -60,5 +60,5 @@ cache:
         - apt/
         - cargo/
         - node_modules/
-        - dist/
+        - static/
         - target/
