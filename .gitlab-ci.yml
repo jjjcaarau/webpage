@@ -55,7 +55,7 @@ copy:backend:
 migrations:backend:
     image: rustlang/rust:nightly
     script:
-        - ssh deploy@new.jjjcaarau.ch 'diesel migration run'
+        - ssh deploy@new.jjjcaarau.ch '/home/deploy/.cargo/bin/diesel migration run'
 
 reload:backend:
     image: rustlang/rust:nightly
