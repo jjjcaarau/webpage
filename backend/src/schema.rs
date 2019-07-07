@@ -10,9 +10,9 @@ table! {
     events (id) {
         id -> Integer,
         member_id -> Integer,
-        event_type -> crate::events::model::EventTypeMapping,
-        class -> crate::events::model::EventClassMapping,
-        division -> crate::events::model::EventDivisionMapping,
+        event_type -> Text,
+        class -> Text,
+        division -> Text,
         comment -> Nullable<Text>,
         date -> Date,
     }
@@ -38,7 +38,7 @@ table! {
         comment -> Text,
         email_allowed -> Bool,
         passport_no -> Text,
-        member_type -> crate::members::model::MemberTypeMapping,
+        member_type -> Text,
         needs_mark -> Bool,
         section_jujitsu -> Bool,
         section_judo -> Bool,

@@ -68,8 +68,8 @@ INSERT INTO members (
     passport_no,
     member_type,
     needs_mark,
-    FALSE AS secttion_jujitsu,
-    FALSE AS secttion_judo
+    0 AS section_jujitsu,
+    0 AS section_judo
 FROM members_old;
 
 DROP TABLE members_old;
