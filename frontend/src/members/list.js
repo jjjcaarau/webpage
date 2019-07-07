@@ -30,6 +30,7 @@ const filterMembers = function(vnode) {
     
     // 'section' ['judo', 'ju jitsu', 'jujitsu']
     // 'type' ['aktiv', 'passiv', 'kind' 'ausgetreten', 'extern']
+    // 'range'
     // 'vorname', 'nachname'
     
     let filters = vnode.state.tags.map(
@@ -107,6 +108,16 @@ const filterMembers = function(vnode) {
                         return tags.filter(t => t == 'Extern').length > 0
                     }
                     return true
+                }
+
+                if (f[0] == 'range' || f[0] == 'r') {
+                    let range = f[1].split('-').map(t => t.trim())
+                    let year = new Date(m[0].birthday).getFullYear()
+
+                    if(range[0] <= year && year <= range[1]) {
+                        return true
+                    }
+                    return false
                 }
             })
             .reduce((accumulator, currentValue) => accumulator + currentValue, 0)

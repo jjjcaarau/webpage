@@ -13680,6 +13680,7 @@ function copyTextToClipboard(text) {
 var filterMembers = function filterMembers(vnode) {
   // 'section' ['judo', 'ju jitsu', 'jujitsu']
   // 'type' ['aktiv', 'passiv', 'kind' 'ausgetreten', 'extern']
+  // 'range'
   // 'vorname', 'nachname'
   var filters = vnode.state.tags.map(function (t) {
     return t.trim().split(':').map(function (t) {
@@ -13777,6 +13778,19 @@ var filterMembers = function filterMembers(vnode) {
         }
 
         return true;
+      }
+
+      if (f[0] == 'range' || f[0] == 'r') {
+        var range = f[1].split('-').map(function (t) {
+          return t.trim();
+        });
+        var year = new Date(m[0].birthday).getFullYear();
+
+        if (range[0] <= year && year <= range[1]) {
+          return true;
+        }
+
+        return false;
       }
     }).reduce(function (accumulator, currentValue) {
       return accumulator + currentValue;
