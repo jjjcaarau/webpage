@@ -267,7 +267,10 @@ fn get_tags(member: &Member, events: &Vec<Event>) -> Vec<Tag> {
     }
 
     // Check if resigned
-    club_events.sort_by(|a, b| b.date.partial_cmp(&a.date).expect("Buggedi bug bug."));
+    club_events.sort_by(|a, b| match b.date.partial_cmp(&a.date).expect("Buggedi bug bug.") {
+        std::cmp::Ordering::Equal => b.id.cmp(&a.id),
+        other => other,
+    });
     if club_events.len() > 0 {
         let last = club_events[0];
         if last.class == EventClass::Demotion {
@@ -279,22 +282,34 @@ fn get_tags(member: &Member, events: &Vec<Event>) -> Vec<Tag> {
         result.push(member.member_type.into());
     }
 
-    board_events.sort_by(|a, b| b.date.partial_cmp(&a.date).expect("Buggedi bug bug."));
+    board_events.sort_by(|a, b| match b.date.partial_cmp(&a.date).expect("Buggedi bug bug.") {
+        std::cmp::Ordering::Equal => b.id.cmp(&a.id),
+        other => other,
+    });
     if board_events.len() > 0 && board_events[0].class == EventClass::Promotion {
         result.push(Tag::Board);
     }
 
-    trainer_events.sort_by(|a, b| b.date.partial_cmp(&a.date).expect("Buggedi bug bug."));
+    trainer_events.sort_by(|a, b| match b.date.partial_cmp(&a.date).expect("Buggedi bug bug.") {
+        std::cmp::Ordering::Equal => b.id.cmp(&a.id),
+        other => other,
+    });
     if trainer_events.len() > 0 && trainer_events[0].class == EventClass::Promotion {
         result.push(Tag::Trainer(trainer_events[0].division.into()));
     }
 
-    cotrainer_events.sort_by(|a, b| b.date.partial_cmp(&a.date).expect("Buggedi bug bug."));
+    cotrainer_events.sort_by(|a, b| match b.date.partial_cmp(&a.date).expect("Buggedi bug bug.") {
+        std::cmp::Ordering::Equal => b.id.cmp(&a.id),
+        other => other,
+    });
     if cotrainer_events.len() > 0 && cotrainer_events[0].class == EventClass::Promotion {
         result.push(Tag::CoTrainer(cotrainer_events[0].division.into()));
     }
 
-    judo_events.sort_by(|a, b| b.date.partial_cmp(&a.date).expect("Buggedi bug bug."));
+    judo_events.sort_by(|a, b| match b.date.partial_cmp(&a.date).expect("Buggedi bug bug.") {
+        std::cmp::Ordering::Equal => b.id.cmp(&a.id),
+        other => other,
+    });
     if judo_events.len() > 0 && judo_events[0].class == EventClass::Promotion {
         let event = judo_events[0];
         match event.event_type {
@@ -317,7 +332,10 @@ fn get_tags(member: &Member, events: &Vec<Event>) -> Vec<Tag> {
         };
     }
 
-    jujitsu_events.sort_by(|a, b| b.date.partial_cmp(&a.date).expect("Buggedi bug bug."));
+    jujitsu_events.sort_by(|a, b| match b.date.partial_cmp(&a.date).expect("Buggedi bug bug.") {
+        std::cmp::Ordering::Equal => b.id.cmp(&a.id),
+        other => other,
+    });
     if jujitsu_events.len() > 0 && jujitsu_events[0].class == EventClass::Promotion {
         let event = jujitsu_events[0];
         match event.event_type {
