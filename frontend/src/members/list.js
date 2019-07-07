@@ -140,6 +140,9 @@ const ordering = [
     }, {
 
         value: 'last_name', label: 'Nachname'
+    }, {
+
+        value: 'birthday', label: 'Geburtstag'
     }
 ]
 
