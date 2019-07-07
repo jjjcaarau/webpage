@@ -67,6 +67,6 @@ cache:
     paths:
         - apt/
         - cargo/
-        - node_modules/
+        - frontend/node_modules/
         - static/
         - backend/target/
