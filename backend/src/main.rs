@@ -12,6 +12,7 @@ extern crate rocket_contrib;
 extern crate serde_derive;
 #[macro_use]
 extern crate itertools;
+use std::env;
 
 mod db;
 mod members;
@@ -26,7 +27,7 @@ use rocket_contrib::{
 
 fn main() {
     rocket::ignite()
-        .mount("/static", StaticFiles::from(concat!(env!("CARGO_MANIFEST_DIR"), "/../static")))
+        .mount("/static", StaticFiles::from(env::var("APP_STATIC").expect("The APP_STATIC environment variable is required.")))
         .mount("/members", routes![
             crate::routes::members::list,
             crate::routes::members::list_json,
