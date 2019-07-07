@@ -13862,6 +13862,8 @@ var MembersList = {
     vnode.state.tags = possibleTags ? JSON.parse(possibleTags) : [];
     vnode.state.order = possibleOrder ? JSON.parse(possibleOrder) : ordering[0];
     vnode.state.orderDirection = possibleOrderDirection ? JSON.parse(possibleOrderDirection) : true;
+    var possibleHelpIsOpen = JSON.parse(window.sessionStorage.getItem('helpIsOpen'));
+    vnode.state.helpIsOpen = possibleHelpIsOpen === null ? false : possibleHelpIsOpen;
     m.request({
       method: 'GET',
       url: "/members/list_json"
@@ -13874,12 +13876,16 @@ var MembersList = {
     var _this = this;
 
     var isEmpty = this.tags.length === 0;
-    return [m('div.col-9', m('form', m('.form-group', [m('button.btn.btn-success[type=text]', {
-      onclick: function onclick(e) {
-        e.preventDefault();
+    return [m('div.col-9', m(_constructUi.ControlGroup, {
+      style: 'display:flex;'
+    }, [m(_constructUi.Button, {
+      iconLeft: _constructUi.Icons.PLUS,
+      label: 'Neues Mitglied hinzufügen',
+      intent: 'primary',
+      onclick: function onclick() {
         window.location = '/members/view/0';
       }
-    }, [m('i.fas.fa-plus'), ' Neues Mitglied hinzufügen.'])]))), m('div.col-3', m('p.text-right', [m('a[href=#]', {
+    })])), m('div.col-3', m('p.text-right', [m('a[href=#]', {
       onclick: function onclick(e) {
         e.preventDefault();
         copyTextToClipboard(vnode.state.mails);
@@ -13889,7 +13895,7 @@ var MembersList = {
     }, 'Email an Liste schreiben ...')])), // 'section' ['judo', 'ju jitsu', 'jujitsu']
     // 'type' ['aktiv', 'passiv', 'kind' 'ausgetreten', 'extern']
     // 'vorname', 'nachname'
-    m('div.col-12', m('', ['Filter sind einzugeben mit dem Format ', m('b', 'filter:wert'), '. Zum Beispiel ', m('b', 'sektion:jujitsu'), ' oder ', m('b', 's:jj'), '.', m('br'), 'Mögliche Filter sind, wobei mögliche Werte in eckigen Klammern und Kürzel in runden Klammern sind:', m('ul', [m('li', 'sektion(s):[judo(j), jujitsu(jj)]'), m('li', 'typ(t):[aktiv(a), passiv(p), kind(k), ausgetreten(r), extern(e)]'), m('li', 'vorname(v):[beliebiger wert]'), m('li', 'nachname(n):[beliebiger wert]')])])), m('div.col-12', [m(_constructUi.ControlGroup, {
+    m('div.col-12', ['Filter sind einzugeben mit dem Format ', m('b', 'filter:wert'), '. Zum Beispiel ', m('b', 'sektion:jujitsu'), ' oder ', m('b', 's:jj'), '.', m('br'), 'Mögliche Filter sind, wobei mögliche Werte in eckigen Klammern und Kürzel in runden Klammern sind:', m('ul', [m('li', 'sektion(s):[judo(j), jujitsu(jj)], z.B. s:jj'), m('li', 'typ(t):[aktiv(a), passiv(p), kind(k), ausgetreten(r), extern(e)], z.B. t:a'), m('li', 'vorname(v):[beliebiger wert], z.B. v:Thomas'), m('li', 'nachname(n):[beliebiger wert], z.B. n:Gabrielli'), m('li', 'range(r):yyyy-yyyy, z.B. r:1999-2003')]), 'Gibt es Input ohne Selektor, z.B. "Cris To", dann wird direkt nach Vor- und Nachnamen gesucht.', m('br'), 'Es können mehrere Filter angewandt werden, wobei alle erfüllt sein müssen damit ein Eintrag erscheint!']), m('div.col-12', [m(_constructUi.ControlGroup, {
       style: 'display:flex;'
     }, [m(_constructUi.TagInput, {
       addOnBlur: this.addOnBlur,
