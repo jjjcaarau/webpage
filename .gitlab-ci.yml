@@ -55,7 +55,7 @@ copy:backend:
 migrations:backend:
     image: rustlang/rust:nightly
     script:
-        - ssh deploy@new.jjjcaarau.ch '/home/deploy/.cargo/bin/diesel migration run --database-url db.sqlite3'
+        - ssh deploy@new.jjjcaarau.ch '/home/deploy/.cargo/bin/diesel migration run --database-url /var/www/jjjcaarau-webpage/db.sqlite3' --migration-dir /var/www/jjjcaarau-webpage/migrations
 
 reload:backend:
     image: rustlang/rust:nightly
