@@ -61,17 +61,61 @@ const eventTypeString = event => {
         case 'Board': return 'Vorstand'
         case 'Honorary': return 'Ehrenmitglied'
         case 'Kyu': return 'Gurtprüfung'
+        case 'Entry': return 'Clubeintritt'
+        case 'Resignation': return 'Clubaustritt'
     }
 }
 
 /// All possible event types.
 const event_types = [
+    'Entry',
+    'Resignation',
     'Trainer',
     'CoTrainer',
     'Board',
     'Honorary',
     'Kyu',
 ]
+
+const ClubEventAdd = {
+    oninit: function(vnode) {
+        vnode.attrs.transmitter.add = () =>
+            m.request({
+                method: 'POST',
+                url: "/events/create_json",
+                data: {
+                    member_id: vnode.state.member.id,
+                    event_type: 'Club',
+                    class: vnode.state.class,
+                    division: vnode.state.division,
+                    comment: vnode.state.comment,
+                    date: vnode.state.date,
+                }
+            })
+        vnode.state.date = getToday()
+        vnode.state.class = vnode.attrs.class
+        vnode.state.division = 'Club'
+        vnode.state.comment = ''
+        vnode.state.member = vnode.attrs.member
+    },
+    onbeforeupdate: function(vnode) {
+        vnode.state.member = vnode.attrs.member
+        vnode.state.class = vnode.attrs.class
+    },
+    view: function(vnode) {
+        return [
+            ' am ',
+            m('input.form-control[type=text][placeholder=Datum(YYYY-MM-DD)][pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"].', {
+                onchange: e => vnode.state.date = e.target.value,
+                value: vnode.state.date,
+            }),
+            m('input.form-control[type=text][placeholder=Kommentar]', {
+                onchange: e => vnode.state.comment = e.target.value,
+                value: vnode.state.comment,
+            }),
+        ]
+    }
+}
 
 const TrainerEventAdd = {
     oninit: function(vnode) {
@@ -278,7 +322,7 @@ export const MemberEvents = {
     oninit: function(vnode) {
         vnode.state.events = vnode.attrs.events;
         vnode.state.member = vnode.attrs.member;
-        vnode.state.type = 'Trainer'
+        vnode.state.type = 'Entry'
         vnode.state.transmitter = {}
     },
     onbeforeupdate: function(vnode) {
@@ -323,6 +367,8 @@ export const MemberEvents = {
                     ' : ',
                     (() => {
                         switch(vnode.state.type) {
+                            case 'Entry': return m(ClubEventAdd, { transmitter: vnode.state.transmitter, member, class: 'Promotion' })
+                            case 'Resignation': return m(ClubEventAdd, { transmitter: vnode.state.transmitter, member, class: 'Demotion' })
                             case 'Trainer': return m(TrainerEventAdd, { transmitter: vnode.state.transmitter, member, type: 'Trainer' })
                             case 'CoTrainer': return m(TrainerEventAdd, { transmitter: vnode.state.transmitter, member, type: 'CoTrainer' })
                             case 'Board': return m(BoardEventAdd, { transmitter: vnode.state.transmitter, member })

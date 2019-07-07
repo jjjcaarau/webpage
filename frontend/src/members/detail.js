@@ -1,12 +1,12 @@
 import m from 'mithril'
 
 // Creates an input field.
-const input = (storage, key, text, pattern) =>
+const input = (storage, key, text, pattern, placeholder) =>
     m('.row.form-group', [
         m('label.col-lg-2.col-md-3.col-sm-4.col-form-label', text),
         m('input[type=text].col-lg-10.col-md-9.col-sm-8.form-control', {
             name: storage[key],
-            placeholder: text,
+            placeholder: placeholder ? placeholder : text,
             value: storage[key],
             pattern: pattern ? pattern : undefined,
             oninput: (e) => storage[key] = e.target.value,
@@ -74,7 +74,7 @@ export const MemberDetail = {
                             m('option[value=M]', 'Männlich'),
                         ]),
                     ]),
-                    input(member, 'birthday', 'Geburtstag*', '[0-9]{4}-[0-9]{2}-[0-9]{2}'),
+                    input(member, 'birthday', 'Geburtstag*', '[0-9]{4}-[0-9]{2}-[0-9]{2}', 'YYYY-MM-DD'),
                     checkbox(member, 'email_allowed', 'Möchte Emails'),
                     input(member, 'email', 'Email'),
                     input(member, 'phone_p', 'Telefon (P)'),

@@ -1461,10 +1461,10 @@ var _mithril = _interopRequireDefault(require("mithril"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Creates an input field.
-var input = function input(storage, key, text, pattern) {
+var input = function input(storage, key, text, pattern, placeholder) {
   return (0, _mithril.default)('.row.form-group', [(0, _mithril.default)('label.col-lg-2.col-md-3.col-sm-4.col-form-label', text), (0, _mithril.default)('input[type=text].col-lg-10.col-md-9.col-sm-8.form-control', {
     name: storage[key],
-    placeholder: text,
+    placeholder: placeholder ? placeholder : text,
     value: storage[key],
     pattern: pattern ? pattern : undefined,
     oninput: function oninput(e) {
@@ -1524,7 +1524,7 @@ var MemberDetail = {
         return member.sex = e.target.value;
       },
       value: member.sex
-    }, [(0, _mithril.default)('option[value=F]', 'Weiblich'), (0, _mithril.default)('option[value=M]', 'Männlich')])]), input(member, 'birthday', 'Geburtstag*', '[0-9]{4}-[0-9]{2}-[0-9]{2}'), checkbox(member, 'email_allowed', 'Möchte Emails'), input(member, 'email', 'Email'), input(member, 'phone_p', 'Telefon (P)'), input(member, 'phone_w', 'Telefon (G)'), input(member, 'mobile', 'Mobiltelefon'), input(member, 'address', 'Strasse*'), input(member, 'address_no', 'Hausnummer*'), input(member, 'postcode', 'PLZ*'), input(member, 'city', 'Wohnort*'), (0, _mithril.default)('.row.form-group', [(0, _mithril.default)('label.col-lg-2.col-md-3.col-sm-4.col-form-label', 'Bemerkungen'), (0, _mithril.default)('textarea[name=comment].col-lg-10.col-md-9.col-sm-8.form-control[placeholder="Bemerkungen"]', {
+    }, [(0, _mithril.default)('option[value=F]', 'Weiblich'), (0, _mithril.default)('option[value=M]', 'Männlich')])]), input(member, 'birthday', 'Geburtstag*', '[0-9]{4}-[0-9]{2}-[0-9]{2}', 'YYYY-MM-DD'), checkbox(member, 'email_allowed', 'Möchte Emails'), input(member, 'email', 'Email'), input(member, 'phone_p', 'Telefon (P)'), input(member, 'phone_w', 'Telefon (G)'), input(member, 'mobile', 'Mobiltelefon'), input(member, 'address', 'Strasse*'), input(member, 'address_no', 'Hausnummer*'), input(member, 'postcode', 'PLZ*'), input(member, 'city', 'Wohnort*'), (0, _mithril.default)('.row.form-group', [(0, _mithril.default)('label.col-lg-2.col-md-3.col-sm-4.col-form-label', 'Bemerkungen'), (0, _mithril.default)('textarea[name=comment].col-lg-10.col-md-9.col-sm-8.form-control[placeholder="Bemerkungen"]', {
       value: member.comment,
       oninput: function oninput(e) {
         return member.comment = e.target.value;
@@ -1871,11 +1871,58 @@ var eventTypeString = function eventTypeString(event) {
 
     case 'Kyu':
       return 'Gurtprüfung';
+
+    case 'Entry':
+      return 'Clubeintritt';
+
+    case 'Resignation':
+      return 'Clubaustritt';
   }
 }; /// All possible event types.
 
 
-var event_types = ['Trainer', 'CoTrainer', 'Board', 'Honorary', 'Kyu'];
+var event_types = ['Entry', 'Resignation', 'Trainer', 'CoTrainer', 'Board', 'Honorary', 'Kyu'];
+var ClubEventAdd = {
+  oninit: function oninit(vnode) {
+    vnode.attrs.transmitter.add = function () {
+      return _mithril.default.request({
+        method: 'POST',
+        url: "/events/create_json",
+        data: {
+          member_id: vnode.state.member.id,
+          event_type: 'Club',
+          class: vnode.state.class,
+          division: vnode.state.division,
+          comment: vnode.state.comment,
+          date: vnode.state.date
+        }
+      });
+    };
+
+    vnode.state.date = (0, _helpers.getToday)();
+    vnode.state.class = vnode.attrs.class;
+    vnode.state.division = 'Club';
+    vnode.state.comment = '';
+    vnode.state.member = vnode.attrs.member;
+  },
+  onbeforeupdate: function onbeforeupdate(vnode) {
+    vnode.state.member = vnode.attrs.member;
+    vnode.state.class = vnode.attrs.class;
+  },
+  view: function view(vnode) {
+    return [' am ', (0, _mithril.default)('input.form-control[type=text][placeholder=Datum(YYYY-MM-DD)][pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"].', {
+      onchange: function onchange(e) {
+        return vnode.state.date = e.target.value;
+      },
+      value: vnode.state.date
+    }), (0, _mithril.default)('input.form-control[type=text][placeholder=Kommentar]', {
+      onchange: function onchange(e) {
+        return vnode.state.comment = e.target.value;
+      },
+      value: vnode.state.comment
+    })];
+  }
+};
 var TrainerEventAdd = {
   oninit: function oninit(vnode) {
     vnode.attrs.transmitter.add = function () {
@@ -2056,7 +2103,7 @@ var MemberEvents = {
   oninit: function oninit(vnode) {
     vnode.state.events = vnode.attrs.events;
     vnode.state.member = vnode.attrs.member;
-    vnode.state.type = 'Trainer';
+    vnode.state.type = 'Entry';
     vnode.state.transmitter = {};
   },
   onbeforeupdate: function onbeforeupdate(vnode) {
@@ -2081,6 +2128,20 @@ var MemberEvents = {
       }, eventTypeString(event_type));
     })), ' : ', function () {
       switch (vnode.state.type) {
+        case 'Entry':
+          return (0, _mithril.default)(ClubEventAdd, {
+            transmitter: vnode.state.transmitter,
+            member: member,
+            class: 'Promotion'
+          });
+
+        case 'Resignation':
+          return (0, _mithril.default)(ClubEventAdd, {
+            transmitter: vnode.state.transmitter,
+            member: member,
+            class: 'Demotion'
+          });
+
         case 'Trainer':
           return (0, _mithril.default)(TrainerEventAdd, {
             transmitter: vnode.state.transmitter,
@@ -2338,7 +2399,9 @@ var MemberView = {
       sex: 'F',
       member_type: 'Active',
       email_allowed: false,
-      needs_mark: false
+      needs_mark: false,
+      section_jujitsu: false,
+      section_judo: false
     };
     vnode.state.events = [];
     vnode.state.family = [];
