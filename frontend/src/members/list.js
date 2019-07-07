@@ -117,10 +117,31 @@ const filterMembers = function(vnode) {
         return undefined
     }).filter(m => m !== undefined)
 
+    vnode.state.filteredMembers.sort(function(a, b){
+        let nameA = a[0][vnode.state.order.value].toLowerCase()
+        let nameB = b[0][vnode.state.order.value].toLowerCase()
+        if (nameA < nameB) {
+            return vnode.state.orderDirection ? -1 : 1
+        }
+        if (nameA > nameB) {
+            return vnode.state.orderDirection ? 1 : -1
+        }
+        return 0; //default return value (no sorting)
+    });
+
     vnode.state.mails = vnode.state.filteredMembers.map(m => m[0].email).join(',')
 }
 
-import { TagInput, Tag, Icon, Icons, Intent, Size } from 'construct-ui'
+import { TagInput, Tag, Icon, Icons, Intent, Size, CustomSelect, Button, ListItem, Colors, ControlGroup } from 'construct-ui'
+
+const ordering = [
+    {
+        value: 'first_name', label: 'Vorname'
+    }, {
+
+        value: 'last_name', label: 'Nachname'
+    }
+]
 
 var MembersList = {
     oninit: function(vnode) {
@@ -134,8 +155,11 @@ var MembersList = {
         vnode.state.extern = true
         vnode.state.mails = ''
         let possibleTags = window.sessionStorage.getItem('searchTags')
+        let possibleOrder = window.sessionStorage.getItem('listOrder')
+        let possibleOrderDirection = window.sessionStorage.getItem('listOrderDirection')
         vnode.state.tags = possibleTags ? JSON.parse(possibleTags) : []
-        
+        vnode.state.order = possibleOrder ? JSON.parse(possibleOrder) : ordering[0]
+        vnode.state.orderDirection = possibleOrderDirection ? JSON.parse(possibleOrderDirection) : true
 
         m.request({
             method: 'GET',
@@ -182,30 +206,46 @@ var MembersList = {
                         m('ul', [
                             m('li', 'sektion(s):[judo(j), jujitsu(jj)]'),
                             m('li', 'typ(t):[aktiv(a), passiv(p), kind(k), ausgetreten(r), extern(e)]'),
-                            m('li', 'vorname(v)[beliebiger wert]'),
-                            m('li', 'nachname(n)[beliebiger wert]'),
+                            m('li', 'vorname(v):[beliebiger wert]'),
+                            m('li', 'nachname(n):[beliebiger wert]'),
                         ])
                     ]
                 )
             ),
             m('div.col-12', [
-                m(TagInput, {
-                    addOnBlur: this.addOnBlur,
-                    tags: this.tags.map(tag => m(Tag, {
-                        label: tag,
-                        onRemove: () => this.removeTag(vnode, tag)
-                    })),
-                    disabled: false,
-                    intent: Intent.DEFAULT,
-                    size: Size.DEFAULT,
-                    contentLeft: m(Icon, { name: Icons.SEARCH }),
-                    contentRight: isEmpty ? '' : m(Icon, {
-                        name: Icons.X,
-                        onclick: v => this.clear(vnode, v)
-                        }),
-                    class: 'search-input',
-                    onAdd: v => this.onAdd(vnode, v),
-                }),
+                m(ControlGroup, { style: 'display:flex;' }, [
+                    m(TagInput, {
+                        addOnBlur: this.addOnBlur,
+                        tags: this.tags.map(tag => m(Tag, {
+                            label: tag,
+                            onRemove: () => this.removeTag(vnode, tag)
+                        })),
+                        disabled: false,
+                        intent: Intent.DEFAULT,
+                        size: Size.DEFAULT,
+                        contentLeft: m(Icon, { name: Icons.SEARCH }),
+                        contentRight: isEmpty ? '' : m(Icon, {
+                            name: Icons.X,
+                            onclick: v => this.clear(vnode, v)
+                            }),
+                        class: 'search-input',
+                        onAdd: v => this.onAdd(vnode, v),
+                    }),
+                    m(CustomSelect, {
+                        value: vnode.state.order.value,
+                        options: ordering,
+                        onSelect: item => this.handleSelect(vnode, item)
+                    }),
+                    m(Button, {
+                        iconLeft: vnode.state.orderDirection ? Icons.ARROW_UP : Icons.ARROW_DOWN,
+                        onclick: () => {
+                            vnode.state.orderDirection = !vnode.state.orderDirection
+                            window.sessionStorage.setItem('listOrderDirection', JSON.stringify(vnode.state.orderDirection))
+                            filterMembers(vnode)
+                        },
+                        style: '',
+                    }),
+                ]),
             ]),
             m('div.col-12', [
                 m('table.table.table-hover.col-12', [
@@ -256,6 +296,11 @@ var MembersList = {
     clear(vnode){
         vnode.state.tags = []
         window.sessionStorage.setItem('searchTags', JSON.stringify(vnode.state.tags))
+        filterMembers(vnode)
+    },
+    handleSelect(vnode, item) {
+        vnode.state.order = item;
+        window.sessionStorage.setItem('listOrder', JSON.stringify(vnode.state.order))
         filterMembers(vnode)
     }
 }

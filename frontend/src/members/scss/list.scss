@@ -1,5 +1,6 @@
 @import "../../../node_modules//construct-ui/lib/index.css";
 
 .search-input {
-    width: 100%;
+    width: 50%;
+    flex-grow: 1;
 }

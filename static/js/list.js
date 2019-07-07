@@ -13790,11 +13790,32 @@ var filterMembers = function filterMembers(vnode) {
   }).filter(function (m) {
     return m !== undefined;
   });
+  vnode.state.filteredMembers.sort(function (a, b) {
+    var nameA = a[0][vnode.state.order.value].toLowerCase();
+    var nameB = b[0][vnode.state.order.value].toLowerCase();
+
+    if (nameA < nameB) {
+      return vnode.state.orderDirection ? -1 : 1;
+    }
+
+    if (nameA > nameB) {
+      return vnode.state.orderDirection ? 1 : -1;
+    }
+
+    return 0; //default return value (no sorting)
+  });
   vnode.state.mails = vnode.state.filteredMembers.map(function (m) {
     return m[0].email;
   }).join(',');
 };
 
+var ordering = [{
+  value: 'first_name',
+  label: 'Vorname'
+}, {
+  value: 'last_name',
+  label: 'Nachname'
+}];
 var MembersList = {
   oninit: function oninit(vnode) {
     vnode.state.q = '';
@@ -13807,7 +13828,11 @@ var MembersList = {
     vnode.state.extern = true;
     vnode.state.mails = '';
     var possibleTags = window.sessionStorage.getItem('searchTags');
+    var possibleOrder = window.sessionStorage.getItem('listOrder');
+    var possibleOrderDirection = window.sessionStorage.getItem('listOrderDirection');
     vnode.state.tags = possibleTags ? JSON.parse(possibleTags) : [];
+    vnode.state.order = possibleOrder ? JSON.parse(possibleOrder) : ordering[0];
+    vnode.state.orderDirection = possibleOrderDirection ? JSON.parse(possibleOrderDirection) : true;
     m.request({
       method: 'GET',
       url: "/members/list_json"
@@ -13835,7 +13860,9 @@ var MembersList = {
     }, 'Email an Liste schreiben ...')])), // 'section' ['judo', 'ju jitsu', 'jujitsu']
     // 'type' ['aktiv', 'passiv', 'kind' 'ausgetreten', 'extern']
     // 'vorname', 'nachname'
-    m('div.col-12', m('', ['Filter sind einzugeben mit dem Format ', m('b', 'filter:wert'), '. Zum Beispiel ', m('b', 'sektion:jujitsu'), ' oder ', m('b', 's:jj'), '.', m('br'), 'Mögliche Filter sind, wobei mögliche Werte in eckigen Klammern und Kürzel in runden Klammern sind:', m('ul', [m('li', 'sektion(s):[judo(j), jujitsu(jj)]'), m('li', 'typ(t):[aktiv(a), passiv(p), kind(k), ausgetreten(r), extern(e)]'), m('li', 'vorname(v)[beliebiger wert]'), m('li', 'nachname(n)[beliebiger wert]')])])), m('div.col-12', [m(_constructUi.TagInput, {
+    m('div.col-12', m('', ['Filter sind einzugeben mit dem Format ', m('b', 'filter:wert'), '. Zum Beispiel ', m('b', 'sektion:jujitsu'), ' oder ', m('b', 's:jj'), '.', m('br'), 'Mögliche Filter sind, wobei mögliche Werte in eckigen Klammern und Kürzel in runden Klammern sind:', m('ul', [m('li', 'sektion(s):[judo(j), jujitsu(jj)]'), m('li', 'typ(t):[aktiv(a), passiv(p), kind(k), ausgetreten(r), extern(e)]'), m('li', 'vorname(v):[beliebiger wert]'), m('li', 'nachname(n):[beliebiger wert]')])])), m('div.col-12', [m(_constructUi.ControlGroup, {
+      style: 'display:flex;'
+    }, [m(_constructUi.TagInput, {
       addOnBlur: this.addOnBlur,
       tags: this.tags.map(function (tag) {
         return m(_constructUi.Tag, {
@@ -13861,7 +13888,21 @@ var MembersList = {
       onAdd: function onAdd(v) {
         return _this.onAdd(vnode, v);
       }
-    })]), m('div.col-12', [m('table.table.table-hover.col-12', [m('thead', m('tr', [m('th', 'ID'), m('th', 'Vorname'), m('th', 'Nachname(n)'), m('th', 'E-Mail'), m('th', 'Geburtstag')])), m('tbody', [vnode.state.filteredMembers ? vnode.state.filteredMembers.map(function (entry) {
+    }), m(_constructUi.CustomSelect, {
+      value: vnode.state.order.value,
+      options: ordering,
+      onSelect: function onSelect(item) {
+        return _this.handleSelect(vnode, item);
+      }
+    }), m(_constructUi.Button, {
+      iconLeft: vnode.state.orderDirection ? _constructUi.Icons.ARROW_UP : _constructUi.Icons.ARROW_DOWN,
+      onclick: function onclick() {
+        vnode.state.orderDirection = !vnode.state.orderDirection;
+        window.sessionStorage.setItem('listOrderDirection', JSON.stringify(vnode.state.orderDirection));
+        filterMembers(vnode);
+      },
+      style: ''
+    })])]), m('div.col-12', [m('table.table.table-hover.col-12', [m('thead', m('tr', [m('th', 'ID'), m('th', 'Vorname'), m('th', 'Nachname(n)'), m('th', 'E-Mail'), m('th', 'Geburtstag')])), m('tbody', [vnode.state.filteredMembers ? vnode.state.filteredMembers.map(function (entry) {
       var member = entry[0];
       var events = entry[1];
       return [m('tr', {
@@ -13886,6 +13927,11 @@ var MembersList = {
   clear: function clear(vnode) {
     vnode.state.tags = [];
     window.sessionStorage.setItem('searchTags', JSON.stringify(vnode.state.tags));
+    filterMembers(vnode);
+  },
+  handleSelect: function handleSelect(vnode, item) {
+    vnode.state.order = item;
+    window.sessionStorage.setItem('listOrder', JSON.stringify(vnode.state.order));
     filterMembers(vnode);
   }
 };
@@ -13921,7 +13967,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "38687" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "42253" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
