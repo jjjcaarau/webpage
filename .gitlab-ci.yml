@@ -2,6 +2,12 @@ variables:
     APT_CACHE_DIR: $CI_PROJECT_DIR/apt
     CARGO_HOME: $CI_PROJECT_DIR/cargo
 
+stages:
+  - build
+  - copy
+  - migrate
+  - reload
+
 before_script:
     - 'which ssh-agent || ( apt update -y && apt install openssh-client -y )'
     - 'which rsync || ( apt update -y && apt install -y rsync )'
@@ -13,6 +19,7 @@ before_script:
     - chmod 644 ~/.ssh/known_hosts
 
 build:frontend:
+    stage: build
     image: node:12.4.0-stretch
     only:
         - master
@@ -22,6 +29,7 @@ build:frontend:
         - yarn build
 
 copy:frontend:
+    stage: copy
     image: node:12.4.0-stretch
     only:
         - master
@@ -30,6 +38,7 @@ copy:frontend:
         - ssh deploy@new.jjjcaarau.ch 'sudo chown -R deploy:www-data /var/www/jjjcaarau-webpage/*'
 
 reload:frontend:
+    stage: reload
     image: node:12.4.0-stretch
     only:
         - master
@@ -39,12 +48,14 @@ reload:frontend:
 
 
 build:backend:
+    stage: build
     image: rustlang/rust:nightly
     script:
         - cd backend
         - cargo build --release
 
 copy:backend:
+    stage: copy
     image: rustlang/rust:nightly
     script:
         - cd backend
@@ -54,11 +65,13 @@ copy:backend:
         - rsync -a migrations deploy@new.jjjcaarau.ch:/var/www/jjjcaarau-webpage/
 
 migrations:backend:
+    stage: migrate
     image: rustlang/rust:nightly
     script:
         - ssh deploy@new.jjjcaarau.ch '/home/deploy/.cargo/bin/diesel migration run --database-url /var/www/jjjcaarau-webpage/db.sqlite3' --migration-dir /var/www/jjjcaarau-webpage/migrations
 
 reload:backend:
+    stage: reload
     image: rustlang/rust:nightly
     script:
         - ssh deploy@new.jjjcaarau.ch 'sudo systemctl daemon-reload'

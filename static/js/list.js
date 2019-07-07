@@ -13806,7 +13806,8 @@ var MembersList = {
     vnode.state.resigned = true;
     vnode.state.extern = true;
     vnode.state.mails = '';
-    vnode.state.tags = [];
+    var possibleTags = window.sessionStorage.getItem('searchTags');
+    vnode.state.tags = possibleTags ? JSON.parse(possibleTags) : [];
     m.request({
       method: 'GET',
       url: "/members/list_json"
@@ -13873,15 +13874,18 @@ var MembersList = {
   },
   onAdd: function onAdd(vnode, value) {
     vnode.state.tags.push(value);
+    window.sessionStorage.setItem('searchTags', JSON.stringify(vnode.state.tags));
     filterMembers(vnode);
   },
   removeTag: function removeTag(vnode, tag) {
     var index = vnode.state.tags.indexOf(tag);
     vnode.state.tags.splice(index, 1);
+    window.sessionStorage.setItem('searchTags', JSON.stringify(vnode.state.tags));
     filterMembers(vnode);
   },
   clear: function clear(vnode) {
     vnode.state.tags = [];
+    window.sessionStorage.setItem('searchTags', JSON.stringify(vnode.state.tags));
     filterMembers(vnode);
   }
 };

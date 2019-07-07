@@ -133,7 +133,9 @@ var MembersList = {
         vnode.state.resigned = true
         vnode.state.extern = true
         vnode.state.mails = ''
-        vnode.state.tags = []
+        let possibleTags = window.sessionStorage.getItem('searchTags')
+        vnode.state.tags = possibleTags ? JSON.parse(possibleTags) : []
+        
 
         m.request({
             method: 'GET',
@@ -241,16 +243,19 @@ var MembersList = {
     },
     onAdd(vnode, value) {
         vnode.state.tags.push(value)
+        window.sessionStorage.setItem('searchTags', JSON.stringify(vnode.state.tags))
         filterMembers(vnode)
     },
     removeTag(vnode, tag) {
         const index = vnode.state.tags.indexOf(tag)
         vnode.state.tags.splice(index, 1)
+        window.sessionStorage.setItem('searchTags', JSON.stringify(vnode.state.tags))
 
         filterMembers(vnode)
     },
     clear(vnode){
         vnode.state.tags = []
+        window.sessionStorage.setItem('searchTags', JSON.stringify(vnode.state.tags))
         filterMembers(vnode)
     }
 }
