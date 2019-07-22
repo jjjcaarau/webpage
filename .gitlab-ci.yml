@@ -51,7 +51,7 @@ copy:backend:
         - cd backend
         - rsync -a target/release/jjjcaarau-webpage deploy@new.jjjcaarau.ch:/var/www/jjjcaarau-webpage/
         - rsync -a templates deploy@new.jjjcaarau.ch:/var/www/jjjcaarau-webpage/
-        - rsync -a config/default.toml deploy@new.jjjcaarau.ch:/var/www/preview.zigzag/config
+        - rsync -a config/default.toml deploy@new.jjjcaarau.ch:/var/www/jjjcaarau-webpage/config
         - ssh deploy@new.jjjcaarau.ch 'sudo chown -R deploy:www-data /var/www/jjjcaarau-webpage/jjjcaarau-webpage'
         - rsync -a migrations deploy@new.jjjcaarau.ch:/var/www/jjjcaarau-webpage/
 

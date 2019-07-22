@@ -1,7 +1,7 @@
 [general]
 log_level = "Warn"
 blog_root = "../blog/"
-upload_root = "../update/"
+upload_root = "../upload/"
 
 [rocket]
 environment = "Development"
