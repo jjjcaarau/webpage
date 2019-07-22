@@ -1,0 +1,55 @@
+{% extends 'layout' %}
+{% block includes %}
+    <link rel="stylesheet" href="/static/css/pages/club.css">
+    <link rel="stylesheet" href="/static/css/tui-editor/tui-editor.min.css"></link>
+    <link rel="stylesheet" href="/static/css/tui-editor/tui-editor-contents.min.css"></link>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.33.0/codemirror.css"></link>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"></link>
+    <script src="/static/js/tui-editor/tui-editor-Editor-full.min.js"></script>
+    <script src="/static/js/extern/mithril.min.js"></script>
+{% endblock %}
+{% block title %}{% endblock %}
+{% block main %}
+
+<div class="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <input id="title" value="{{ title }}" />
+                <h5>{{ created }}</h5>
+                <p id="editSection">{{ body | safe }}</p>
+                <button onClick="update()">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var editor = new tui.Editor({
+        usageStatistics: false,
+        el: document.querySelector('#editSection'),
+        initialValue: document.querySelector('#editSection').innerHTML,
+        initialEditType: 'markdown',
+        previewStyle: 'vertical',
+        height: '600px'
+    });
+
+    var update = function() {
+        let split = window.location.pathname.split('/');
+        let name = split[split.length - 1];
+        m.request({
+            method: 'POST',
+            url: window.location.pathname,
+            data: {
+                name: name,
+                title: document.querySelector('#title').value,
+                created: '',
+                modified: '',
+                body: editor.getValue(),
+            }
+        })
+        .then(function(result) {
+            console.log(result)
+        })
+    }
+</script>
+{% endblock %}

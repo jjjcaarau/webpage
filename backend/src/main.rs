@@ -12,13 +12,18 @@ extern crate rocket_contrib;
 extern crate serde_derive;
 #[macro_use]
 extern crate itertools;
-use std::env;
+#[macro_use]
+extern crate lazy_static;
 
+mod config;
 mod db;
 mod members;
 mod events;
 mod schema;
 mod routes;
+mod blog;
+
+use crate::config::CONFIG;
 
 use rocket_contrib::{
     templates::Template,
@@ -26,8 +31,22 @@ use rocket_contrib::{
 };
 
 fn main() {
-    rocket::ignite()
-        .mount("/static", StaticFiles::from(env::var("APP_STATIC").expect("The APP_STATIC environment variable is required.")))
+    let config = rocket::config::Config::build(match CONFIG.rocket.environment {
+        crate::config::Environment::Development => rocket::config::Environment::Development,
+        crate::config::Environment::Staging => rocket::config::Environment::Staging,
+        crate::config::Environment::Production => rocket::config::Environment::Production,
+    })
+    .address(&CONFIG.rocket.address)
+        .port(CONFIG.rocket.port)
+        .log_level(match CONFIG.rocket.log_level {
+            log::Level::Error | log::Level::Warn => rocket::config::LoggingLevel::Critical,
+            log::Level::Info => rocket::config::LoggingLevel::Normal,
+            log::Level::Debug | log::Level::Trace => rocket::config::LoggingLevel::Debug,
+        })
+        .finalize()
+        .expect("Failed to create rocket config.");
+    rocket::custom(config)
+        .mount("/static", StaticFiles::from(&CONFIG.rocket.static_root))
         .mount("/members", routes![
             crate::routes::members::list,
             crate::routes::members::list_json,
@@ -39,6 +58,10 @@ fn main() {
         ])
         .mount("/events", routes![
             crate::routes::events::create_json,
+        ])
+        .mount("/blog", routes![
+            crate::routes::blog::edit_get,
+            crate::routes::blog::edit_post,
         ])
         .mount("/", routes![
             crate::routes::root::index,

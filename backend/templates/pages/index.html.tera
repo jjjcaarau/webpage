@@ -1,0 +1,23 @@
+{% extends 'layout' %}
+{% block includes %}
+    <link rel="stylesheet" href="static/css/pages/club.css">
+{% endblock %}
+{% block title %}{% endblock %}
+{% block main %}
+<div class="content">
+    <div class="container">
+        <div class="text-center">
+            <h1 class="content-title">Events</h1>
+        </div>
+        {% for entry in entries %}
+            <div class="row">
+                <div class="col-12">
+                    <h3>{{ entry.title }}</h3>
+                    <h5>{{ entry.created }}</h5>
+                    <p>{{ entry.body | safe }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

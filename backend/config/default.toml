@@ -1,0 +1,13 @@
+[general]
+log_level = "Warn"
+blog_root = "../blog/"
+upload_root = "../update/"
+
+[rocket]
+environment = "Development"
+address = "127.0.0.1"
+port = "8000"
+log_level = "Warn"
+static_root = "../static/"
+recaptcha_private_key = ""
+recaptcha_url = "https://www.google.com/recaptcha/api/siteverify"
