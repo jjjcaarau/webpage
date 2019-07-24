@@ -126,7 +126,8 @@ pub fn update_family(connection: &SqliteConnection, member_id: i32, family_id: O
 pub struct Stats {
     number_of_paying_members: usize,
     paying_members: Vec<(Member, Vec<Event>)>,
-    paying_kids: usize,
+    number_of_paying_kids: usize,
+    paying_kids: Vec<(Member, Vec<Event>)>,
     number_of_paying_students: usize,
     paying_students: Vec<(Member, Vec<Event>)>,
 }
@@ -151,7 +152,7 @@ pub fn get_stats(connection: &SqliteConnection) -> Stats {
     let paying_kids = zipped_members
         .iter()
         .filter(|m| m.0.member_type == MemberType::Kid && is_paying(&get_tags(&m.0, &m.1)))
-        .count();
+        .collect::<Vec<_>>();
     let paying_students = zipped_members
         .clone()
         .into_iter()
@@ -174,6 +175,7 @@ fn is_paying(tags: &Vec<Tag>) -> bool {
             Tag::Honorary => return false,
             Tag::Resigned => return false,
             Tag::Board => return false,
+            Tag::Passive => return false,
             Tag::Trainer(_) => return false,
             Tag::CoTrainer(_) => return false,
             _ => ()

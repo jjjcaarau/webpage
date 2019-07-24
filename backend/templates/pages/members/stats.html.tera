@@ -20,7 +20,10 @@
                 <p>{{ member.0.first_name }} {{ member.0.last_name }}</p>
             {% endfor %}
             <br>
-            <h3>Paying kids: {{ paying_kids }}</h3>
+            <h3>Paying kids: {{ number_of_paying_kids }}</h3>
+            {% for member in paying_kids %}
+                <p>{{ member.0.first_name }} {{ member.0.last_name }}</p>
+            {% endfor %}
             <br>
             <h3>Paying students: {{ number_of_paying_students }}</h3>
             {% for member in paying_students %}
