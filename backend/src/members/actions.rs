@@ -150,6 +150,7 @@ pub fn get_stats(connection: &SqliteConnection) -> Stats {
         .filter(|m| m.0.member_type == MemberType::Active && is_paying(&get_tags(&m.0, &m.1)))
         .collect::<Vec<_>>();
     let paying_kids = zipped_members
+        .clone()
         .into_iter()
         .filter(|m| m.0.member_type == MemberType::Kid && is_paying(&get_tags(&m.0, &m.1)))
         .collect::<Vec<_>>();
