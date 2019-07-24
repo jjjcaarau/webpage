@@ -52,13 +52,13 @@ export const Badges = {
                     badges.push({ type: 'success', text: 'Passiv' })
                     break
                 case 'Student':
-                    badges.push({ type: 'success', text: 'Passiv' })
+                    badges.push({ type: 'success', text: 'Student' })
                     break
                 case 'Parent':
-                    badges.push({ type: 'success', text: 'Passiv' })
+                    badges.push({ type: 'success', text: 'Elternteil' })
                     break
                 case 'Kid':
-                    badges.push({ type: 'success', text: 'Passiv' })
+                    badges.push({ type: 'success', text: 'Kind' })
                     break
                 case 'Honorary':
                     badges.push({ type: 'light', text: 'Ehrenmitglied' })
