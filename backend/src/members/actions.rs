@@ -273,8 +273,8 @@ fn get_tags(member: &Member, events: &Vec<Event>) -> Vec<Tag> {
     // Check if resigned
     club_events.sort_by(|a, b| match b.date.partial_cmp(&a.date).expect("Buggedi bug bug.") {
         std::cmp::Ordering::Equal => match a.class {
-            EventClass::Promotion => std::cmp::Ordering::Less,
-            _ => std::cmp::Ordering::Greater,
+            EventClass::Promotion => std::cmp::Ordering::Greater,
+            _ => std::cmp::Ordering::Less,
         },
         other => other,
     });
