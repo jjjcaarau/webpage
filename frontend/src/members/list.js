@@ -101,7 +101,7 @@ const filterMembers = function(vnode) {
                     if(f[1] == 'kind' || f[1] == 'k') {
                         return tags.filter(t => t == 'Kid').length > 0
                     }
-                    if(f[1] == 'schüler' || f[1] == 's') {
+                    if(f[1] == 'jugendlich' || f[1] == 'j') {
                         return tags.filter(t => t == 'Student').length > 0
                     }
                     if(f[1] == 'ausgetreten' || f[1] == 'r') {
@@ -154,7 +154,7 @@ const filterMembers = function(vnode) {
         return 0; //default return value (no sorting)
     });
 
-    vnode.state.mails = vnode.state.filteredMembers.map(m => m[0].email).join(',')
+    vnode.state.mails = vnode.state.filteredMembers.filter(m => m[0].email_allowed).map(m => m[0].email).join(',')
 }
 
 import { TagInput, Tag, Icon, Icons, Intent, Size, CustomSelect, Button, Collapse, ControlGroup, Card } from 'construct-ui'
@@ -240,7 +240,7 @@ var MembersList = {
                 'Mögliche Filter sind, wobei mögliche Werte in eckigen Klammern und Kürzel in runden Klammern sind:',
                 m('ul', [
                     m('li', 'sektion(s):[judo(j), jujitsu(jj)], z.B. s:jj'),
-                    m('li', 'typ(t):[aktiv(a), passiv(p), kind(k), ausgetreten(r), extern(e)], z.B. t:a'),
+                    m('li', 'typ(t):[aktiv(a), passiv(p), kind(k), jugendlich(j), ausgetreten(r), extern(e)], z.B. t:a'),
                     m('li', 'vorname(v):[beliebiger wert], z.B. v:Thomas'),
                     m('li', 'nachname(n):[beliebiger wert], z.B. n:Gabrielli'),
                     m('li', 'range(r):yyyy-yyyy, z.B. r:1999-2003'),
