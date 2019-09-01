@@ -93,6 +93,7 @@ export const MemberDetail = {
                     ]),
                     checkbox(member, 'section_jujitsu', 'Sektion Ju Jitsu'),
                     checkbox(member, 'section_judo', 'Sektion Judo'),
+                    checkbox(member, 'section_judo_kids', 'Sektion Judo Kinder'),
                     input(member, 'passport_no', 'Passnummer'),
                     checkbox(member, 'needs_mark', 'Jahresmarke benötigt'),
                     m('.row.form-group', [

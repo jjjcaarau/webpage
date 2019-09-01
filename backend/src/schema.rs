@@ -42,6 +42,7 @@ table! {
         needs_mark -> Bool,
         section_jujitsu -> Bool,
         section_judo -> Bool,
+        section_judo_kids -> Bool,
     }
 }
 

@@ -1529,7 +1529,7 @@ var MemberDetail = {
       oninput: function oninput(e) {
         return member.comment = e.target.value;
       }
-    })]), checkbox(member, 'section_jujitsu', 'Sektion Ju Jitsu'), checkbox(member, 'section_judo', 'Sektion Judo'), input(member, 'passport_no', 'Passnummer'), checkbox(member, 'needs_mark', 'Jahresmarke benötigt'), (0, _mithril.default)('.row.form-group', [(0, _mithril.default)('label.col-lg-2.col-md-3.col-sm-4.col-form-label', 'Mitglieds-Art'), (0, _mithril.default)('select.col-lg-10.col-md-9.col-sm-8.form-control', {
+    })]), checkbox(member, 'section_jujitsu', 'Sektion Ju Jitsu'), checkbox(member, 'section_judo', 'Sektion Judo'), checkbox(member, 'section_judo_kids', 'Sektion Judo Kinder'), input(member, 'passport_no', 'Passnummer'), checkbox(member, 'needs_mark', 'Jahresmarke benötigt'), (0, _mithril.default)('.row.form-group', [(0, _mithril.default)('label.col-lg-2.col-md-3.col-sm-4.col-form-label', 'Mitglieds-Art'), (0, _mithril.default)('select.col-lg-10.col-md-9.col-sm-8.form-control', {
       onchange: function onchange(e) {
         return member.member_type = e.target.value;
       },

@@ -94,6 +94,7 @@ pub fn update_json(member: Json<JsonMember>) -> Json<UpdateResponse> {
             needs_mark: member.needs_mark,
             section_jujitsu: member.section_jujitsu,
             section_judo: member.section_judo,
+            section_judo_kids: member.section_judo_kids,
         };
         crate::members::actions::create(&connection, &member).map(|m| m.id)
     } else {
@@ -120,6 +121,7 @@ pub fn update_json(member: Json<JsonMember>) -> Json<UpdateResponse> {
             needs_mark: member.needs_mark,
             section_jujitsu: member.section_jujitsu,
             section_judo: member.section_judo,
+            section_judo_kids: member.section_judo_kids,
         };
         crate::members::actions::update(&connection, &member).map(|_| member.id)
     };

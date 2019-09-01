@@ -13741,6 +13741,10 @@ var filterMembers = function filterMembers(vnode) {
           return m[0].section_judo;
         }
 
+        if (f[1] == 'kinder', f[1] == 'k') {
+          return m[0].section_judo_kids;
+        }
+
         return true;
       }
 
@@ -13841,6 +13845,7 @@ var filterMembers = function filterMembers(vnode) {
   }).map(function (m) {
     return m[0].email;
   }).join(',');
+  console.log(vnode.state.mails);
 };
 
 var ordering = [{
@@ -13903,7 +13908,7 @@ var MembersList = {
     }, 'Email an Liste schreiben ...')])), // 'section' ['judo', 'ju jitsu', 'jujitsu']
     // 'type' ['aktiv', 'passiv', 'kind' 'ausgetreten', 'extern']
     // 'vorname', 'nachname'
-    m('div.col-12', ['Filter sind einzugeben mit dem Format ', m('b', 'filter:wert'), '. Zum Beispiel ', m('b', 'sektion:jujitsu'), ' oder ', m('b', 's:jj'), '.', m('br'), 'Mögliche Filter sind, wobei mögliche Werte in eckigen Klammern und Kürzel in runden Klammern sind:', m('ul', [m('li', 'sektion(s):[judo(j), jujitsu(jj)], z.B. s:jj'), m('li', 'typ(t):[aktiv(a), passiv(p), kind(k), jugendlich(j), ausgetreten(r), extern(e)], z.B. t:a'), m('li', 'vorname(v):[beliebiger wert], z.B. v:Thomas'), m('li', 'nachname(n):[beliebiger wert], z.B. n:Gabrielli'), m('li', 'range(r):yyyy-yyyy, z.B. r:1999-2003')]), 'Gibt es Input ohne Selektor, z.B. "Cris To", dann wird direkt nach Vor- und Nachnamen gesucht.', m('br'), 'Es können mehrere Filter angewandt werden, wobei alle erfüllt sein müssen damit ein Eintrag erscheint!']), m('div.col-12', [m(_constructUi.ControlGroup, {
+    m('div.col-12', ['Filter sind einzugeben mit dem Format ', m('b', 'filter:wert'), '. Zum Beispiel ', m('b', 'sektion:jujitsu'), ' oder ', m('b', 's:jj'), '.', m('br'), 'Mögliche Filter sind, wobei mögliche Werte in eckigen Klammern und Kürzel in runden Klammern sind:', m('ul', [m('li', 'sektion(s):[judo(j), jujitsu(jj), kinder(k)], z.B. s:jj'), m('li', 'typ(t):[aktiv(a), passiv(p), kind(k), jugendlich(j), ausgetreten(r), extern(e)], z.B. t:a'), m('li', 'vorname(v):[beliebiger wert], z.B. v:Thomas'), m('li', 'nachname(n):[beliebiger wert], z.B. n:Gabrielli'), m('li', 'range(r):yyyy-yyyy, z.B. r:1999-2003')]), 'Gibt es Input ohne Selektor, z.B. "Cris To", dann wird direkt nach Vor- und Nachnamen gesucht.', m('br'), 'Es können mehrere Filter angewandt werden, wobei alle erfüllt sein müssen damit ein Eintrag erscheint!']), m('div.col-12', [m(_constructUi.ControlGroup, {
       style: 'display:flex;'
     }, [m(_constructUi.TagInput, {
       addOnBlur: this.addOnBlur,

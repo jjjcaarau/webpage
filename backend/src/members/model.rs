@@ -39,6 +39,7 @@ pub struct Member {
     pub needs_mark: bool,
     pub section_jujitsu: bool,
     pub section_judo: bool,
+    pub section_judo_kids: bool,
 }
 
 #[derive(Insertable, Derivative, Associations)]
@@ -67,6 +68,7 @@ pub struct NewMember {
     pub needs_mark: bool,
     pub section_jujitsu: bool,
     pub section_judo: bool,
+    pub section_judo_kids: bool,
 }
 
 #[derive(Default, Serialize, Deserialize)]
@@ -93,6 +95,7 @@ pub struct JsonMember {
     pub needs_mark: bool,
     pub section_jujitsu: bool,
     pub section_judo: bool,
+    pub section_judo_kids: bool,
 }
 
 impl NewMember {
