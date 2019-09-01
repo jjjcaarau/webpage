@@ -20,7 +20,8 @@ before_script:
 
 build:frontend:
     stage: build
-    tags: docker
+    tags:
+        docker
     image: node:12.4.0-stretch
     only:
         - master
@@ -31,7 +32,8 @@ build:frontend:
 
 copy:frontend:
     stage: copy
-    tags: docker
+    tags:
+        docker
     image: node:12.4.0-stretch
     only:
         - master
@@ -41,7 +43,8 @@ copy:frontend:
 
 build:backend:
     stage: build
-    tags: docker
+    tags:
+        docker
     image: rustlang/rust:nightly
     script:
         - cd backend
@@ -49,7 +52,8 @@ build:backend:
 
 copy:backend:
     stage: copy
-    tags: docker
+    tags:
+        docker
     image: rustlang/rust:nightly
     script:
         - cd backend
@@ -61,14 +65,16 @@ copy:backend:
 
 migrations:backend:
     stage: migrate
-    tags: docker
+    tags:
+        docker
     image: rustlang/rust:nightly
     script:
         - ssh deploy@new.jjjcaarau.ch '/home/deploy/.cargo/bin/diesel migration run --database-url /var/www/jjjcaarau-webpage/db.sqlite3' --migration-dir /var/www/jjjcaarau-webpage/migrations
 
 reload:
     stage: reload
-    tags: docker
+    tags:
+        docker
     image: rustlang/rust:nightly
     only:
         - master
