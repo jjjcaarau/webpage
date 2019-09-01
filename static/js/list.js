@@ -13765,6 +13765,12 @@ var filterMembers = function filterMembers(vnode) {
           }).length > 0;
         }
 
+        if (f[1] == 'schüler' || f[1] == 's') {
+          return tags.filter(function (t) {
+            return t == 'Student';
+          }).length > 0;
+        }
+
         if (f[1] == 'ausgetreten' || f[1] == 'r') {
           return tags.filter(function (t) {
             return t == 'Resigned';
@@ -14002,7 +14008,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "42253" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "39247" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

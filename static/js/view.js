@@ -2286,21 +2286,21 @@ var Badges = {
         case 'Student':
           badges.push({
             type: 'success',
-            text: 'Passiv'
+            text: 'Student'
           });
           break;
 
         case 'Parent':
           badges.push({
             type: 'success',
-            text: 'Passiv'
+            text: 'Elternteil'
           });
           break;
 
         case 'Kid':
           badges.push({
             type: 'success',
-            text: 'Passiv'
+            text: 'Kind'
           });
           break;
 
@@ -2484,7 +2484,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "42253" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "39247" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

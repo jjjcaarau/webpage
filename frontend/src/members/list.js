@@ -101,6 +101,9 @@ const filterMembers = function(vnode) {
                     if(f[1] == 'kind' || f[1] == 'k') {
                         return tags.filter(t => t == 'Kid').length > 0
                     }
+                    if(f[1] == 'schüler' || f[1] == 's') {
+                        return tags.filter(t => t == 'Student').length > 0
+                    }
                     if(f[1] == 'ausgetreten' || f[1] == 'r') {
                         return tags.filter(t => t == 'Resigned').length > 0
                     }
