@@ -43,6 +43,8 @@ table! {
         section_jujitsu -> Bool,
         section_judo -> Bool,
         section_judo_kids -> Bool,
+        password -> Nullable<Text>,
+        login_hash -> Nullable<Text>,
     }
 }
 
