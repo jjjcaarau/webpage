@@ -24,7 +24,7 @@ CREATE TABLE members (
     section_judo BOOLEAN NOT NULL,
     section_judo_kids BOOLEAN NOT NULL,
     password TEXT NULL,
-    login_hash TEXT NULL
+    can_edit_members BOOLEAN NOT NULL
 );
 
 INSERT INTO members (
@@ -52,7 +52,7 @@ INSERT INTO members (
     section_judo,
     section_judo_kids,
     password,
-    login_hash
+    can_edit_members
 ) SELECT
     id,
     family_id,
@@ -78,7 +78,7 @@ INSERT INTO members (
     section_judo,
     0 AS section_judo_kids,
     NULL,
-    NULL
+    0
 FROM members_old;
 
 DROP TABLE members_old;

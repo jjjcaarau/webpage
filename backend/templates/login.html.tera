@@ -1,0 +1,25 @@
+{% extends 'layout' %}
+{% block includes %}
+{% endblock %}
+{% block title %}{% endblock %}
+{% block main %}
+<div class="content">
+    <div class="container">
+        <h1>Rocket Session: Please Login</h1>
+
+        <p>Please login to continue.</p>
+
+        {%if flash %}
+            <p>{%if flash_type %}{{flash_type}}: {% endif %}{{ flash }}</p>
+        {% endif %}
+
+        <form action="/login" method="post" accept-charset="utf-8">
+            <label for="username">username</label>
+            <input type="text" name="username" id="username" value="" />
+            <label for="password">password</label>
+            <input type="password" name="password" id="password" value="" />
+            <p><input type="submit" value="login"></p>
+        </form>
+    </div>
+</div>
+{% endblock %}

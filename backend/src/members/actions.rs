@@ -88,6 +88,33 @@ pub fn get(connection: &SqliteConnection, id: i32) -> Result<(Member, Vec<Event>
 
 }
 
+/// Fetches an existing member from the DB.
+pub fn get_by_email(connection: &SqliteConnection, email: &str) -> Result<(Member, Vec<Event>, Vec<Member>, Vec<Tag>), Error> {
+    let member = {
+        let mut members = members::table
+            .filter(members::columns::email.eq(email))
+            .load::<Member>(connection)?;
+        if members.len() == 1 {
+            members.remove(0)
+        } else {
+            return Err(Error::NotFound)
+        }
+    };
+    let event_list = Event::belonging_to(&member)
+        .order((events::columns::date, events::columns::id))
+        .load::<Event>(connection)?;
+    let family_list = members::table
+        .filter({
+            members::columns::family_id.eq(member.family_id)
+            .and(members::columns::id.ne(member.id))
+        })
+        .order_by(members::columns::birthday)
+        .load::<Member>(connection)?;
+    let tag_list = get_tags(&member, &event_list);
+
+    Ok((member, event_list, family_list, tag_list))
+}
+
 /// Creates a new member in the DB.
 pub fn create(connection: &SqliteConnection, new_member: &NewMember) -> Result<Member, diesel::result::Error> {
     diesel::insert_into(members::table)

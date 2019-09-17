@@ -40,6 +40,8 @@ pub struct Member {
     pub section_jujitsu: bool,
     pub section_judo: bool,
     pub section_judo_kids: bool,
+    pub password: Option<String>,
+    pub can_edit_members: bool,
 }
 
 #[derive(Insertable, Derivative, Associations)]
@@ -69,6 +71,8 @@ pub struct NewMember {
     pub section_jujitsu: bool,
     pub section_judo: bool,
     pub section_judo_kids: bool,
+    pub password: Option<String>,
+    pub can_edit_members: bool,
 }
 
 #[derive(Default, Serialize, Deserialize)]
@@ -96,6 +100,8 @@ pub struct JsonMember {
     pub section_jujitsu: bool,
     pub section_judo: bool,
     pub section_judo_kids: bool,
+    pub password: Option<String>,
+    pub can_edit_members: bool,
 }
 
 impl NewMember {

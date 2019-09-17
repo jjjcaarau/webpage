@@ -44,7 +44,7 @@ table! {
         section_judo -> Bool,
         section_judo_kids -> Bool,
         password -> Nullable<Text>,
-        login_hash -> Nullable<Text>,
+        can_edit_members -> Bool,
     }
 }
 
