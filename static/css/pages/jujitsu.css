@@ -17,3 +17,16 @@
 .trainer-description {
     margin-top: 1em;
 }
+
+#dojo-events-jujitsu {
+    margin-top: 64px;
+    width: 100%;
+    border: 0;
+    background-color: #eee;
+    overflow: hidden;
+}
+
+#trainings {
+    list-style-type: none;
+    padding: 0;
+}
