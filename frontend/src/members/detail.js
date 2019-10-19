@@ -1,15 +1,16 @@
 import m from 'mithril'
 
 // Creates an input field.
-const input = (storage, key, text, pattern, placeholder) =>
+const input = (storage, key, text, pattern, placeholder, isPassword) =>
     m('.row.form-group', [
         m('label.col-lg-2.col-md-3.col-sm-4.col-form-label', text),
-        m('input[type=text].col-lg-10.col-md-9.col-sm-8.form-control', {
+        m('input.col-lg-10.col-md-9.col-sm-8.form-control', {
             name: storage[key],
             placeholder: placeholder ? placeholder : text,
             value: storage[key],
             pattern: pattern ? pattern : undefined,
             oninput: (e) => storage[key] = e.target.value,
+            type: isPassword ? 'password': 'text',
         })
     ])
 
@@ -110,6 +111,8 @@ export const MemberDetail = {
                             m('option[value=Extern]', 'Extern'),
                         ]),
                     ]),
+                    input(member, 'password', 'Passwort', undefined, undefined, true),
+                    checkbox(member, 'can_edit_members', 'Kann Member editieren'),
                 ]),
                 m('.row', [
                     m('.col-1', [

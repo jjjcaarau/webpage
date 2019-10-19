@@ -79,29 +79,34 @@
 <footer>
     <div class="footer">
         <div class="container ">
-            <h5>Dojo</h5>
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-5">
+                    <h5>Impressum</h5>
                     <a href="https://goo.gl/maps/MP1UabHZLW72" target="_blank">
                         <address>
                             Judo und Ju Jitsu Club Aarau<br/>
                             Postfach<br/>
                             5000 Aarau
                         </address>
+                        <a href="mailto:praesident@jjjcaarau.ch ">praesident@jjjcaarau.ch</a><br>
+                        <a href="tel:+41628243366">062 824 33 66</a>
                     </a>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-5">
+                    <h5>Sitemap</h5>
                     <p>
-                        <a href="mailto:president@jjjcaarau.ch ">president@jjjcaarau.ch</a><br>
-                        <a href="tel:+41628243366">062 824 33 66</a>
-                    </p>
-                    <p>
-                        <a href="/kontakt">Kontakt &rarr;</a><br>
+                        <a href="/index">Index</a>&nbsp;
+                        <a href="/club">Club</a>&nbsp;
+                        <a href="/judo">Judo</a>&nbsp;
+                        <a href="/jujitsu">Ju Jitsu</a>&nbsp;
+                        <a href="/partnerschaften">Partnerschaften</a>&nbsp;
+                        <a href="/kontakt">Kontakt</a>&nbsp;
+                        <a href="/members">Members</a>&nbsp;
                     </p>
                 </div>
             </div>
             <div class="row ">
-                <div class="col-md-12 align-self-end text-right ">
+                <div class="col-md-12 align-self-end text-left ">
                     <small id="copyright">
                         Copyright &copy; 2019 | Judo & Ju Jitsu Club Aarau
                     </small>

@@ -7,14 +7,12 @@ html {
     min-height: 100%;
     width: 100%;
     overflow-x: hidden;
+    background-color: #EEEEEE;
 }
 
 body {
     overflow-x: hidden;
     position: relative;
-}
-
-main {
     background-color: #EEEEEE;
 }
 
@@ -36,7 +34,7 @@ p {
 }
 
 .content {
-    padding: 120px 0 50px 0;
+    padding: 64px 0 50px 0;
 }
 
 .header a {
@@ -90,7 +88,7 @@ p {
 .footer {
     background-color: #e3000b;
     color: #ddd;
-    padding: 100px 0;
+    padding: 50px 0;
 }
 
 .footer a {
@@ -134,7 +132,29 @@ p {
     padding-bottom: 15px;
 }
 
-.row {
-    margin-top: 2em;
-    margin-bottom: 2em;
+.spacer {
+    height: 60px;
+    width: 100%;
+
+    @media #{$mq-small} {
+        height: 120px;
+    }
+}
+
+.half-spacer {
+    height: 30px;
+    width: 100%;
+
+    @media #{$mq-small} {
+        height: 60px;
+    }
+}
+
+.quarter-spacer {
+    height: 15px;
+    width: 100%;
+
+    @media #{$mq-small} {
+        height: 30px;
+    }
 }

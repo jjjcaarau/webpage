@@ -1461,15 +1461,16 @@ var _mithril = _interopRequireDefault(require("mithril"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Creates an input field.
-var input = function input(storage, key, text, pattern, placeholder) {
-  return (0, _mithril.default)('.row.form-group', [(0, _mithril.default)('label.col-lg-2.col-md-3.col-sm-4.col-form-label', text), (0, _mithril.default)('input[type=text].col-lg-10.col-md-9.col-sm-8.form-control', {
+var input = function input(storage, key, text, pattern, placeholder, isPassword) {
+  return (0, _mithril.default)('.row.form-group', [(0, _mithril.default)('label.col-lg-2.col-md-3.col-sm-4.col-form-label', text), (0, _mithril.default)('input.col-lg-10.col-md-9.col-sm-8.form-control', {
     name: storage[key],
     placeholder: placeholder ? placeholder : text,
     value: storage[key],
     pattern: pattern ? pattern : undefined,
     oninput: function oninput(e) {
       return storage[key] = e.target.value;
-    }
+    },
+    type: isPassword ? 'password' : 'text'
   })]);
 }; // Creates a checkbox field.
 
@@ -1534,7 +1535,7 @@ var MemberDetail = {
         return member.member_type = e.target.value;
       },
       value: member.member_type
-    }, [(0, _mithril.default)('option[value=Active]', 'Aktiv'), (0, _mithril.default)('option[value=Passive]', 'Passiv'), (0, _mithril.default)('option[value=Parent]', 'Vormund'), (0, _mithril.default)('option[value=Student]', 'Student'), (0, _mithril.default)('option[value=Kid]', 'Kind'), (0, _mithril.default)('option[value=Extern]', 'Extern')])])]), (0, _mithril.default)('.row', [(0, _mithril.default)('.col-1', [!vnode.state.working ? (0, _mithril.default)('button[type="submit"].btn.btn-primary', {
+    }, [(0, _mithril.default)('option[value=Active]', 'Aktiv'), (0, _mithril.default)('option[value=Passive]', 'Passiv'), (0, _mithril.default)('option[value=Parent]', 'Vormund'), (0, _mithril.default)('option[value=Student]', 'Student'), (0, _mithril.default)('option[value=Kid]', 'Kind'), (0, _mithril.default)('option[value=Extern]', 'Extern')])]), input(member, 'password', 'Passwort', undefined, undefined, true), checkbox(member, 'can_edit_members', 'Kann Member editieren')]), (0, _mithril.default)('.row', [(0, _mithril.default)('.col-1', [!vnode.state.working ? (0, _mithril.default)('button[type="submit"].btn.btn-primary', {
       onclick: function onclick(e) {
         e.preventDefault();
         updateMember(vnode);
@@ -2484,7 +2485,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "39247" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "40615" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
