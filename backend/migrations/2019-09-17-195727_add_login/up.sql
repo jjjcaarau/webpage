@@ -24,6 +24,7 @@ CREATE TABLE members (
     section_judo BOOLEAN NOT NULL,
     section_judo_kids BOOLEAN NOT NULL,
     password TEXT NULL,
+    password_recovery TEXT NULL,
     can_edit_members BOOLEAN NOT NULL
 );
 
@@ -52,6 +53,7 @@ INSERT INTO members (
     section_judo,
     section_judo_kids,
     password,
+    password_recovery,
     can_edit_members
 ) SELECT
     id,
@@ -77,6 +79,7 @@ INSERT INTO members (
     section_jujitsu,
     section_judo,
     0 AS section_judo_kids,
+    NULL,
     NULL,
     0
 FROM members_old;

@@ -26,6 +26,12 @@ pub struct General {
     pub log_level: log::Level,
     pub blog_root: String,
     pub upload_root: String,
+    pub site_url: String,
+    pub email: String,
+    pub smtp_server: String,
+    pub smtp_port: u16,
+    pub smtp_username: String,
+    pub smtp_password: String,
 }
 
 #[derive(Debug, Deserialize)]

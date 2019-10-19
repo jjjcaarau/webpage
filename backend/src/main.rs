@@ -24,6 +24,7 @@ mod schema;
 mod routes;
 mod blog;
 mod login;
+mod email;
 
 use crate::config::CONFIG;
 
@@ -76,6 +77,8 @@ fn main() {
             crate::login::logout,
             crate::login::login_user,
             crate::login::login_page,
+            crate::login::password_recovery_get,
+            crate::login::password_recovery_post,
         ])
         .attach(Template::fairing())
         .launch();

@@ -41,6 +41,7 @@ pub struct Member {
     pub section_judo: bool,
     pub section_judo_kids: bool,
     pub password: Option<String>,
+    pub password_recovery: Option<String>,
     pub can_edit_members: bool,
 }
 
@@ -72,6 +73,7 @@ pub struct NewMember {
     pub section_judo: bool,
     pub section_judo_kids: bool,
     pub password: Option<String>,
+    pub password_recovery: Option<String>,
     pub can_edit_members: bool,
 }
 
@@ -101,6 +103,7 @@ pub struct JsonMember {
     pub section_judo: bool,
     pub section_judo_kids: bool,
     pub password: Option<String>,
+    pub password_recovery: Option<String>,
     pub can_edit_members: bool,
 }
 

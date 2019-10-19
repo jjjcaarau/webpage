@@ -57,6 +57,7 @@ pub fn view_json(_user: crate::login::User, id: i32) -> Json<ViewResult> {
         Ok(mut member) => {
             // Do not show password hash/salt.
             member.0.password = member.0.password.map(|_p| "password".to_string());
+            member.0.password_recovery = None;
             Json(ViewResult { member })
         },
         Err(Error::Diesel(_)) => panic!("Internal Server Error"),
@@ -101,6 +102,7 @@ pub fn update_json(user: crate::login::User, member: Json<JsonMember>) -> Json<U
                 section_judo: member.section_judo,
                 section_judo_kids: member.section_judo_kids,
                 password: member.password.map(|p| pbkdf2::pbkdf2_simple(&p, 1).unwrap()),
+                password_recovery: None,
                 can_edit_members: member.can_edit_members,
             };
             crate::members::actions::create(&connection, &member).map(|m| m.id)
@@ -130,6 +132,7 @@ pub fn update_json(user: crate::login::User, member: Json<JsonMember>) -> Json<U
                 section_judo: member.section_judo,
                 section_judo_kids: member.section_judo_kids,
                 password: member.password.map(|p| pbkdf2::pbkdf2_simple(&p, 1).unwrap()),
+                password_recovery: None,
                 can_edit_members: member.can_edit_members,
             };
             crate::members::actions::update(&connection, &member).map(|_| member.id)

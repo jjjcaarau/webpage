@@ -5,10 +5,13 @@ use rocket::http::{Cookie, Cookies};
 
 use rocket_contrib::templates::Template;
 
+use crate::config::CONFIG;
+
 #[derive(FromForm)]
 pub struct Login {
     username: String,
-    password: String
+    password: String,
+    submit: String,
 }
 
 #[derive(Debug)]
@@ -40,15 +43,30 @@ impl<'a, 'r> FromRequest<'a, 'r> for User {
 #[post("/login", data = "<login>")]
 pub fn login(mut cookies: Cookies<'_>, login: Form<Login>) -> Result<Redirect, Flash<Redirect>> {
     let connection = crate::db::establish_connection();
-    if let Ok(member) = crate::members::actions::get_by_email(&connection, &login.username) {
-        if let Some(password) = member.0.password {
-            if pbkdf2::pbkdf2_check(&login.password, &password).is_ok() {
-                cookies.add_private(Cookie::new("user_id", member.0.id.to_string()));
-                return Ok(Redirect::to(uri!(crate::routes::root::index)));
+    
+    // Request recovery password.
+    if login.submit == "recovery" {
+        if let Ok(mut member) = crate::members::actions::get_by_email(&connection, &login.username) {
+            let hash = uuid::Uuid::new_v4().to_string();
+
+            crate::members::actions::update_recovery(&connection, &member.0, Some(hash.clone()));
+
+            let content = format!("{}/password_recovery/{}", CONFIG.general.site_url.clone(), hash);
+            
+            crate::email::send(CONFIG.general.email.clone(), login.username.clone(), "Passwort zurücksetzen".into(), "".into(), content);
+        }
+        Err(Flash::success(Redirect::to(uri!(login_page)), "Email was sent to user if it exists."))
+    } else {
+        if let Ok(member) = crate::members::actions::get_by_email(&connection, &login.username) {
+            if let Some(password) = member.0.password {
+                if pbkdf2::pbkdf2_check(&login.password, &password).is_ok() {
+                    cookies.add_private(Cookie::new("user_id", member.0.id.to_string()));
+                    return Ok(Redirect::to(uri!(crate::routes::root::index)));
+                }
             }
         }
+        Err(Flash::error(Redirect::to(uri!(login_page)), "Invalid username/password."))
     }
-    Err(Flash::error(Redirect::to(uri!(login_page)), "Invalid username/password."))
 }
 
 #[get("/logout")]
@@ -78,4 +96,32 @@ pub fn login_page(flash: Option<FlashMessage<'_, '_>>) -> Template {
 #[get("/", rank = 2)]
 pub fn index_redirect() -> Redirect {
     Redirect::to(uri!(login_page))
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Hash {
+    hash: String,
+}
+
+#[get("/password_recovery/<hash>")]
+pub fn password_recovery_get(hash: String) -> Template {
+    Template::render("password_recovery", &Hash { hash })
+}
+
+#[derive(FromForm)]
+pub struct Recovery {
+    password: String,
+    hash: String,
+}
+
+#[post("/password_recovery", data = "<recovery>")]
+pub fn password_recovery_post(recovery: Form<Recovery>) -> Flash<Redirect> {
+    let connection = crate::db::establish_connection();
+    if let Ok(mut member) = crate::members::actions::get_by_recovery(&connection, &recovery.hash) {
+        crate::members::actions::update_recovery(&connection, &member, None).unwrap();
+        crate::members::actions::update_password(&connection, &member, Some(recovery.password.clone())).unwrap();
+        Flash::success(Redirect::to(uri!(login_page)), "Password recovery successful.")
+    } else {
+        Flash::error(Redirect::to(uri!(login_page)), "Password recovery failed.")
+    }
 }
