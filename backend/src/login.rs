@@ -52,6 +52,8 @@ pub fn login(mut cookies: Cookies<'_>, login: Form<Login>) -> Result<Redirect, F
             crate::members::actions::update_recovery(&connection, &member.0, Some(hash.clone()));
 
             let content = format!("{}/password_recovery/{}", CONFIG.general.site_url.clone(), hash);
+
+            println!("{}", content);
             
             crate::email::send(CONFIG.general.email.clone(), login.username.clone(), "Passwort zurücksetzen".into(), "".into(), content);
         }
