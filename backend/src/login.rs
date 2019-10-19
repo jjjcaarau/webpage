@@ -93,20 +93,24 @@ pub fn login_page(flash: Option<FlashMessage<'_, '_>>) -> Template {
     Template::render("login", &context)
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-struct Hash {
-    hash: String,
-}
-
 #[get("/password_recovery/<hash>")]
-pub fn password_recovery_get(hash: String) -> Template {
-    Template::render("password_recovery", &Hash { hash })
+pub fn password_recovery_get(flash: Option<FlashMessage<'_, '_>>, hash: String) -> Template {
+    let mut context = std::collections::HashMap::new();
+    if let Some(ref msg) = flash {
+        context.insert("flash", msg.msg());
+        if msg.name() == "error" {
+            context.insert("flash_type", "Error");
+        }
+    }
+    context.insert("hash", &hash);
+    Template::render("password_recovery", &context)
 }
 
 #[derive(FromForm)]
 pub struct Recovery {
     password: String,
     hash: String,
+    submit: String,
 }
 
 #[post("/password_recovery", data = "<recovery>")]
@@ -117,6 +121,6 @@ pub fn password_recovery_post(recovery: Form<Recovery>) -> Flash<Redirect> {
         crate::members::actions::update_password(&connection, &member, Some(recovery.password.clone())).unwrap();
         Flash::success(Redirect::to(uri!(login_page)), "Password recovery successful.")
     } else {
-        Flash::error(Redirect::to(uri!(login_page)), "Password recovery failed.")
+        Flash::error(Redirect::to(uri!(password_recovery_get: recovery.hash.clone())), "Password recovery failed.")
     }
 }

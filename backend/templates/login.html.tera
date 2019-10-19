@@ -5,21 +5,31 @@
 {% block main %}
 <div class="content">
     <div class="container">
-        <h1>Rocket Session: Please Login</h1>
-
-        <p>Please login to continue.</p>
+        <h1>Login</h1>
 
         {%if flash %}
-            <p>{%if flash_type %}{{flash_type}}: {% endif %}{{ flash }}</p>
+            {% if flash_type and flash_type == "Error" %}
+                {% set flash_class = "danger" -%}
+            {% elif flash_type and flash_type == "Success" %}
+                {% set flash_class = "success" -%}
+            {% else %}
+                {% set flash_class = "primary" -%}
+            {% endif %}
+            <div class="alert alert-{{ flash_class }}" role="alert">{{ flash }}</div>
         {% endif %}
 
         <form action="/login" method="post" accept-charset="utf-8">
-            <label for="username">username</label>
-            <input type="text" name="username" id="username" value="" />
-            <label for="password">password</label>
-            <input type="password" name="password" id="password" value="" />
-            <p><input type="submit" name="submit" value="login"></p>
-            <p><input type="submit" name="submit" value="recovery"></p>
+            <div class="form-group">
+                <label for="username">Email</label>
+                <input id="username" name="username" type="email" class="form-control" aria-describedby="emailHelp" placeholder="Email">
+                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+            <div class="form-group">
+                <label for="password">Passwort</label>
+                <input name="password" id="password" type="password" class="form-control" placeholder="Passwort">
+            </div>
+            <button type="submit" name="submit" value="login" class="btn btn-primary">Login</button>
+            <button type="submit" name="submit" value="recovery" class="btn btn-success">Passwort zurücksetzen</button>
         </form>
     </div>
 </div>
