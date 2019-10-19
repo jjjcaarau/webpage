@@ -8,7 +8,7 @@ use pulldown_cmark::{
 };
 
 #[get("/")]
-pub fn index() -> Template {
+pub fn index(user: crate::login::User) -> Template {
 
     #[derive(Deserialize, Serialize)]
     pub struct Blog {

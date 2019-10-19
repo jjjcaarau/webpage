@@ -23,6 +23,8 @@ mod events;
 mod schema;
 mod routes;
 mod blog;
+mod login;
+mod email;
 
 use crate::config::CONFIG;
 
@@ -70,6 +72,13 @@ fn main() {
             crate::routes::root::judo,
             crate::routes::root::jujitsu,
             crate::routes::root::kontakt,
+            crate::login::index_redirect,
+            crate::login::login,
+            crate::login::logout,
+            crate::login::login_user,
+            crate::login::login_page,
+            crate::login::password_recovery_get,
+            crate::login::password_recovery_post,
         ])
         .attach(Template::fairing())
         .launch();
