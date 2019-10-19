@@ -1,6 +1,7 @@
 use rocket_contrib::templates::Template;
 use rocket_contrib::json::Json;
 use chrono::NaiveDate;
+use rocket::response::{Redirect, Flash};
 use crate::members::model::{
     Member,
     NewMember,
@@ -32,9 +33,19 @@ pub fn list(_user: crate::login::User) -> Result<Template, diesel::result::Error
     members.map(|v| Template::render("pages/members/list", ListResult { members: v }))
 }
 
+#[get("/list", rank = 2)]
+pub fn list_redirect() -> Redirect {
+    Redirect::to(uri!(crate::login::login_page))
+}
+
 #[get("/view/<id>")]
 pub fn view(_user: crate::login::User, id: i32) -> Template {
     Template::render("pages/members/view", std::collections::HashMap::<i32,i32>::new())
+}
+
+#[get("/view/<id>", rank = 2)]
+pub fn view_redirect(id: i32) -> Redirect {
+    Redirect::to(uri!(crate::login::login_page))
 }
 
 #[get("/stats")]
@@ -43,10 +54,20 @@ pub fn stats() -> Template {
     Template::render("pages/members/stats", get_stats(&connection))
 }
 
+#[get("/stats", rank = 2)]
+pub fn stats_redirect() -> Redirect {
+    Redirect::to(uri!(crate::login::login_page))
+}
+
 #[get("/list_json")]
 pub fn list_json(_user: crate::login::User) -> Json<Vec<(Member, Vec<Event>, Vec<Member>, Vec<Tag>)>> {
     let connection = crate::db::establish_connection();
     Json(crate::members::actions::list_all(&connection).unwrap())
+}
+
+#[get("/list_json", rank = 2)]
+pub fn list_json_redirect() -> Redirect {
+    Redirect::to(uri!(crate::login::login_page))
 }
 
 #[get("/view_json/<id>")]
@@ -63,6 +84,11 @@ pub fn view_json(_user: crate::login::User, id: i32) -> Json<ViewResult> {
         Err(Error::Diesel(_)) => panic!("Internal Server Error"),
         Err(Error::NotFound) => panic!("Not Found"),
     }
+}
+
+#[get("/view_json/<id>", rank = 2)]
+pub fn view_json_redirect(id: i32) -> Redirect {
+    Redirect::to(uri!(crate::login::login_page))
 }
 
 #[derive(Serialize)]

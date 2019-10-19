@@ -52,12 +52,17 @@ fn main() {
         .mount("/static", StaticFiles::from(&CONFIG.rocket.static_root))
         .mount("/members", routes![
             crate::routes::members::list,
+            crate::routes::members::list_redirect,
             crate::routes::members::list_json,
+            crate::routes::members::list_json_redirect,
             crate::routes::members::view_json,
+            crate::routes::members::view_json_redirect,
             crate::routes::members::view,
+            crate::routes::members::view_redirect,
             crate::routes::members::update_json,
             crate::routes::members::update_family_json,
             crate::routes::members::stats,
+            crate::routes::members::stats_redirect,
         ])
         .mount("/events", routes![
             crate::routes::events::create_json,
@@ -72,7 +77,6 @@ fn main() {
             crate::routes::root::judo,
             crate::routes::root::jujitsu,
             crate::routes::root::kontakt,
-            crate::login::index_redirect,
             crate::login::login,
             crate::login::logout,
             crate::login::login_user,

@@ -93,11 +93,6 @@ pub fn login_page(flash: Option<FlashMessage<'_, '_>>) -> Template {
     Template::render("login", &context)
 }
 
-#[get("/", rank = 2)]
-pub fn index_redirect() -> Redirect {
-    Redirect::to(uri!(login_page))
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 struct Hash {
     hash: String,
