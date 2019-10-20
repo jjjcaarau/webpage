@@ -51,11 +51,23 @@ pub fn login(mut cookies: Cookies<'_>, login: Form<Login>) -> Result<Redirect, F
 
             crate::members::actions::update_recovery(&connection, &member.0, Some(hash.clone()));
 
-            let content = format!("{}/password_recovery/{}", CONFIG.general.site_url.clone(), hash);
+            let content = format!("Hallo {}
+Es wurde soeben ein neues Passwort für deinen Account auf der Website des JJJCA angefordert.
+Falls Du dies nicht warst, melde dies doch bitte an aktuar@jjjcaarau.ch.
+Ansonsten kannst Du Dein Passwort unter folgendem Link zurücksetzen:
+
+{}/password_recovery/{}
+
+Liebe Grüsse
+Dein Website-Team",
+                member.0.first_name,
+                CONFIG.general.site_url.clone(),
+                hash
+            );
 
             println!("{}", content);
             
-            crate::email::send(CONFIG.general.email.clone(), login.username.clone(), "Passwort zurücksetzen".into(), "".into(), content);
+            crate::email::send(CONFIG.general.email.clone(), login.username.clone(), "Passwort zurücksetzen".into(), content);
         }
         Err(Flash::success(Redirect::to(uri!(login_page)), "Email was sent to user if it exists."))
     } else {

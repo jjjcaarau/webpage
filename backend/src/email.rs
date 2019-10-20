@@ -32,15 +32,17 @@ impl From<lettre::smtp::error::Error> for EmailError {
     }
 }
 
-pub fn send(from: String, to: String, subject: String, content_html: String, content_text: String) -> Result<(), EmailError> {
+pub fn send(from: String, to: String, subject: String, content_text: String) -> Result<(), EmailError> {
     let mut builder = lettre_email::Email::builder()
         .to(to)
         .from(from)
         .subject(subject)
-        .alternative(content_html, content_text);
+        .text(content_text);
 
     let build_result = builder.build();
     let email = build_result?;
+
+    dbg!(&CONFIG.general);
 
     let smtp_server = CONFIG.general.smtp_server.clone();
     let smtp_port = CONFIG.general.smtp_port;
