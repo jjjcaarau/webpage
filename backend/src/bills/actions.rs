@@ -97,6 +97,9 @@ pub fn confirm_paid(connection: &SqliteConnection, bill: &Bill) -> Result<(), di
         .execute(connection).map(|_| ())
 }
 
+/// Generates a new bill at a due date.
+/// This does not store the bill to the DB.
+/// The procedure honors all sorts of special rules and is aware of reminder bills.
 pub fn generate_bill(connection: &SqliteConnection, member: &Member, events: &Vec<Event>, date: &chrono::NaiveDate) -> Option<NewBill> {
     let events: Vec<_> = events
         .iter()
@@ -111,21 +114,40 @@ pub fn generate_bill(connection: &SqliteConnection, member: &Member, events: &Ve
         let last_bill = get_last_this_year(connection, member, year);
 
         let (number, paid_amount, bill_amount, bill_passport) = if let Ok(last_bill) = last_bill {
+            // First bill this year was already created.
+            
+            // If bill this year was already paid, don't take action ofc.
             if last_bill.paid {
                 return None;
             }
 
+            // Make sure we advance the bill number to account for unpaid history.
             (last_bill.number + 1, last_bill.paid_amount, last_bill.bill_amount, last_bill.bill_passport)
         } else {
+            // First bill this year.
+            let year = date.year();
+            let month = date.month();
+
+            // Figure amount based on settings.
             let amount = match member.member_type {
                 MemberType::Active => CONFIG.general.fee_actives,
                 MemberType::Kid => CONFIG.general.fee_kids,
                 MemberType::Student => CONFIG.general.fee_students,
                 _ => 0,
             };
-            (0, 0, amount, 0)
+
+            // Return bill data factoring in month of the year for under year entries.
+            let factor = if month <= 3 { 1.0 } else if month > 3 && month <= 9 { 0.5 } else { 0.0 };
+            (0, 0, (amount as f32 * factor) as i32 , 0)
         };
 
+        // If there was no passport ordered and no fee is due
+        // (members with a passport and club entry in months 10 to 12), do not create a bill.
+        if bill_amount == 0 && bill_passport == 0 {
+            return None;
+        }
+
+        // Create a new bill.
         let bill = NewBill {
             member_id: member.id,
             year,
