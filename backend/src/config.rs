@@ -32,6 +32,9 @@ pub struct General {
     pub smtp_port: u16,
     pub smtp_username: String,
     pub smtp_password: String,
+    pub fee_actives: i32,
+    pub fee_kids: i32,
+    pub fee_students: i32,
 }
 
 #[derive(Debug, Deserialize)]

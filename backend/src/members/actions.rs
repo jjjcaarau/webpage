@@ -224,7 +224,7 @@ pub fn get_stats(connection: &SqliteConnection) -> Stats {
 }
 
 /// Returns whether a member has to pay fees.
-fn is_paying(tags: &Vec<Tag>) -> bool {
+pub fn is_paying(tags: &Vec<Tag>) -> bool {
     for tag in tags {
         match tag {
             Tag::Honorary => return false,
@@ -233,6 +233,7 @@ fn is_paying(tags: &Vec<Tag>) -> bool {
             Tag::Passive => return false,
             Tag::Trainer(_) => return false,
             Tag::CoTrainer(_) => return false,
+            Tag::Extern => return false,
             _ => ()
         }
     }
@@ -240,7 +241,7 @@ fn is_paying(tags: &Vec<Tag>) -> bool {
 }
 
 /// Returns all tags a member is associated with.
-fn get_tags(member: &Member, events: &Vec<Event>) -> Vec<Tag> {
+pub fn get_tags(member: &Member, events: &Vec<Event>) -> Vec<Tag> {
     let mut club_events = Vec::new();
     let mut board_events = Vec::new();
     let mut trainer_events = Vec::new();

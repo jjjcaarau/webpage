@@ -1,0 +1,38 @@
+use crate::schema::*;
+use crate::members::model::Member;
+
+#[derive(Queryable, Identifiable, AsChangeset, Associations, Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[belongs_to(Member, foreign_key = "member_id")]
+pub struct Bill {
+    pub id: i32,
+    pub member_id: i32,
+    pub year: i32,
+    pub number: i32,
+    pub bill_passport: i32,
+    pub bill_amount: i32,
+    pub paid_amount: i32,
+    pub paid: bool,
+    pub comment: String,
+}
+
+#[derive(Insertable, Derivative, Associations)]
+#[derivative(Default)]
+#[table_name="bills"]
+pub struct NewBill {
+    pub member_id: i32,
+    pub year: i32,
+    pub number: i32,
+    pub bill_passport: i32,
+    pub bill_amount: i32,
+    pub paid_amount: i32,
+    pub paid: bool,
+    pub comment: String,
+}
+
+impl NewBill {
+    pub fn new() -> Self {
+        Self {
+            ..Default::default()
+        }
+    }
+}

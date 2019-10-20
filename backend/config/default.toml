@@ -8,6 +8,9 @@ smtp_server = "localhost"
 smtp_port = 2555
 smtp_username = "kek"
 smtp_password = ""
+fee_actives = 420
+fee_kids = 240
+fee_students = 300
 
 [rocket]
 environment = "Development"

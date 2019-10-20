@@ -1,4 +1,19 @@
 table! {
+    bills (id) {
+        id -> Integer,
+        member_id -> Integer,
+        year -> Integer,
+        number -> Integer,
+        bill_passport -> Integer,
+        bill_amount -> Integer,
+        paid_amount -> Integer,
+        paid -> Bool,
+        comment -> Text,
+    }
+}
+
+
+table! {
     courses (id) {
         id -> Integer,
         name -> Text,
@@ -50,6 +65,7 @@ table! {
 }
 
 allow_tables_to_appear_in_same_query!(
+    bills,
     courses,
     events,
     members,

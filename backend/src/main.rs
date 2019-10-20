@@ -20,6 +20,7 @@ mod config;
 mod db;
 mod members;
 mod events;
+mod bills;
 mod schema;
 mod routes;
 mod blog;
@@ -63,6 +64,8 @@ fn main() {
             crate::routes::members::update_family_json,
             crate::routes::members::stats,
             crate::routes::members::stats_redirect,
+            crate::routes::members::generate_bills,
+            // crate::routes::members::generate_bills_redirect,
         ])
         .mount("/events", routes![
             crate::routes::events::create_json,
