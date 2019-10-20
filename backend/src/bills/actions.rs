@@ -14,6 +14,13 @@ use crate::schema::{
     bills,
 };
 use diesel::prelude::*;
+use rocket_contrib::templates::Template;
+use rocket::response::Responder;
+use rocket::http::ContentType;
+use rocket::Response;
+use rocket::Request;
+use rocket::http::Status;
+use rocket::State;
 
 use crate::error::Error;
 
@@ -85,6 +92,11 @@ pub fn update_paid(connection: &SqliteConnection, bill: &Bill, amount: i32) -> R
 pub fn confirm_paid(connection: &SqliteConnection, bill: &Bill) -> Result<(), diesel::result::Error>{
     diesel::update(bill)
         .set(bills::columns::paid.eq(true))
+        .execute(connection).map(|_| ())
+}
+
+pub fn delete(connection: &SqliteConnection, bill: &Bill) -> Result<(), diesel::result::Error>{
+    diesel::delete(bill)
         .execute(connection).map(|_| ())
 }
 
@@ -171,4 +183,40 @@ pub fn generate_bills(connection: &SqliteConnection, date: &chrono::NaiveDate) {
     }
 
     println!("count: {}", count);
+}
+
+
+use wkhtmltopdf::PdfBuilder;
+pub struct PDFFile<'a>(PdfBuilder, String, &'a Bill);
+
+impl<'a> Responder<'static> for PDFFile<'a> {
+    fn respond_to(mut self, req: &Request) -> Result<Response<'static>, Status> {
+        
+
+        let render = Template::render(self.1, self.2)
+            .respond_to(&req)
+            .expect("Unable to render template.")
+            .body()
+            .unwrap()
+            .into_string()
+            .unwrap();
+
+        let data = self.0.build_from_html(&render);
+        Response::build()
+            .header(ContentType::new("application", "pdf"))
+            .streamed_body(data.expect("Unable to build PDF."))
+            .ok()
+    }
+}
+
+pub fn generate_pdf<'a>(connection: &SqliteConnection, bill: &'a Bill) -> PDFFile<'a> {
+    use wkhtmltopdf::*;
+    let mut pdf_app = PdfApplication::new().expect("Failed to init PDF application");
+    let mut builder = pdf_app.builder();
+    builder
+        .orientation(Orientation::Portrait)
+        .margin(Size::Inches(2))
+        .title("Awesome Foo");
+
+    PDFFile(builder, "pages/members/invoice_template".to_string(), bill)
 }

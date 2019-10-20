@@ -74,6 +74,8 @@ fn main() {
         .mount("/bills", routes![
             crate::routes::bills::update,
             crate::routes::bills::pay,
+            crate::routes::bills::delete,
+            crate::routes::bills::pdf,
         ])
         .mount("/blog", routes![
             crate::routes::blog::edit_get,

@@ -37,6 +37,9 @@
                         <form class="mark-pay" action="/bills/pay/{{ member.2.id }}" method="POST">
                             <input class="btn btn-success" type="submit" value="Mark as paid" />
                         </form>
+                        <form class="mark-pay" action="/bills/delete/{{ member.2.id }}" method="POST">
+                            <input class="btn btn-success" type="submit" value="Delete" />
+                        </form>
                         <br>
                         <br>
                         <form action="/bills/update/{{ member.2.id }}" method="POST">
@@ -58,6 +61,7 @@
                                 </div>
                             </div>
                         </form>
+                        <a href="/bills/pdf/{{ member.2.id }}">PDF</a>
                         {% endif %}
                     {% endif %}
                 </div>
