@@ -9,7 +9,16 @@ import { Badges } from '/badges'
 
 export const MemberView = {
     oninit: function(vnode) {
-        vnode.state.member = { id: 0, sex: 'F', member_type: 'Active', email_allowed: false, needs_mark: false, section_jujitsu: false, section_judo: false };
+        vnode.state.member = {
+            id: 0,
+            sex: 'F',
+            member_type: 'Active',
+            email_allowed: false,
+            needs_mark: false,
+            section_jujitsu: false,
+            section_judo: false,
+            section_judo_kids: false,
+        };
         vnode.state.events = [];
         vnode.state.family = [];
         vnode.state.tags = [];
