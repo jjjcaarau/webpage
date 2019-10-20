@@ -137,7 +137,8 @@ pub fn generate_bill(connection: &SqliteConnection, member: &Member, events: &Ve
             };
 
             // Return bill data factoring in month of the year for under year entries.
-            let factor = if month <= 3 { 1.0 } else if month > 3 && month <= 9 { 0.5 } else { 0.0 };
+            // TODO: fix numbers after testing!
+            let factor = if month <= 3 { 1.0 } else if month > 3 && month <= 9 { 0.5 } else { 1.0 };
             (0, 0, (amount as f32 * factor) as i32 , 0)
         };
 
@@ -171,8 +172,8 @@ pub fn generate_bills(connection: &SqliteConnection, date: &chrono::NaiveDate) {
     for member in members {
         
         if let Some(bill) = generate_bill(connection, &member.0, &member.1, date) {
-
-        println!("{} {}", member.0.first_name, member.0.last_name);
+            create(connection, &bill);
+            println!("{} {}", member.0.first_name, member.0.last_name);
             count += 1;
         }
     }

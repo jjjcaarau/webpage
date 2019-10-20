@@ -9,12 +9,16 @@ use super::model::{
 use crate::schema::{
     members,
     events,
+    bills,
 };
 use crate::events::model::{
     Event,
     EventClass,
     EventDivision,
     EventType,
+};
+use crate::bills::model::{
+    Bill,
 };
 use diesel::prelude::*;
 
@@ -178,11 +182,11 @@ pub fn update_family(connection: &SqliteConnection, member_id: i32, family_id: O
 #[derive(Serialize)]
 pub struct Stats {
     number_of_paying_members: usize,
-    paying_members: Vec<(Member, Vec<Event>)>,
+    paying_members: Vec<(Member, Vec<Event>, Option<Bill>)>,
     number_of_paying_kids: usize,
-    paying_kids: Vec<(Member, Vec<Event>)>,
+    paying_kids: Vec<(Member, Vec<Event>, Option<Bill>)>,
     number_of_paying_students: usize,
-    paying_students: Vec<(Member, Vec<Event>)>,
+    paying_students: Vec<(Member, Vec<Event>, Option<Bill>)>,
 }
 
 /// Returns a struct of global club stats.
@@ -194,8 +198,16 @@ pub fn get_stats(connection: &SqliteConnection) -> Stats {
         .order_by(events::columns::date)
         .load::<Event>(connection).expect("Load of event list failed.")
         .grouped_by(&member_list);
+    let bill_list = Bill::belonging_to(&member_list)
+        .order_by(bills::columns::number)
+        .load::<Bill>(connection).expect("Load of bill list failed.")
+        .grouped_by(&member_list);
 
-    let zipped_members = itertools::izip!(member_list.into_iter(), event_list).collect::<Vec<_>>();
+    let zipped_members = itertools::izip!(
+        member_list.into_iter(),
+        event_list,
+        bill_list.into_iter().map(|mut item| if item.is_empty() { None } else { Some(item.remove(0)) })
+    ).collect::<Vec<_>>();
 
     let paying_members = zipped_members
         .clone()

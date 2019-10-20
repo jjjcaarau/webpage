@@ -17,7 +17,11 @@
         <div class="col">
             <h3>Paying members: {{ number_of_paying_members }}</h3>
             {% for member in paying_members %}
-                <p>{{ member.0.first_name }} {{ member.0.last_name }}</p>
+                <p>
+                    {{ member.0.first_name }}
+                    {{ member.0.last_name }}
+                    {% if member.2 %}{{ member.2.paid }} {% else %} {% endif %}
+                </p>
             {% endfor %}
             <br>
             <h3>Paying kids: {{ number_of_paying_kids }}</h3>
