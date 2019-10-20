@@ -12,9 +12,9 @@ use crate::events::model::{
     Event,
 };
 use crate::members::actions::{
-    Error,
     get_stats,
 };
+use crate::error::Error;
 
 #[derive(Serialize)]
 struct ListResult {

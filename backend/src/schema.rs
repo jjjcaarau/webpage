@@ -3,6 +3,7 @@ table! {
         id -> Integer,
         member_id -> Integer,
         year -> Integer,
+        date -> Date,
         number -> Integer,
         bill_passport -> Integer,
         bill_amount -> Integer,

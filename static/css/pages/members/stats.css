@@ -1,0 +1,16 @@
+.member {
+    border: 2px solid black;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.badge {
+    font-size: 1.4em;
+    padding: 0.375em 0.4em;
+    line-height: 1;
+}
+
+.mark-pay {
+    display: inline;
+}

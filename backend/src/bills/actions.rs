@@ -15,19 +15,9 @@ use crate::schema::{
 };
 use diesel::prelude::*;
 
+use crate::error::Error;
+
 use crate::config::CONFIG;
-
-#[derive(Debug)]
-pub enum Error {
-    Diesel(diesel::result::Error),
-    NotFound,
-}
-
-impl From<diesel::result::Error> for Error {
-    fn from(error: diesel::result::Error) -> Self {
-        Error::Diesel(error)
-    }
-}
 
 /// Fetches all known bills from the DB.
 pub fn list_all(connection: &SqliteConnection) -> Result<Vec<Bill>, diesel::result::Error> {
@@ -59,8 +49,9 @@ pub fn get_last_this_year(connection: &SqliteConnection, member: &Member, year: 
         let mut bills = bills::table
             .filter(bills::columns::member_id.eq(member.id))
             .filter(bills::columns::year.eq(year))
+            .order_by(bills::columns::number.desc())
             .load::<Bill>(connection)?;
-        if bills.len() == 1 {
+        if bills.len() > 0 {
             bills.remove(0)
         } else {
             return Err(Error::NotFound)
@@ -152,6 +143,7 @@ pub fn generate_bill(connection: &SqliteConnection, member: &Member, events: &Ve
         let bill = NewBill {
             member_id: member.id,
             year,
+            date: chrono::Utc::now().date().naive_utc(),
             number,
             bill_passport,
             bill_amount,

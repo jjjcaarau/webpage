@@ -1,8 +1,6 @@
 {% extends 'layout' %}
 {% block includes %}
-    <script type="text/javascript" src="/static/js/extern/fuse.min.js" defer></script>
-    <script type="text/javascript" src="/static/js/view.js" defer></script>
-    <link rel="stylesheet" href="/static/css/pages/members/view.css">
+<link rel="stylesheet" href="/static/css/pages/members/stats.css">
 {% endblock %}
 
 {% block content %}
@@ -17,11 +15,52 @@
         <div class="col">
             <h3>Paying members: {{ number_of_paying_members }}</h3>
             {% for member in paying_members %}
-                <p>
+                <div class="member">
                     {{ member.0.first_name }}
                     {{ member.0.last_name }}
-                    {% if member.2 %}{{ member.2.paid }} {% else %} {% endif %}
-                </p>
+                    {% if member.2 %}
+                        {% if member.2.paid %}
+                            {% set color = "success" %}
+                        {% else %}
+                            {% set color = "danger" %}
+                        {% endif %}
+                        <span class="badge badge-{{ color }}">
+                            {{ member.2.number }}
+                            :
+                            {{ member.2.date }}
+                            :
+                            {{ member.2.paid_amount }}
+                            :
+                            {{ member.2.comment }}
+                        </span>
+                        {% if not member.2.paid %}
+                        <form class="mark-pay" action="/bills/pay/{{ member.2.id }}" method="POST">
+                            <input class="btn btn-success" type="submit" value="Mark as paid" />
+                        </form>
+                        <br>
+                        <br>
+                        <form action="/bills/update/{{ member.2.id }}" method="POST">
+                            <div class="form-row">
+                                <div class="col">
+                                    <input name="bill_passport" type="text" value="{{ member.2.bill_passport }}" class="form-control">
+                                </div>
+                                <div class="col">
+                                    <input name="bill_amount" type="text" value="{{ member.2.bill_amount }}" class="form-control">
+                                </div>
+                                <div class="col">
+                                    <input name="paid_amount" type="text" value="{{ member.2.paid_amount }}" class="form-control">
+                                </div>
+                                <div class="col">
+                                    <input name="comment" type="text" value="{{ member.2.comment }}" class="form-control">
+                                </div>
+                                <div class="col">
+                                    <input class="btn btn-primary" type="submit" value="Update" />
+                                </div>
+                            </div>
+                        </form>
+                        {% endif %}
+                    {% endif %}
+                </div>
             {% endfor %}
             <br>
             <h3>Paying kids: {{ number_of_paying_kids }}</h3>

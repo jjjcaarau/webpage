@@ -26,6 +26,7 @@ mod routes;
 mod blog;
 mod login;
 mod email;
+mod error;
 
 use crate::config::CONFIG;
 
@@ -69,6 +70,10 @@ fn main() {
         ])
         .mount("/events", routes![
             crate::routes::events::create_json,
+        ])
+        .mount("/bills", routes![
+            crate::routes::bills::update,
+            crate::routes::bills::pay,
         ])
         .mount("/blog", routes![
             crate::routes::blog::edit_get,

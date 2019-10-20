@@ -22,17 +22,7 @@ use crate::bills::model::{
 };
 use diesel::prelude::*;
 
-#[derive(Debug)]
-pub enum Error {
-    Diesel(diesel::result::Error),
-    NotFound,
-}
-
-impl From<diesel::result::Error> for Error {
-    fn from(error: diesel::result::Error) -> Self {
-        Error::Diesel(error)
-    }
-}
+use crate::error::Error;
 
 /// Fetches all known members from the DB.
 pub fn list_all(connection: &SqliteConnection) -> Result<Vec<(Member, Vec<Event>, Vec<Member>, Vec<Tag>)>, diesel::result::Error> {
@@ -199,7 +189,7 @@ pub fn get_stats(connection: &SqliteConnection) -> Stats {
         .load::<Event>(connection).expect("Load of event list failed.")
         .grouped_by(&member_list);
     let bill_list = Bill::belonging_to(&member_list)
-        .order_by(bills::columns::number)
+        .order_by(bills::columns::number.desc())
         .load::<Bill>(connection).expect("Load of bill list failed.")
         .grouped_by(&member_list);
 
