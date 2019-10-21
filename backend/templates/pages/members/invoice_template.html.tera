@@ -128,15 +128,24 @@ html #small-address {
         </address>
 
         <dl id="informations">
-            <dt>Jahresrechnung</dt>
-            <dd>{{ bill.number }}</dd>
+            {% if bill.number > 0 %}
+            <dt>{{ bill.number }}. Mahnung</dt>
+            <dd>RE {{ bill.id }}</dd>
+            {% else %}
+            <dt>Rechnung</dt>
+            <dd>RE {{ bill.id }}</dd>
+            {% endif %}
             <dt>Rechnungsdatum</dt>
             <dd>{{ bill.date }}</dd>
             <dt>Zahlbar bis</dt>
             <dd>{{ bill.date }}</dd>
         </dl>
 
-        <h3>Jahresrechnung {{ bill.number }}</h3>
+        {% if bill.number > 0 %}
+        <h3>{{ bill.number }}. Mahnung, RE {{ bill.id }}</h3>
+        {% else %}
+        <h3>RE {{ bill.id }}</h3>
+        {% endif %}
 
         Liebe{% if member.sex == "M" %}r{% endif %} {{ member.first_name }}
 
