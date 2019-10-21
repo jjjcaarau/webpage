@@ -1,3 +1,7 @@
+use std::process::{Command, Stdio};
+use std::io::BufWriter;
+use std::io::Write;
+
 use super::model::{
     Bill,
     NewBill,
@@ -185,15 +189,11 @@ pub fn generate_bills(connection: &SqliteConnection, date: &chrono::NaiveDate) {
     println!("count: {}", count);
 }
 
+pub struct PDFFile(String, BillData);
 
-use wkhtmltopdf::PdfBuilder;
-pub struct PDFFile<'a>(PdfBuilder, String, &'a Bill);
-
-impl<'a> Responder<'static> for PDFFile<'a> {
+impl Responder<'static> for PDFFile {
     fn respond_to(mut self, req: &Request) -> Result<Response<'static>, Status> {
-        
-
-        let render = Template::render(self.1, self.2)
+        let render = Template::render(self.0, &self.1)
             .respond_to(&req)
             .expect("Unable to render template.")
             .body()
@@ -201,22 +201,38 @@ impl<'a> Responder<'static> for PDFFile<'a> {
             .into_string()
             .unwrap();
 
-        let data = self.0.build_from_html(&render);
+        let weasyprint = Command::new("python3")
+            .arg("-m")
+            .arg("weasyprint")
+            .arg("-f")
+            .arg("pdf")
+            .arg("-")
+            .arg("-")
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::inherit())
+            .spawn()
+            .expect("failed to execute process");
+
+        let mut stdin = weasyprint.stdin.unwrap();
+        let mut stdout = weasyprint.stdout.unwrap();
+        let mut writer = BufWriter::new(&mut stdin);
+
+        writer.write_all(&render.into_bytes()).unwrap();
+
         Response::build()
             .header(ContentType::new("application", "pdf"))
-            .streamed_body(data.expect("Unable to build PDF."))
+            .streamed_body(stdout)
             .ok()
     }
 }
 
-pub fn generate_pdf<'a>(connection: &SqliteConnection, bill: &'a Bill) -> PDFFile<'a> {
-    use wkhtmltopdf::*;
-    let mut pdf_app = PdfApplication::new().expect("Failed to init PDF application");
-    let mut builder = pdf_app.builder();
-    builder
-        .orientation(Orientation::Portrait)
-        .margin(Size::Inches(2))
-        .title("Awesome Foo");
+#[derive(Debug, Serialize)]
+pub struct BillData {
+    pub bill: crate::bills::model::Bill,
+    pub member: crate::members::model::Member,
+}
 
-    PDFFile(builder, "pages/members/invoice_template".to_string(), bill)
+pub fn generate_pdf(connection: &SqliteConnection, data: BillData) -> PDFFile {
+    PDFFile("pages/members/invoice_template".to_string(), data)
 }

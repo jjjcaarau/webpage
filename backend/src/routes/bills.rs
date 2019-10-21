@@ -1,6 +1,7 @@
 use crate::error::Error;
 use rocket::request::{Form};
 use rocket::response::{Redirect, Flash};
+use rocket::http::{Status};
 
 #[derive(FromForm)]
 pub struct Update {
@@ -76,15 +77,21 @@ pub fn delete(id: i32) -> Flash<Redirect> {
 }
 
 #[get("/pdf/<id>")]
-pub fn pdf(id: i32) -> Flash<Redirect> {
+pub fn pdf(id: i32) -> Result<crate::bills::actions::PDFFile, Status> {
     let connection = crate::db::establish_connection();
     let mut bill = crate::bills::actions::get(&connection, id);
     match bill {
         Ok(mut bill) => {
-            let pdf = crate::bills::actions::generate_pdf(&connection, &bill);
-            Flash::success(Redirect::to("/members/stats"), "Successfully marked bill as paid.")
+            let mut member = crate::members::actions::get(&connection, bill.member_id).unwrap().0;
+            let pdf = crate::bills::actions::generate_pdf(
+                &connection,
+                crate::bills::actions::BillData {
+                    bill,
+                    member,
+                });
+            Ok(pdf)
         },
-        Err(Error::Diesel(_)) => Flash::error(Redirect::to("/members/stats"), "Internal Server Error"),
-        Err(Error::NotFound) => Flash::error(Redirect::to("/members/stats"), "Bill not found."),
+        Err(Error::Diesel(_)) => Err(Status::InternalServerError),
+        Err(Error::NotFound) => Err(Status::NotFound),
     }
 }

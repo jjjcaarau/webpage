@@ -1,1 +1,199 @@
-<html><body><div>foo</div></body></html>
+<html>
+    <head>
+        <style>
+@charset "UTF-8";
+@import url("https://fonts.googleapis.com/css?family=Pacifico|Source+Sans+Pro:400,700");
+@page {
+    margin: 3cm;
+    @bottom-left {
+        color: #e3000b;
+        font-family: Pacifico;
+        content: '♥ Thank you!';
+    }
+    @bottom-right {
+        color: #a9a;
+        content: 'Judo und Ju Jitsu Club Aarau | Delfterstrasse 44 | 5000 Aarau';
+        font-size: 9pt;
+    }
+}
+
+html {
+    color: #14213d;
+    font-family: Source Sans Pro;
+    font-size: 11pt;
+    line-height: 1.6;
+}
+
+html body {
+    margin: 0;
+}
+
+html #logo {
+    height: 3cm;
+    position: absolute;
+    right: 0;
+    top: -1cm;
+}
+
+html address {
+    font-style: normal;
+    white-space: pre-line;
+}
+
+html address#from {
+    color: #a9a;
+}
+
+html address#to {
+    margin-top: 1cm;
+    text-align: left;
+}
+
+html dl {
+    text-align: right;
+}
+
+html dl dt, html dl dd {
+    display: inline;
+    margin: 0;
+}
+
+html dl dt {
+    color: #a9a;
+}
+
+html dl dt::before {
+    content: '';
+    display: block;
+}
+
+html dl dt::after {
+    content: ':';
+}
+
+html table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+html table th {
+    border-bottom: .2mm solid #a9a;
+    color: #a9a;
+    font-size: 10pt;
+    font-weight: 400;
+    padding-bottom: .25cm;
+    text-transform: uppercase;
+}
+
+html table td {
+    padding-top: 1mm;
+}
+
+html table th:first-of-type, html table td:first-of-type {
+    text-align: left;
+}
+
+html table th:last-of-type, html table td:last-of-type {
+    text-align: right;
+}
+
+html table#total {
+    background: #f6f6f6;
+    border-color: #f6f6f6;
+    border-style: solid;
+    border-width: 1cm 3cm;
+    bottom: 0;
+    font-size: 15pt;
+    margin: 0 -3cm;
+    position: absolute;
+    width: 18cm;
+}
+
+html table#total tr td {
+    vertical-align: top;
+}
+
+html #small-address {
+    font-size: 10pt;
+    line-height: 1.25rem;
+}
+        </style>
+    </head>
+    <body>
+        <img id="logo" src="templates/pages/members/logo.svg" />
+        <address id="to">
+            {{ member.first_name }} {{ member.last_name }}
+            {{ member.address }} {{ member.address_no }}
+            {{ member.postcode }} {{ member.city }}
+        </address>
+
+        <dl id="informations">
+            <dt>Jahresrechnung</dt>
+            <dd>{{ bill.number }}</dd>
+            <dt>Rechnungsdatum</dt>
+            <dd>{{ bill.date }}</dd>
+            <dt>Zahlbar bis</dt>
+            <dd>{{ bill.date }}</dd>
+        </dl>
+
+        <h3>Jahresrechnung {{ bill.number }}</h3>
+
+        Liebe{% if member.sex == "M" %}r{% endif %} {{ member.first_name }}
+
+        <p>
+            Im Namen des JJJAC stelle ich Dir den Mitgliederbeitrag für das Jahr {{ bill.year }} in Rechnung.
+        </p>
+
+        <p>
+            Ich möchte darauf hinweisen, dass der Beitrag auch dann geschuldet ist, wenn keine Trainings besucht werden. Ein Austritt kann jeweils bis zum 31.12 des Vorjahres schriftlich beim Vorstand eingereicht werden und wird für den Beitrag des Folgejahres berücksichtigt.
+        </p>
+
+        <p>
+            Bei Fragen erreichst Du mich unter <strong>079 960 71 30</strong> oder <strong>yatekii@yatekii.ch</strong>.
+        </p>
+
+        <p>
+            Liebe Grüsse und viel Spass beim weiteren Trainieren<br>
+            Noah (Kassier)
+        </p>
+
+        <table>
+            <thead>
+                <th>Posten</th>
+                <th>Betrag</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Grundbeitrag</td>
+                    <td>{{ bill.bill_amount }} CHF</td>
+                </tr>
+                <tr>
+                    <td>Pass (einmalig beim Eintritt)</td>
+                    <td>{{ bill.bill_passport }} CHF</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table id="total">
+            <thead>
+                <th>Zahlbar bis</th>
+                <th>Kontoinformation</th>
+                <th>Total</th>
+            </thead>
+            <tbody>
+                <tr>
+                <td>May 10, 2018</td>
+                <td>
+                    IBAN CH94 0588 1077 2509 6100 0<br>
+                    <p id="small-address">
+                        Judo und Ju Jitsu Club Aarau<br>
+                        Delfterstrasse 44<br>
+                        5004 Aarau
+                    </p>
+                </td>
+                <td>{{ bill.bill_passport + bill.bill_amount }} CHF</td>
+                </tr>
+            </tbody>
+        </table>
+    </body>
+</html>
