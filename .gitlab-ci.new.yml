@@ -20,10 +20,25 @@ before_script:
     - echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
 
+
+build-backend:
+    stage: build
+    image: node:12.4.0-stretch
+    artifacts:
+        paths:
+            - static/
+        expire_in: 1h 
+    script:
+        - cd frontend
+        - yarn install
+        - yarn build
+
+
 build-docker:
+    stage: build
     tags:
         - dind
-    stage: build
+    dependencies: build-backend
     image: docker:19.03.1
     services:
         - docker:19.03.1-dind
@@ -36,6 +51,23 @@ build-docker:
         - docker build --cache-from $IMAGE_TAG_LATEST -t $CI_REGISTRY_IMAGE .
         - docker save $IMAGE_TAG_LATEST -o image
 
+deploy:staging:
+    stage: deploy
+    tags:
+        - docker
+    dependencies:
+        - build-docker
+    script:
+        - cat image | ssh -C deploy@new.jjjcaarau.ch docker load
+        - ssh deploy@new.jjjcaarau.ch docker tag $IMAGE_TAG_LATEST $IMAGE_TAG_STAGING
+        - ssh deploy@new.jjjcaarau.ch 'bash -s' < scripts/restart_staging.sh
+    environment:
+        name: staging
+        url: https://new.jjjcaarau.ch
+    only:
+        - staging
+
+
 deploy:prod:
     stage: deploy
     tags:
@@ -43,11 +75,11 @@ deploy:prod:
     dependencies:
         - build-docker
     script:
-        - ssh deploy@cloud.technokrat.ch docker tag $IMAGE_TAG_STAGING $IMAGE_TAG_PRODUCTION
-        - ssh deploy@cloud.technokrat.ch 'bash -s' < scripts/restart_production.sh
+        - ssh deploy@new.jjjcaarau.ch docker tag $IMAGE_TAG_STAGING $IMAGE_TAG_PRODUCTION
+        - ssh deploy@new.jjjcaarau.ch 'bash -s' < scripts/restart_production.sh
     environment:
         name: production
-        url: https://new.jjjcaarau.ch
+        url: https://jjjcaarau.ch
     when: manual
     only:
         - staging

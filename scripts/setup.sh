@@ -1,3 +1,5 @@
-scp scripts/zigzag-web.service scripts/zigzag-web.conf scripts/setup-remote.sh technokrat@technokrat.ch:preview.zigzag
+ssh -t deploy@new.jjjcaarau.ch 'mkdir -p jjjcaarau-webpage'
 
-ssh -t technokrat@technokrat.ch '/bin/bash preview.zigzag/setup-remote.sh'
+scp scripts/new.jjjcaarau.ch.conf scripts/setup-remote.sh deploy@new.jjjcaarau.ch:jjjcaarau-webpage
+
+ssh -t deploy@new.jjjcaarau.ch '/bin/bash jjjcaarau-webpage/setup-remote.sh'

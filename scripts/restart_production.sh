@@ -1,10 +1,10 @@
 echo "Restarting zigfred.ch"
-docker stop jjjcaarau-webpage
-docker rm jjjcaarau-webpage
+docker stop production.jjjcaarau-webpage
+docker rm production.jjjcaarau-webpage
 docker run \
---name=jjjcaarau-webpage \
+--name=production.jjjcaarau-webpage \
 -d \
 --restart=always \
 -ti \
--v "/var/www/jjjcaarau-webpage/data/:/app/data/" \
--p 8088:1337 jjjcaarau-webpage:production
+-v "/var/www/jjjcaarau.ch/data/:/app/data/" \
+-p 8088:1337 jjjcaarau.ch:production

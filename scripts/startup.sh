@@ -32,11 +32,13 @@ fi
 
 pwd
 ls defaults
-cp defaults/GeoLite2Country.mmdb data/
 
 cd data
 
-ZIGFRED_WEB_PORT=1337 \
-ZIGFRED_WEB_ADDRESS=0.0.0.0 \
-ZIGFRED_WEB_STATIC_ROOT=/app/static \
-../zigfred-web-backend
+JJJCAARAU_WEB_PORT=1337 \
+JJJCAARAU_WEB_ADDRESS=0.0.0.0 \
+JJJCAARAU_WEB_STATIC_ROOT=/app/static \
+JJJCAARAU_WEB_BLOG_ROOT=/app/data/blog \
+DATABASE_URL=/app/data/db.sqlite3 \
+RUST_BACKTRACE=1 \
+../jjjcaarau-webpage

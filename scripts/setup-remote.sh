@@ -1,18 +1,17 @@
 # Move config files from the temporary scp location to their final destination.
-sudo mv preview.zigzag/zigzag-web.service /etc/systemd/system/zigzag-web.service
-sudo mv preview.zigzag/zigzag-web.conf /etc/nginx/sites-available/zigzag-web.conf
+sudo mv jjjcaarau-webpage/new.jjjcaarau.ch.conf /etc/nginx/sites-available/new.jjjcaarau.ch.conf
 
 # Enable the nginx server block.
-sudo ln -s /etc/nginx/sites-available/zigzag-web.conf /etc/nginx/sites-enabled/zigzag-web.conf
+sudo ln -s /etc/nginx/sites-available/new.jjjcaarau.ch.conf /etc/nginx/sites-enabled/new.jjjcaarau.ch.conf
 
 # Make sure nginx is not running.
 sudo service nginx stop
 
 # Aquire an LE certificate.
-sudo certbot certonly --standalone -d preview.zigzag.technokrat.ch
+sudo certbot certonly --standalone -d new.jjjcaarau.ch
 
 # Start up nginx.
 sudo service nginx start
 
 # Remove this script from the temporary location.
-rm preview.zigzag/setup-remote.sh
+rm jjjcaarau-webpage/setup-remote.sh

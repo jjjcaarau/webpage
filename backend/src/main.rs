@@ -36,13 +36,21 @@ use rocket_contrib::{
 };
 
 fn main() {
+    let address = std::env::var("JJJCAARAU_WEB_ADDRESS")
+        .unwrap_or(CONFIG.rocket.address.clone());
+    let port = std::env::var("JJJCAARAU_WEB_PORT")
+        .and_then(|p: String| p.parse::<u16>().map_err(|_| std::env::VarError::NotPresent))
+        .unwrap_or(CONFIG.rocket.port.clone());
+    let static_root = std::env::var("JJJCAARAU_WEB_STATIC_ROOT")
+        .unwrap_or(CONFIG.rocket.static_root.clone());
+
     let config = rocket::config::Config::build(match CONFIG.rocket.environment {
         crate::config::Environment::Development => rocket::config::Environment::Development,
         crate::config::Environment::Staging => rocket::config::Environment::Staging,
         crate::config::Environment::Production => rocket::config::Environment::Production,
     })
-    .address(&CONFIG.rocket.address)
-        .port(CONFIG.rocket.port)
+    .address(&address)
+        .port(port)
         .log_level(match CONFIG.rocket.log_level {
             log::Level::Error | log::Level::Warn => rocket::config::LoggingLevel::Critical,
             log::Level::Info => rocket::config::LoggingLevel::Normal,
@@ -50,8 +58,9 @@ fn main() {
         })
         .finalize()
         .expect("Failed to create rocket config.");
+
     rocket::custom(config)
-        .mount("/static", StaticFiles::from(&CONFIG.rocket.static_root))
+        .mount("/static", StaticFiles::from(static_root))
         .mount("/members", routes![
             crate::routes::members::list,
             crate::routes::members::list_redirect,

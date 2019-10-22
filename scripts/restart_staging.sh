@@ -1,11 +1,10 @@
-echo "Restarting staging.zigfred.ch"
-docker stop staging.backend.web.zigfred
-docker rm staging.backend.web.zigfred
+echo "Restarting zigfred.ch"
+docker stop staging.jjjcaarau-webpage
+docker rm staging.jjjcaarau-webpage
 docker run \
---name=staging.backend.web.zigfred \
+--name=staging.jjjcaarau-webpage \
 -d \
 --restart=always \
 -ti \
--v "/var/www/staging.zigfred.ch/data/:/app/data/" \
--v "/var/www/staging.zigfred.ch/dist/:/app/static/" \
--p 8087:1337 registry.technokrat.ch/zigfred/backend.web.zigfred:staging
+-v "/var/www/new.jjjcaarau.ch/data/:/app/data/" \
+-p 8088:1337 new.jjjcaarau.ch:staging
