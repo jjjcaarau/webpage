@@ -1,0 +1,12 @@
+# Exclude everything by default
+*
+Dockerfile
+# Include selectively
+!backend/templates
+!backend/src
+!backend/migrations
+!scripts
+!backend/config
+!backend/Cargo.toml
+!/home/rust/target/x86_64-unknown-linux-musl/release/jjjcaarau-webpage
+!static

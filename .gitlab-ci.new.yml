@@ -1,0 +1,88 @@
+stages:
+  - build
+  - deploy
+
+variables:
+    APT_CACHE_DIR: $CI_PROJECT_DIR/apt
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+    IMAGE_TAG_LATEST: $CI_REGISTRY_IMAGE:latest
+    IMAGE_TAG_STAGING: $CI_REGISTRY_IMAGE:staging
+    IMAGE_TAG_PRODUCTION: $CI_REGISTRY_IMAGE:production
+    DOCKER_DRIVER: overlay2
+
+# include:
+#     - project: technokrat/ci-scripts
+#       file: /setup_ssh.yml
+
+before_script:
+    - 'which ssh-agent || ( apt update -y && apt install openssh-client -y )'
+    - 'which rsync || ( apt update -y && apt install -y rsync )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY_CLOUD" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$SSH_KNOWN_HOSTS_CLOUD" > ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+
+build-docker:
+    tags:
+        - dind
+    stage: build
+    image: docker:19.03.1
+    services:
+        - docker:19.03.1-dind
+    artifacts:
+        paths:
+            - image
+    before_script: []
+    script:
+        - docker version
+        - docker login -u deploy -p $DEPLOY_TOKEN $CI_REGISTRY
+        - docker build --cache-from $IMAGE_TAG_LATEST -t $CI_REGISTRY_IMAGE .
+        # - docker push $IMAGE_TAG_LATEST
+        - docker save $IMAGE_TAG_LATEST -o image
+
+deploy:staging:
+    stage: deploy
+    tags:
+        - docker
+    dependencies:
+        - build-docker
+    script:
+        # - docker login -u deploy -p $DEPLOY_TOKEN $CI_REGISTRY
+        # - docker tag $IMAGE_TAG_LATEST $IMAGE_TAG_STAGING
+        # - docker push $IMAGE_TAG_STAGING
+        # - docker save $IMAGE_TAG_STAGING | ssh -C technokrat-cloud docker load
+        - cat image | ssh -C deploy@cloud.technokrat.ch docker load
+        - ssh deploy@cloud.technokrat.ch docker tag $IMAGE_TAG_LATEST $IMAGE_TAG_STAGING
+        - ssh deploy@cloud.technokrat.ch 'bash -s' < scripts/restart_staging.sh
+    environment:
+        name: staging
+        url: https://staging.zigfred.ch
+    only:
+        - staging
+
+deploy:prod:
+    stage: deploy
+    tags:
+        - docker
+    dependencies:
+        - build-docker
+    script:
+        # - docker login -u deploy -p $DEPLOY_TOKEN $CI_REGISTRY
+        # - docker tag $IMAGE_TAG_LATEST $IMAGE_TAG_PRODUCTION
+        # - docker push $IMAGE_TAG_PRODUCTION
+        # - docker save $IMAGE_TAG_PRODUCTION | ssh -C technokrat-cloud docker load
+        - ssh deploy@cloud.technokrat.ch docker tag $IMAGE_TAG_STAGING $IMAGE_TAG_PRODUCTION
+        - ssh deploy@cloud.technokrat.ch 'bash -s' < scripts/restart_production.sh
+    environment:
+        name: production
+        url: https://zigfred.ch
+    when: manual
+    only:
+        - staging
+
+cache:
+    paths:
+        - apt/
+        - target/

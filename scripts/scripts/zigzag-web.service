@@ -1,0 +1,15 @@
+[Unit]
+Description=zigzag-web (Rocket Web Application)
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/preview.zigzag
+Environment="ROCKET_ENV=prod"
+Environment="ROCKET_ADDRESS=127.0.0.1"
+Environment="ROCKET_PORT=1337"
+Environment="ROCKET_LOG=critical"
+ExecStart=/var/www/preview.zigzag/zigzag-web-backend
+
+[Install]
+WantedBy=multi-user.target
