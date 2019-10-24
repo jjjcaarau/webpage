@@ -78,7 +78,7 @@ INSERT INTO members (
     needs_mark,
     section_jujitsu,
     section_judo,
-    0 AS section_judo_kids,
+    section_judo_kids,
     NULL,
     NULL,
     0
