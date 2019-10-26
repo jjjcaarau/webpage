@@ -3,6 +3,7 @@ CREATE TABLE bills (
     member_id INTEGER NOT NULL,
     year INTEGER NOT NULL,
     date DATE NOT NULL,
+    due_date DATE NOT NULL,
     number INTEGER NOT NULL,
     bill_passport INTEGER NOT NULL,
     bill_amount INTEGER NOT NULL,

@@ -99,26 +99,26 @@ pub fn pdf(id: i32) -> Result<crate::bills::actions::PDFFile, Status> {
 
 //_user: crate::login::User
 #[post("/generate_all")]
-pub fn generate_all() -> Json<()> {
+pub fn generate_all() -> Redirect {
     let connection = crate::db::establish_connection();
     crate::bills::actions::generate_bills(&connection, &chrono::Utc::now().date().naive_utc(), crate::bills::actions::BillType::All);
-    Json(())
+    Redirect::to("/members/stats")
 }
 
 //_user: crate::login::User
 #[post("/generate_late_notice")]
-pub fn generate_late_notice() -> Json<()> {
+pub fn generate_late_notice() -> Redirect {
     let connection = crate::db::establish_connection();
     crate::bills::actions::generate_bills(&connection, &chrono::Utc::now().date().naive_utc(), crate::bills::actions::BillType::LateNotice);
-    Json(())
+    Redirect::to("/members/stats")
 }
 
 //_user: crate::login::User
 #[post("/generate_first")]
-pub fn generate_first() -> Json<()> {
+pub fn generate_first() -> Redirect {
     let connection = crate::db::establish_connection();
     crate::bills::actions::generate_bills(&connection, &chrono::Utc::now().date().naive_utc(), crate::bills::actions::BillType::First);
-    Json(())
+    Redirect::to("/members/stats")
 }
 
 // #[get("/generate_bills", rank = 2)]

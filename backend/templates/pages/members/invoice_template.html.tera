@@ -63,16 +63,16 @@ html dl {
 html dl dt, html dl dd {
     display: inline;
     margin: 0;
+    position: absolute;
+    right: 0;
 }
 
 html dl dt {
+    position: absolute;
+    right: 2cm;
     color: #aa99aa;
 }
 
-html dl dt::before {
-    content: '';
-    display: block;
-}
 
 html dl dt::after {
     content: ':';
@@ -142,10 +142,12 @@ html #small-address {
             <dt>Rechnung</dt>
             <dd>RE {{ bill.id }}</dd>
             {% endif %}
+            <br>
             <dt>Rechnungsdatum</dt>
             <dd>{{ bill.date }}</dd>
+            <br>
             <dt>Zahlbar bis</dt>
-            <dd>{{ bill.date }}</dd>
+            <dd>{{ bill.due_date }}</dd>
         </dl>
 
         {% if bill.number > 0 %}
@@ -165,7 +167,7 @@ html #small-address {
         </p>
 
         <p>
-            Bei Fragen erreichst Du mich unter <strong>079 960 71 30</strong> oder <strong>yatekii@yatekii.ch</strong>.
+            Bei Fragen erreichst Du mich unter <strong>079 960 71 30</strong> oder <strong>kassier@jjjcaarau.ch</strong>.
         </p>
 
         <p>
@@ -198,7 +200,7 @@ html #small-address {
             </thead>
             <tbody>
                 <tr>
-                <td>May 10, 2018</td>
+                <td>{{ bill.due_date }}</td>
                 <td>
                     IBAN CH94 0588 1077 2509 6100 0<br>
                     <p id="small-address">

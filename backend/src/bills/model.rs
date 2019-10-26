@@ -8,6 +8,7 @@ pub struct Bill {
     pub member_id: i32,
     pub year: i32,
     pub date: chrono::NaiveDate,
+    pub due_date: chrono::NaiveDate,
     pub number: i32,
     pub bill_passport: i32,
     pub bill_amount: i32,
@@ -24,6 +25,8 @@ pub struct NewBill {
     pub year: i32,
     #[derivative(Default(value="chrono::NaiveDate::from_ymd(2019, 01, 12)"))]
     pub date: chrono::NaiveDate,
+    #[derivative(Default(value="chrono::NaiveDate::from_ymd(2019, 01, 12)"))]
+    pub due_date: chrono::NaiveDate,
     pub number: i32,
     pub bill_passport: i32,
     pub bill_amount: i32,

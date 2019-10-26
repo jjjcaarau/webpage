@@ -4,6 +4,7 @@ table! {
         member_id -> Integer,
         year -> Integer,
         date -> Date,
+        due_date -> Date,
         number -> Integer,
         bill_passport -> Integer,
         bill_amount -> Integer,

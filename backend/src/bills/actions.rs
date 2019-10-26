@@ -161,11 +161,15 @@ pub fn generate_bill(connection: &SqliteConnection, member: &Member, events: &Ve
             return None;
         }
 
+        let date = chrono::Utc::now().date().naive_utc();
+        let due_date = date + chrono::Duration::days(30);
+
         // Create a new bill.
         let bill = NewBill {
             member_id: member.id,
             year,
-            date: chrono::Utc::now().date().naive_utc(),
+            date,
+            due_date,
             number,
             bill_passport,
             bill_amount,
@@ -188,25 +192,30 @@ pub fn generate_bills(connection: &SqliteConnection, date: &chrono::NaiveDate, b
             match bill_type {
                 BillType::All => {
                     create(connection, &bill);
+                    if bill.number == 0 {
+                        count += 1;
+                        println!("Generated first bill for {} {}.", member.0.first_name, member.0.last_name);
+                    }
+                    if bill.number > 0 {
+                        count += 1;
+                        println!("Generated {}. late notice for {} {}.", bill.number, member.0.first_name, member.0.last_name);
+                    }
                 },
                 BillType::First => {
                     if bill.number == 0 {
                         create(connection, &bill);
+                        count += 1;
+                        println!("Generated first bill for {} {}.", member.0.first_name, member.0.last_name);
                     }
                 },
                 BillType::LateNotice => {
                     if bill.number > 0 {
                         create(connection, &bill);
+                        count += 1;
+                        println!("Generated {}. late notice for {} {}.", bill.number, member.0.first_name, member.0.last_name);
                     }
                 }
             }
-            if bill.number == 0 {
-                println!("Generated first bill for {} {}.", member.0.first_name, member.0.last_name);
-            }
-            if bill.number > 0 {
-                println!("Generated {}. late notice for {} {}.", bill.number, member.0.first_name, member.0.last_name);
-            }
-            count += 1;
         }
     }
 
