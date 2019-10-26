@@ -29,29 +29,34 @@ pub fn list_all(connection: &SqliteConnection) -> Result<Vec<(Member, Vec<Event>
     let member_list = members::table
         .order_by(members::columns::first_name)
         .load::<Member>(connection)?;
+
+    let ids = member_list
+        .iter()
+        .map(|member| (member.id, member.family_id))
+        .unzip::<i32, Option<i32>, Vec<i32>, Vec<Option<i32>>>();
     let event_list = Event::belonging_to(&member_list)
         .order_by((events::columns::date, events::columns::id))
         .load::<Event>(connection)?
         .grouped_by(&member_list);
-    let family_list = members::table
-        .filter({
-            let ids = member_list
+    let family_list = member_list
+        .iter()
+        .map(|member| {
+            member_list
                 .iter()
-                .map(|member| (member.id, member.family_id))
-                .unzip::<i32, Option<i32>, Vec<i32>, Vec<Option<i32>>>();
-            members::columns::family_id.eq_any(ids.1)
-            .and(members::columns::id.ne_all(ids.0))
+                .filter(|inner| {
+                    inner.family_id == Some(member.id)
+                 && inner.id != member.id
+                })
+                .cloned()
+                .collect::<Vec<_>>()
         })
-        .order_by(members::columns::birthday)
-        .load::<Member>(connection)?
-        .grouped_by(&member_list);
+        .collect::<Vec<_>>();
     let tag_list = member_list
         .iter()
         .zip(event_list.iter())
         .map(|(m, e)| get_tags(m, e))
         .collect::<Vec<_>>();
-
-    Ok(itertools::izip!(member_list.into_iter(), event_list, family_list, tag_list).collect::<Vec<_>>())
+    Ok(itertools::izip!(member_list.into_iter(), event_list, family_list.into_iter(), tag_list).collect::<Vec<_>>())
 }
 
 /// Fetches an existing member from the DB.

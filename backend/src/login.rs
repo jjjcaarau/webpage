@@ -68,6 +68,8 @@ Dein Website-Team",
             println!("{}", content);
             
             crate::email::send(CONFIG.general.email.clone(), login.username.clone(), "Passwort zurücksetzen".into(), content);
+        } else {
+                log::error!("No member with this email found.");
         }
         Err(Flash::success(Redirect::to(uri!(login_page)), "Email was sent to user if it exists."))
     } else {

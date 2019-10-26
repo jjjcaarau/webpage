@@ -104,6 +104,12 @@ pub fn delete(connection: &SqliteConnection, bill: &Bill) -> Result<(), diesel::
         .execute(connection).map(|_| ())
 }
 
+pub enum BillType {
+    First,
+    LateNotice,
+    All,
+}
+
 /// Generates a new bill at a due date.
 /// This does not store the bill to the DB.
 /// The procedure honors all sorts of special rules and is aware of reminder bills.
@@ -173,20 +179,38 @@ pub fn generate_bill(connection: &SqliteConnection, member: &Member, events: &Ve
     return None;
 }
 
-pub fn generate_bills(connection: &SqliteConnection, date: &chrono::NaiveDate) {
+pub fn generate_bills(connection: &SqliteConnection, date: &chrono::NaiveDate, bill_type: BillType) {
     let members = crate::members::actions::list_all(connection).unwrap();
 
     let mut count = 0;
     for member in members {
-        
         if let Some(bill) = generate_bill(connection, &member.0, &member.1, date) {
-            create(connection, &bill);
-            println!("{} {}", member.0.first_name, member.0.last_name);
+            match bill_type {
+                BillType::All => {
+                    create(connection, &bill);
+                },
+                BillType::First => {
+                    if bill.number == 0 {
+                        create(connection, &bill);
+                    }
+                },
+                BillType::LateNotice => {
+                    if bill.number > 0 {
+                        create(connection, &bill);
+                    }
+                }
+            }
+            if bill.number == 0 {
+                println!("Generated first bill for {} {}.", member.0.first_name, member.0.last_name);
+            }
+            if bill.number > 0 {
+                println!("Generated {}. late notice for {} {}.", bill.number, member.0.first_name, member.0.last_name);
+            }
             count += 1;
         }
     }
 
-    println!("count: {}", count);
+    println!("Genrated {} bills.", count);
 }
 
 pub struct PDFFile(String, BillData);

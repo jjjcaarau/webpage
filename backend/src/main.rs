@@ -74,7 +74,6 @@ fn main() {
             crate::routes::members::update_family_json,
             crate::routes::members::stats,
             crate::routes::members::stats_redirect,
-            crate::routes::members::generate_bills,
             // crate::routes::members::generate_bills_redirect,
         ])
         .mount("/events", routes![
@@ -85,6 +84,9 @@ fn main() {
             crate::routes::bills::pay,
             crate::routes::bills::delete,
             crate::routes::bills::pdf,
+            crate::routes::bills::generate_all,
+            crate::routes::bills::generate_first,
+            crate::routes::bills::generate_late_notice,
         ])
         .mount("/blog", routes![
             crate::routes::blog::edit_get,

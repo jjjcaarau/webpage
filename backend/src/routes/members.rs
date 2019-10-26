@@ -91,19 +91,6 @@ pub fn view_json_redirect(id: i32) -> Redirect {
     Redirect::to(uri!(crate::login::login_page))
 }
 
-//_user: crate::login::User
-#[get("/generate_bills")]
-pub fn generate_bills() -> Json<()> {
-    let connection = crate::db::establish_connection();
-    crate::bills::actions::generate_bills(&connection, &chrono::Utc::now().date().naive_utc());
-    Json(())
-}
-
-// #[get("/generate_bills", rank = 2)]
-// pub fn generate_bills_redirect() -> Redirect {
-//     Redirect::to(uri!(crate::login::login_page))
-// }
-
 #[derive(Serialize)]
 pub struct UpdateResponse {
     id: i32,

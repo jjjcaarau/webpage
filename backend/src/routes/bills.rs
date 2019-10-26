@@ -2,6 +2,7 @@ use crate::error::Error;
 use rocket::request::{Form};
 use rocket::response::{Redirect, Flash};
 use rocket::http::{Status};
+use rocket_contrib::json::Json;
 
 #[derive(FromForm)]
 pub struct Update {
@@ -95,3 +96,32 @@ pub fn pdf(id: i32) -> Result<crate::bills::actions::PDFFile, Status> {
         Err(Error::NotFound) => Err(Status::NotFound),
     }
 }
+
+//_user: crate::login::User
+#[post("/generate_all")]
+pub fn generate_all() -> Json<()> {
+    let connection = crate::db::establish_connection();
+    crate::bills::actions::generate_bills(&connection, &chrono::Utc::now().date().naive_utc(), crate::bills::actions::BillType::All);
+    Json(())
+}
+
+//_user: crate::login::User
+#[post("/generate_late_notice")]
+pub fn generate_late_notice() -> Json<()> {
+    let connection = crate::db::establish_connection();
+    crate::bills::actions::generate_bills(&connection, &chrono::Utc::now().date().naive_utc(), crate::bills::actions::BillType::LateNotice);
+    Json(())
+}
+
+//_user: crate::login::User
+#[post("/generate_first")]
+pub fn generate_first() -> Json<()> {
+    let connection = crate::db::establish_connection();
+    crate::bills::actions::generate_bills(&connection, &chrono::Utc::now().date().naive_utc(), crate::bills::actions::BillType::First);
+    Json(())
+}
+
+// #[get("/generate_bills", rank = 2)]
+// pub fn generate_bills_redirect() -> Redirect {
+//     Redirect::to(uri!(crate::login::login_page))
+// }
