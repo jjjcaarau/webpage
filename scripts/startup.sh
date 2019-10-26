@@ -6,11 +6,17 @@ if [ -f "/app/data/db.sqlite3" ]; then
     echo "Database found. Doing nothing."
 else 
     echo "No database found. Initializing."
-    ./housekeeping/diesel setup --database-url /app/data/db.sqlite3 --migration-dir /app/housekeeping/migrations
+    ./housekeeping/diesel \
+    setup \
+    --database-url /app/data/db.sqlite3 \
+    --migration-dir /app/housekeeping/migrations
 fi
 
 echo "Migrating."
-./housekeeping/diesel migration run --database-url /app/data/db.sqlite3 --migration-dir /app/housekeeping/migrations
+./housekeeping/diesel \
+migration run \
+--database-url /app/data/db.sqlite3 \
+--migration-dir /app/housekeeping/migrations
 
 echo "Ensuring directories"
 mkdir -p data/config/
