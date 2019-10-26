@@ -38,7 +38,8 @@ build-docker:
     stage: build
     tags:
         - dind
-    dependencies: build-frontend
+    dependencies:
+        - build-frontend
     image: docker:19.03.1
     services:
         - docker:19.03.1-dind
