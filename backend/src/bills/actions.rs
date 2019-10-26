@@ -183,6 +183,26 @@ pub fn generate_bill(connection: &SqliteConnection, member: &Member, events: &Ve
     return None;
 }
 
+fn try_generate_late_notice(connection: &SqliteConnection, bill: &NewBill, member: &Member) -> bool {
+    if bill.number > 0 && bill.due_date < chrono::Utc::now().date().naive_utc() {
+        create(connection, &bill);
+        println!("Generated {}. late notice for {} {}.", bill.number, member.first_name, member.last_name);
+        true
+    } else {
+        false
+    }
+}
+
+fn try_generate_first(connection: &SqliteConnection, bill: &NewBill, member: &Member) -> bool {
+    if bill.number == 0 {
+        create(connection, &bill);
+        println!("Generated first bill for {} {}.", member.first_name, member.last_name);
+        true
+    } else {
+        false
+    }
+}
+
 pub fn generate_bills(connection: &SqliteConnection, date: &chrono::NaiveDate, bill_type: BillType) {
     let members = crate::members::actions::list_all(connection).unwrap();
 
@@ -191,29 +211,14 @@ pub fn generate_bills(connection: &SqliteConnection, date: &chrono::NaiveDate, b
         if let Some(bill) = generate_bill(connection, &member.0, &member.1, date) {
             match bill_type {
                 BillType::All => {
-                    create(connection, &bill);
-                    if bill.number == 0 {
-                        count += 1;
-                        println!("Generated first bill for {} {}.", member.0.first_name, member.0.last_name);
-                    }
-                    if bill.number > 0 {
-                        count += 1;
-                        println!("Generated {}. late notice for {} {}.", bill.number, member.0.first_name, member.0.last_name);
-                    }
+                    count += if try_generate_late_notice(connection, &bill, &member.0) { 1 } else { 0 };
+                    count += if try_generate_first(connection, &bill, &member.0) { 1 } else { 0 };
                 },
                 BillType::First => {
-                    if bill.number == 0 {
-                        create(connection, &bill);
-                        count += 1;
-                        println!("Generated first bill for {} {}.", member.0.first_name, member.0.last_name);
-                    }
+                    count += if try_generate_first(connection, &bill, &member.0) { 1 } else { 0 };
                 },
                 BillType::LateNotice => {
-                    if bill.number > 0 {
-                        create(connection, &bill);
-                        count += 1;
-                        println!("Generated {}. late notice for {} {}.", bill.number, member.0.first_name, member.0.last_name);
-                    }
+                    count += if try_generate_late_notice(connection, &bill, &member.0) { 1 } else { 0 };
                 }
             }
         }
