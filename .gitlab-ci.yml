@@ -1,5 +1,6 @@
 stages:
-  - build
+  - build-frontend
+  - build-backend
   - deploy
 
 variables:
@@ -22,7 +23,7 @@ before_script:
 
 
 build-frontend:
-    stage: build
+    stage: build-frontend
     image: node:12.4.0-stretch
     artifacts:
         paths:
@@ -35,7 +36,7 @@ build-frontend:
 
 
 build-docker:
-    stage: build
+    stage: build-backend
     tags:
         - dind
     dependencies:
