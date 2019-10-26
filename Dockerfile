@@ -20,6 +20,37 @@ RUN cargo build --release
 
 FROM alpine:latest
 
+RUN apk \
+    --update \
+    --upgrade \
+    --no-cache \
+    add \
+        cairo-dev \
+        pango-dev \
+        gdk-pixbuf-dev \
+        ttf-dejavu
+
+ADD requirements.txt requirements.txt
+
+RUN set \
+    -ex \
+&& apk \
+    --no-cache \
+    --virtual .build-deps \
+    add \
+        gcc \
+        musl-dev \
+        jpeg-dev \
+        zlib-dev \
+        libffi-dev \
+        python3-dev \
+&& pip3 \
+    install \
+    --no-cache-dir \
+    -r requirements.txt \
+&& apk \
+    del .build-deps
+
 WORKDIR /app
 
 RUN mkdir housekeeping

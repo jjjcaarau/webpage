@@ -230,6 +230,8 @@ impl Responder<'static> for PDFFile {
             .arg("weasyprint")
             .arg("-f")
             .arg("pdf")
+            .arg("-e")
+            .arg("utf8")
             .arg("-")
             .arg("-")
             .stdin(Stdio::piped())
