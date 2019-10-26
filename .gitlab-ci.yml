@@ -21,7 +21,7 @@ before_script:
     - chmod 644 ~/.ssh/known_hosts
 
 
-build-backend:
+build-frontend:
     stage: build
     image: node:12.4.0-stretch
     artifacts:
@@ -38,7 +38,7 @@ build-docker:
     stage: build
     tags:
         - dind
-    dependencies: build-backend
+    dependencies: build-frontend
     image: docker:19.03.1
     services:
         - docker:19.03.1-dind
@@ -63,10 +63,9 @@ deploy:staging:
         - ssh deploy@new.jjjcaarau.ch 'bash -s' < scripts/restart_staging.sh
     environment:
         name: staging
-        url: https://new.jjjcaarau.ch
+        url: https://staging.jjjcaarau.ch
     only:
         - staging
-
 
 deploy:prod:
     stage: deploy
@@ -79,7 +78,7 @@ deploy:prod:
         - ssh deploy@new.jjjcaarau.ch 'bash -s' < scripts/restart_production.sh
     environment:
         name: production
-        url: https://jjjcaarau.ch
+        url: https://new.jjjcaarau.ch
     when: manual
     only:
         - staging
