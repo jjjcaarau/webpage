@@ -20,3 +20,6 @@ log_level = "Warn"
 static_root = "../static/"
 recaptcha_private_key = ""
 recaptcha_url = "https://www.google.com/recaptcha/api/siteverify"
+
+[api]
+socket_path = "/tmp/jjjca_control.sock"

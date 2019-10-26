@@ -27,6 +27,7 @@ mod blog;
 mod login;
 mod email;
 mod error;
+mod commander;
 
 use crate::config::CONFIG;
 
@@ -58,6 +59,8 @@ fn main() {
         })
         .finalize()
         .expect("Failed to create rocket config.");
+
+    let handle = commander::init();
 
     rocket::custom(config)
         .mount("/static", StaticFiles::from(static_root))

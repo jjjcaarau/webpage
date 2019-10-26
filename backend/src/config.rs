@@ -38,9 +38,15 @@ pub struct General {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct Api {
+    pub socket_path: String,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct Config {
     pub general: General,
     pub rocket: Rocket,
+    pub api: Api,
 }
 
 impl Config {

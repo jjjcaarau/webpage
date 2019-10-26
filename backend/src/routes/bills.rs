@@ -97,25 +97,22 @@ pub fn pdf(id: i32) -> Result<crate::bills::actions::PDFFile, Status> {
     }
 }
 
-//_user: crate::login::User
 #[post("/generate_all")]
-pub fn generate_all() -> Redirect {
+pub fn generate_all(_user: crate::login::User) -> Redirect {
     let connection = crate::db::establish_connection();
     crate::bills::actions::generate_bills(&connection, &chrono::Utc::now().date().naive_utc(), crate::bills::actions::BillType::All);
     Redirect::to("/members/stats")
 }
 
-//_user: crate::login::User
 #[post("/generate_late_notice")]
-pub fn generate_late_notice() -> Redirect {
+pub fn generate_late_notice(_user: crate::login::User) -> Redirect {
     let connection = crate::db::establish_connection();
     crate::bills::actions::generate_bills(&connection, &chrono::Utc::now().date().naive_utc(), crate::bills::actions::BillType::LateNotice);
     Redirect::to("/members/stats")
 }
 
-//_user: crate::login::User
 #[post("/generate_first")]
-pub fn generate_first() -> Redirect {
+pub fn generate_first(_user: crate::login::User) -> Redirect {
     let connection = crate::db::establish_connection();
     crate::bills::actions::generate_bills(&connection, &chrono::Utc::now().date().naive_utc(), crate::bills::actions::BillType::First);
     Redirect::to("/members/stats")

@@ -13,8 +13,8 @@ chrono = { version = "*", features = ["serde"] }
 derivative = "*"
 rocket = "*"
 rocket_contrib = { version = "*", default-features = false, features = ["tera_templates", "serve", "json"] }
-serde = "*"
-serde_derive = "*"
+serde = "1.0.101"
+serde_derive = "1.0.101"
 itertools = "*"
 pulldown-cmark = { version = "0.5.3", default-features = false }
 config = "0.9"
@@ -25,3 +25,5 @@ uuid = { version = "*", features = ["v4"] }
 native-tls = "*"
 lettre = "0.9"
 lettre_email = "0.9"
+structopt = "0.3.3"
+bufstream = "0.1.4"
