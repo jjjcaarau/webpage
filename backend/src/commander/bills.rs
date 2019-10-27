@@ -25,17 +25,29 @@ pub fn generate_first() {
     );
 }
 
-pub fn send_all() {
+pub fn send_all(force: bool) {
     let connection = crate::db::establish_connection();
-    unimplemented!();
+    crate::bills::actions::send_bills(
+        &connection,
+        crate::bills::actions::BillType::All,
+        force
+    );
 }
 
-pub fn send_late_notice() {
+pub fn send_late_notice(force: bool) {
     let connection = crate::db::establish_connection();
-    unimplemented!();
+    crate::bills::actions::send_bills(
+        &connection,
+        crate::bills::actions::BillType::LateNotice,
+        force
+    );
 }
 
-pub fn send_first() {
+pub fn send_first(force: bool) {
     let connection = crate::db::establish_connection();
-    unimplemented!();
+    crate::bills::actions::send_bills(
+        &connection,
+        crate::bills::actions::BillType::First,
+        force
+    );
 }

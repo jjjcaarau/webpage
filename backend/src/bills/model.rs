@@ -1,6 +1,14 @@
 use crate::schema::*;
 use crate::members::model::Member;
 
+#[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug, Copy, Clone)]
+#[derivative(Default(bound=""))]
+pub enum SentAs {
+    #[derivative(Default)]
+    SnailMail,
+    Email,
+}
+
 #[derive(Queryable, Identifiable, AsChangeset, Associations, Serialize, Deserialize, PartialEq, Debug, Clone)]
 #[belongs_to(Member, foreign_key = "member_id")]
 pub struct Bill {
@@ -9,6 +17,8 @@ pub struct Bill {
     pub year: i32,
     pub date: chrono::NaiveDate,
     pub due_date: chrono::NaiveDate,
+    pub sent: Option<chrono::NaiveDate>,
+    pub sent_as: SentAs,
     pub number: i32,
     pub bill_passport: i32,
     pub bill_amount: i32,
@@ -27,6 +37,8 @@ pub struct NewBill {
     pub date: chrono::NaiveDate,
     #[derivative(Default(value="chrono::NaiveDate::from_ymd(2019, 01, 12)"))]
     pub due_date: chrono::NaiveDate,
+    pub sent: Option<chrono::NaiveDate>,
+    pub sent_as: SentAs,
     pub number: i32,
     pub bill_passport: i32,
     pub bill_amount: i32,

@@ -5,6 +5,8 @@ table! {
         year -> Integer,
         date -> Date,
         due_date -> Date,
+        sent -> Nullable<Date>,
+        sent_as -> crate::bills::model::SentAsMapping,
         number -> Integer,
         bill_passport -> Integer,
         bill_amount -> Integer,

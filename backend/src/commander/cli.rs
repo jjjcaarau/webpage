@@ -17,6 +17,8 @@ pub enum Invoice {
     },
     #[structopt(name = "send")]
     Send {
+        #[structopt(name = "force", short = "f")]
+        force: bool,
         typ: String,
     },
 }

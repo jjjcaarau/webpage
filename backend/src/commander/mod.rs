@@ -33,10 +33,11 @@ fn handle_client(stream: UnixStream) {
                 },
                 cli::Invoice::Send {
                     typ,
+                    force,
                 } => match &typ[..] {
-                    "all" => bills::send_all(),
-                    "first" => bills::send_first(),
-                    "late" => bills::send_late_notice(),
+                    "all" => bills::send_all(force),
+                    "first" => bills::send_first(force),
+                    "late" => bills::send_late_notice(force),
                     t => println!("Action type \"{}\" does not exist.", t),
                 },
             }

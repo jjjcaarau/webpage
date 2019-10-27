@@ -104,6 +104,7 @@ pub fn delete(connection: &SqliteConnection, bill: &Bill) -> Result<(), diesel::
         .execute(connection).map(|_| ())
 }
 
+#[derive(Copy, Clone, Debug)]
 pub enum BillType {
     First,
     LateNotice,
@@ -170,6 +171,8 @@ pub fn generate_bill(connection: &SqliteConnection, member: &Member, events: &Ve
             year,
             date,
             due_date,
+            sent: None,
+            sent_as: Default::default(),
             number,
             bill_passport,
             bill_amount,
@@ -225,6 +228,82 @@ pub fn generate_bills(connection: &SqliteConnection, date: &chrono::NaiveDate, b
     }
 
     println!("Genrated {} bills.", count);
+}
+
+pub fn send_bill(connection: &SqliteConnection, member: &Member, today: &chrono::NaiveDate, last_bill: Result<Bill, Error>, bill_type: BillType, force: bool) -> bool {
+    // Check if the bill to send even exists.
+    if let Ok(mut last_bill) = last_bill {
+        match bill_type {
+            BillType::All => {},
+            // If we only want to send first time invoices and the invoice is not of that type, return false.
+            BillType::First => {
+                if last_bill.number > 0 {
+                    return false;
+                }
+            },
+            // If we only want to send late notice invoices and the invoice is not of that type, return false.
+            BillType::LateNotice => {
+                if last_bill.number == 0 {
+                    return false;
+                }
+            }
+        }
+
+        // If we do not want to force send, we do not send again sent invoices.
+        if !force && last_bill.sent.is_some() {
+            log::info!("Invoice was already sent. Not sending it again.");
+            return false;
+        }
+        
+        // Try send the email.
+        let content = format!(
+            "Hallo {}
+
+Du hast soeben eine neue Rechnung des Judo und Ju Jitsu Clubs Aarau erhalten.
+Im Anhang findest du das PDF mit den genauen Informationen.
+
+Liebe Grüsse,
+Noah",
+            member.first_name
+        );
+
+        println!("{}", content);
+        
+        // All checks have passed until here, so try send the email.
+        if crate::email::send(
+            CONFIG.general.email.clone(),
+            member.email.clone(),
+            "Neue Mitgliederrechnung".into(),
+            content
+        ).is_ok() {
+            // If all checks are passed, update the sent date for the DB entry of the invoice.
+            last_bill.sent = Some(*today);
+            update(connection, &last_bill);
+            true
+        } else {
+            false
+        }
+    } else {
+        false
+    }
+}
+
+pub fn send_bills(connection: &SqliteConnection, bill_type: BillType, force: bool) {
+    let members = crate::members::actions::list_all(connection).unwrap();
+
+    let mut count = 0;
+    for member in members {
+        use chrono::Datelike;
+        let today = chrono::Utc::now().date().naive_utc();
+        let year = today.year();
+        let last_bill = get_last_this_year(connection, &member.0, year);
+        if send_bill(connection, &member.0, &today, last_bill, bill_type, force) {
+            count += 1;
+            log::info!("Sent invoice to {}.", member.0.email);
+        }
+    }
+
+    println!("Sent {} invoices.", count);
 }
 
 pub struct PDFFile(String, BillData);
