@@ -54,11 +54,17 @@ impl Config {
         let mut s = config::Config::new();
 
         // Start off by merging in the "default" configuration file
-        s.merge(config::File::with_name("config/default"))?;
+        s.merge(config::File::from_str(include_str!("config.toml"), config::FileFormat::Toml))?;
 
         // Add in a local configuration file
         // This file shouldn't be checked in to git
         s.merge(config::File::with_name("config/local").required(false))?;
+
+        if let Ok(config_file) = std::env::var("JJJCA_CONFIG") {
+            s.merge(config::File::new(&config_file, config::FileFormat::Toml).required(true))?;
+        } else {
+            log::warn!("No specific config was found. Continue with the default config.")
+        }
 
         // You can deserialize (and thus freeze) the entire configuration as
         s.try_into()

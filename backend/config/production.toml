@@ -1,0 +1,5 @@
+[general]
+smtp_server = "lx1.hoststar.hosting"
+smtp_port = 25
+smtp_username = "noreply@jjjcaarau.ch"
+smtp_password = "London.21"
