@@ -5,10 +5,10 @@ stages:
 
 variables:
     APT_CACHE_DIR: $CI_PROJECT_DIR/apt
-    IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-    IMAGE_TAG_LATEST: $CI_REGISTRY_IMAGE:latest
-    IMAGE_TAG_STAGING: $CI_REGISTRY_IMAGE:staging
-    IMAGE_TAG_PRODUCTION: $CI_REGISTRY_IMAGE:production
+    IMAGE_TAG: $CI_PROJECT_NAME:$CI_COMMIT_REF_SLUG
+    IMAGE_TAG_LATEST: $CI_PROJECT_NAME:latest
+    IMAGE_TAG_STAGING: $CI_PROJECT_NAME:staging
+    IMAGE_TAG_PRODUCTION: $CI_PROJECT_NAME:production
     DOCKER_DRIVER: overlay2
 
 before_script:
@@ -50,7 +50,7 @@ build-docker:
     before_script: []
     script:
         - docker version
-        - docker build --cache-from $IMAGE_TAG_LATEST -t $CI_REGISTRY_IMAGE .
+        - docker build --cache-from $IMAGE_TAG_LATEST -t $CI_PROJECT_NAME .
         - docker save $IMAGE_TAG_LATEST -o image
 
 deploy:staging:
