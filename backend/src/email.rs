@@ -1,13 +1,10 @@
-extern crate native_tls;
 extern crate lettre;
 extern crate lettre_email;
+extern crate native_tls;
 
 use crate::config::CONFIG;
 
-use lettre::{
-    ClientSecurity, ClientTlsParameters,
-    SmtpClient, Transport,
-};
+use lettre::{ClientSecurity, ClientTlsParameters, SmtpClient, Transport};
 
 use lettre::smtp::authentication::{Credentials, Mechanism};
 use lettre::smtp::ConnectionReuseParameters;
@@ -32,7 +29,12 @@ impl From<lettre::smtp::error::Error> for EmailError {
     }
 }
 
-pub fn send(from: String, to: String, subject: String, content_text: String) -> Result<(), EmailError> {
+pub fn send(
+    from: String,
+    to: String,
+    subject: String,
+    content_text: String,
+) -> Result<(), EmailError> {
     let mut builder = lettre_email::Email::builder()
         .to(to)
         .from(from)
@@ -51,24 +53,22 @@ pub fn send(from: String, to: String, subject: String, content_text: String) -> 
 
     let mut tls_builder = TlsConnector::builder();
     tls_builder.min_protocol_version(Some(Protocol::Tlsv10));
-    let tls_parameters =
-        ClientTlsParameters::new(
-            smtp_server.clone(),
-            tls_builder.build().map_err(|_e| EmailError::Tls)?
-        );
+    let tls_parameters = ClientTlsParameters::new(
+        smtp_server.clone(),
+        tls_builder.build().map_err(|_e| EmailError::Tls)?,
+    );
 
     let mut mailer = SmtpClient::new(
-        (&*smtp_server, smtp_port), ClientSecurity::Opportunistic(tls_parameters)
-    ).unwrap()
-        .authentication_mechanism(Mechanism::Login)
-        .credentials(Credentials::new(
-            smtp_username, smtp_password
-        ))
-        .connection_reuse(ConnectionReuseParameters::ReuseUnlimited)
-        .transport();
+        (&*smtp_server, smtp_port),
+        ClientSecurity::Opportunistic(tls_parameters),
+    )
+    .unwrap()
+    .authentication_mechanism(Mechanism::Login)
+    .credentials(Credentials::new(smtp_username, smtp_password))
+    .connection_reuse(ConnectionReuseParameters::ReuseUnlimited)
+    .transport();
 
-    mailer.send(email.into())
-    .map_err(|e| {
+    mailer.send(email.into()).map_err(|e| {
         log::error!("Could not send email. Reason:\r\n\t{:?}", e);
         e
     })?;

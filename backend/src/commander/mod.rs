@@ -1,13 +1,10 @@
 mod cli;
 mod invoices;
 
-use std::io::{BufRead, Write};
 use bufstream::BufStream;
-use std::os::unix::net::{UnixStream,UnixListener};
-use std::thread::{
-    self,
-    JoinHandle,
-};
+use std::io::{BufRead, Write};
+use std::os::unix::net::{UnixListener, UnixStream};
+use std::thread::{self, JoinHandle};
 use structopt::StructOpt;
 
 use crate::config::CONFIG;
@@ -20,27 +17,22 @@ fn handle_client(stream: UnixStream) {
         stream.read_line(&mut s);
         s.trim();
         let opt = cli::Opt::from_iter(s.trim().split(" "));
-        
+
         match opt {
             cli::Opt::Invoice(invoice) => match invoice {
-                cli::Invoice::Generate {
-                    typ,
-                } => match &typ[..] {
+                cli::Invoice::Generate { typ } => match &typ[..] {
                     "all" => invoices::generate_all(),
                     "first" => invoices::generate_first(),
                     "late" => invoices::generate_late_notice(),
                     t => println!("Action type \"{}\" does not exist.", t),
                 },
-                cli::Invoice::Send {
-                    typ,
-                    force,
-                } => match &typ[..] {
+                cli::Invoice::Send { typ, force } => match &typ[..] {
                     "all" => invoices::send_all(force),
                     "first" => invoices::send_first(force),
                     "late" => invoices::send_late_notice(force),
                     t => println!("Action type \"{}\" does not exist.", t),
                 },
-            }
+            },
         }
 
         stream.flush();

@@ -1,8 +1,8 @@
-use crate::schema::*;
 use crate::members::model::Member;
+use crate::schema::*;
 
 #[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug, Clone)]
-#[derivative(Default(bound=""))]
+#[derivative(Default(bound = ""))]
 pub enum EventType {
     #[derivative(Default)]
     Trainer,
@@ -29,15 +29,17 @@ pub enum EventType {
 }
 
 #[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug, Clone)]
-#[derivative(Default(bound=""))]
+#[derivative(Default(bound = ""))]
 pub enum EventClass {
     #[derivative(Default)]
     Promotion,
     Demotion,
 }
 
-#[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug, Copy, Clone)]
-#[derivative(Default(bound=""))]
+#[derive(
+    Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug, Copy, Clone,
+)]
+#[derivative(Default(bound = ""))]
 pub enum EventDivision {
     #[derivative(Default)]
     Club,
@@ -45,9 +47,19 @@ pub enum EventDivision {
     Jujitsu,
 }
 
-#[derive(Queryable, Identifiable, AsChangeset, Associations, Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[derive(
+    Queryable,
+    Identifiable,
+    AsChangeset,
+    Associations,
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Debug,
+    Clone,
+)]
 #[belongs_to(Member, foreign_key = "member_id")]
-#[table_name="events"]
+#[table_name = "events"]
 pub struct Event {
     pub id: i32,
     pub member_id: i32,
@@ -59,7 +71,7 @@ pub struct Event {
 }
 
 #[derive(Insertable, Derivative, Associations)]
-#[table_name="events"]
+#[table_name = "events"]
 pub struct NewEvent {
     pub member_id: i32,
     pub event_type: EventType,

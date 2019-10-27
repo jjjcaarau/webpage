@@ -1,20 +1,11 @@
-use rocket_contrib::templates::Template;
-use rocket_contrib::json::Json;
-use chrono::NaiveDate;
-use rocket::response::{Redirect, Flash};
-use crate::members::model::{
-    Member,
-    NewMember,
-    JsonMember,
-    Tag,
-};
-use crate::events::model::{
-    Event,
-};
-use crate::members::actions::{
-    get_stats,
-};
 use crate::error::Error;
+use crate::events::model::Event;
+use crate::members::actions::get_stats;
+use crate::members::model::{JsonMember, Member, NewMember, Tag};
+use chrono::NaiveDate;
+use rocket::response::{Flash, Redirect};
+use rocket_contrib::json::Json;
+use rocket_contrib::templates::Template;
 
 #[derive(Serialize)]
 struct ListResult {
@@ -40,7 +31,10 @@ pub fn list_redirect() -> Redirect {
 
 #[get("/view/<id>")]
 pub fn view(_user: crate::login::User, id: i32) -> Template {
-    Template::render("pages/members/view", std::collections::HashMap::<i32,i32>::new())
+    Template::render(
+        "pages/members/view",
+        std::collections::HashMap::<i32, i32>::new(),
+    )
 }
 
 #[get("/view/<id>", rank = 2)]
@@ -60,7 +54,9 @@ pub fn stats_redirect() -> Redirect {
 }
 
 #[get("/list_json")]
-pub fn list_json(_user: crate::login::User) -> Json<Vec<(Member, Vec<Event>, Vec<Member>, Vec<Tag>)>> {
+pub fn list_json(
+    _user: crate::login::User,
+) -> Json<Vec<(Member, Vec<Event>, Vec<Member>, Vec<Tag>)>> {
     let connection = crate::db::establish_connection();
     Json(crate::members::actions::list_all(&connection).unwrap())
 }
@@ -80,7 +76,7 @@ pub fn view_json(_user: crate::login::User, id: i32) -> Json<ViewResult> {
             member.0.password = member.0.password.map(|_p| "password".to_string());
             member.0.password_recovery = None;
             Json(ViewResult { member })
-        },
+        }
         Err(Error::Diesel(_)) => panic!("Internal Server Error"),
         Err(Error::NotFound) => panic!("Not Found"),
     }
@@ -102,7 +98,8 @@ pub fn update_json(user: crate::login::User, member: Json<JsonMember>) -> Json<U
         let connection = crate::db::establish_connection();
 
         let member = member.0;
-        let birthday = NaiveDate::parse_from_str(member.birthday.as_ref(), "%Y-%m-%d").unwrap_or(NaiveDate::from_ymd(1970, 1, 1));
+        let birthday = NaiveDate::parse_from_str(member.birthday.as_ref(), "%Y-%m-%d")
+            .unwrap_or(NaiveDate::from_ymd(1970, 1, 1));
         let result = if member.id == 0 {
             let member = NewMember {
                 family_id: None,
@@ -127,7 +124,9 @@ pub fn update_json(user: crate::login::User, member: Json<JsonMember>) -> Json<U
                 section_jujitsu: member.section_jujitsu,
                 section_judo: member.section_judo,
                 section_judo_kids: member.section_judo_kids,
-                password: member.password.map(|p| pbkdf2::pbkdf2_simple(&p, 1).unwrap()),
+                password: member
+                    .password
+                    .map(|p| pbkdf2::pbkdf2_simple(&p, 1).unwrap()),
                 password_recovery: None,
                 can_edit_members: member.can_edit_members,
             };
@@ -157,7 +156,9 @@ pub fn update_json(user: crate::login::User, member: Json<JsonMember>) -> Json<U
                 section_jujitsu: member.section_jujitsu,
                 section_judo: member.section_judo,
                 section_judo_kids: member.section_judo_kids,
-                password: member.password.map(|p| pbkdf2::pbkdf2_simple(&p, 1).unwrap()),
+                password: member
+                    .password
+                    .map(|p| pbkdf2::pbkdf2_simple(&p, 1).unwrap()),
                 password_recovery: None,
                 can_edit_members: member.can_edit_members,
             };
@@ -166,7 +167,7 @@ pub fn update_json(user: crate::login::User, member: Json<JsonMember>) -> Json<U
 
         let id = result.expect("This is a bug. Please report it.");
 
-        return Json(UpdateResponse { id })
+        return Json(UpdateResponse { id });
     }
     panic!("Insufficient permissions.");
 }
@@ -181,7 +182,8 @@ pub struct MemberFamilyUpdate {
 pub fn update_family_json(user: crate::login::User, update: Json<MemberFamilyUpdate>) {
     if user.can_edit_members {
         let connection = crate::db::establish_connection();
-        crate::members::actions::update_family(&connection, update.member_id, update.family_id).unwrap();
+        crate::members::actions::update_family(&connection, update.member_id, update.family_id)
+            .unwrap();
     }
     panic!("Insufficient permissions.");
 }

@@ -3,7 +3,7 @@ pub fn generate_all() {
     crate::invoices::actions::generate_invoices(
         &connection,
         &chrono::Utc::now().date().naive_utc(),
-        crate::invoices::actions::InvoiceType::All
+        crate::invoices::actions::InvoiceType::All,
     );
 }
 
@@ -12,7 +12,7 @@ pub fn generate_late_notice() {
     crate::invoices::actions::generate_invoices(
         &connection,
         &chrono::Utc::now().date().naive_utc(),
-        crate::invoices::actions::InvoiceType::LateNotice
+        crate::invoices::actions::InvoiceType::LateNotice,
     );
 }
 
@@ -21,7 +21,7 @@ pub fn generate_first() {
     crate::invoices::actions::generate_invoices(
         &connection,
         &chrono::Utc::now().date().naive_utc(),
-        crate::invoices::actions::InvoiceType::First
+        crate::invoices::actions::InvoiceType::First,
     );
 }
 
@@ -30,7 +30,7 @@ pub fn send_all(force: bool) {
     crate::invoices::actions::send_invoices(
         &connection,
         crate::invoices::actions::InvoiceType::All,
-        force
+        force,
     );
 }
 
@@ -39,7 +39,7 @@ pub fn send_late_notice(force: bool) {
     crate::invoices::actions::send_invoices(
         &connection,
         crate::invoices::actions::InvoiceType::LateNotice,
-        force
+        force,
     );
 }
 
@@ -48,6 +48,6 @@ pub fn send_first(force: bool) {
     crate::invoices::actions::send_invoices(
         &connection,
         crate::invoices::actions::InvoiceType::First,
-        force
+        force,
     );
 }

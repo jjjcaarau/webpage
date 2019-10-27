@@ -1,9 +1,5 @@
-use super::model::{
-    NewEvent,
-};
-use crate::schema::{
-    events,
-};
+use super::model::NewEvent;
+use crate::schema::events;
 use diesel::prelude::*;
 
 pub fn create(connection: &SqliteConnection, new_event: NewEvent) {

@@ -1,6 +1,6 @@
-use rocket_contrib::templates::Template;
-use rocket_contrib::json::Json;
 use crate::blog::entry::Entry;
+use rocket_contrib::json::Json;
+use rocket_contrib::templates::Template;
 use std::io::Write;
 
 use crate::config::CONFIG;
@@ -19,9 +19,14 @@ pub fn edit_get(date: Option<String>) -> Template {
 #[post("/edit/<date>", format = "json", data = "<entry>")]
 pub fn edit_post(date: String, entry: Json<Entry>) {
     let entry = entry.0;
-    let mut file = match std::fs::File::create(CONFIG.general.blog_root.clone() + &entry.name.clone() + ".tmp") {
+    let mut file = match std::fs::File::create(
+        CONFIG.general.blog_root.clone() + &entry.name.clone() + ".tmp",
+    ) {
         Ok(file) => std::io::LineWriter::new(file),
-        Err(_) => panic!("Unable to read title from {:?}", entry.name.clone() + ".tmp"),
+        Err(_) => panic!(
+            "Unable to read title from {:?}",
+            entry.name.clone() + ".tmp"
+        ),
     };
 
     writeln!(file, "{}", entry.title);
@@ -29,6 +34,6 @@ pub fn edit_post(date: String, entry: Json<Entry>) {
     file.flush();
     std::fs::rename(
         CONFIG.general.blog_root.clone() + &entry.name.clone() + ".tmp",
-        CONFIG.general.blog_root.clone() + &entry.name + ".md"
+        CONFIG.general.blog_root.clone() + &entry.name + ".md",
     );
 }

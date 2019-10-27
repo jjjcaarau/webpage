@@ -67,9 +67,4 @@ table! {
     }
 }
 
-allow_tables_to_appear_in_same_query!(
-    courses,
-    events,
-    invoices,
-    members,
-);
+allow_tables_to_appear_in_same_query!(courses, events, invoices, members,);

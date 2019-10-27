@@ -1,7 +1,7 @@
-use rocket::outcome::IntoOutcome;
-use rocket::request::{self, Form, FlashMessage, FromRequest, Request};
-use rocket::response::{Redirect, Flash};
 use rocket::http::{Cookie, Cookies};
+use rocket::outcome::IntoOutcome;
+use rocket::request::{self, FlashMessage, Form, FromRequest, Request};
+use rocket::response::{Flash, Redirect};
 
 use rocket_contrib::templates::Template;
 
@@ -24,7 +24,8 @@ impl<'a, 'r> FromRequest<'a, 'r> for User {
     type Error = std::convert::Infallible;
 
     fn from_request(request: &'a Request<'r>) -> request::Outcome<User, Self::Error> {
-        let value = request.cookies()
+        let value = request
+            .cookies()
             .get_private("user_id")
             .and_then(|cookie| cookie.value().parse().ok());
         if let Some(id) = value {
@@ -33,7 +34,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for User {
                 return request::Outcome::Success(User {
                     id: id as usize,
                     can_edit_members: member.0.can_edit_members,
-                })
+                });
             }
         }
         return request::Outcome::Forward(());
@@ -43,15 +44,17 @@ impl<'a, 'r> FromRequest<'a, 'r> for User {
 #[post("/login", data = "<login>")]
 pub fn login(mut cookies: Cookies<'_>, login: Form<Login>) -> Result<Redirect, Flash<Redirect>> {
     let connection = crate::db::establish_connection();
-    
+
     // Request recovery password.
     if login.submit == "recovery" {
-        if let Ok(mut member) = crate::members::actions::get_by_email(&connection, &login.username) {
+        if let Ok(mut member) = crate::members::actions::get_by_email(&connection, &login.username)
+        {
             let hash = uuid::Uuid::new_v4().to_string();
 
             crate::members::actions::update_recovery(&connection, &member.0, Some(hash.clone()));
 
-            let content = format!("Hallo {}
+            let content = format!(
+                "Hallo {}
 Es wurde soeben ein neues Passwort für deinen Account auf der Website des JJJCA angefordert.
 Falls Du dies nicht warst, melde dies doch bitte an aktuar@jjjcaarau.ch.
 Ansonsten kannst Du Dein Passwort unter folgendem Link zurücksetzen:
@@ -66,12 +69,20 @@ Dein Website-Team",
             );
 
             println!("{}", content);
-            
-            crate::email::send(CONFIG.general.email.clone(), login.username.clone(), "Passwort zurücksetzen".into(), content);
+
+            crate::email::send(
+                CONFIG.general.email.clone(),
+                login.username.clone(),
+                "Passwort zurücksetzen".into(),
+                content,
+            );
         } else {
-                log::error!("No member with this email found.");
+            log::error!("No member with this email found.");
         }
-        Err(Flash::success(Redirect::to(uri!(login_page)), "Email was sent to user if it exists."))
+        Err(Flash::success(
+            Redirect::to(uri!(login_page)),
+            "Email was sent to user if it exists.",
+        ))
     } else {
         if let Ok(member) = crate::members::actions::get_by_email(&connection, &login.username) {
             if let Some(password) = member.0.password {
@@ -81,7 +92,10 @@ Dein Website-Team",
                 }
             }
         }
-        Err(Flash::error(Redirect::to(uri!(login_page)), "Invalid username/password."))
+        Err(Flash::error(
+            Redirect::to(uri!(login_page)),
+            "Invalid username/password.",
+        ))
     }
 }
 
@@ -134,9 +148,20 @@ pub fn password_recovery_post(recovery: Form<Recovery>) -> Flash<Redirect> {
     let connection = crate::db::establish_connection();
     if let Ok(mut member) = crate::members::actions::get_by_recovery(&connection, &recovery.hash) {
         crate::members::actions::update_recovery(&connection, &member, None).unwrap();
-        crate::members::actions::update_password(&connection, &member, Some(recovery.password.clone())).unwrap();
-        Flash::success(Redirect::to(uri!(login_page)), "Password recovery successful.")
+        crate::members::actions::update_password(
+            &connection,
+            &member,
+            Some(recovery.password.clone()),
+        )
+        .unwrap();
+        Flash::success(
+            Redirect::to(uri!(login_page)),
+            "Password recovery successful.",
+        )
     } else {
-        Flash::error(Redirect::to(uri!(password_recovery_get: recovery.hash.clone())), "Password recovery failed.")
+        Flash::error(
+            Redirect::to(uri!(password_recovery_get: recovery.hash.clone())),
+            "Password recovery failed.",
+        )
     }
 }

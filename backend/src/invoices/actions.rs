@@ -1,30 +1,19 @@
-use std::process::{Command, Stdio};
 use std::io::BufWriter;
 use std::io::Write;
+use std::process::{Command, Stdio};
 
-use super::model::{
-    Invoice,
-    NewInvoice,
-};
-use crate::members::model::{
-    Member,
-    MemberType,
-};
-use crate::events::model::{
-    Event
-};
-use crate::schema::{
-    members,
-    invoices,
-};
+use super::model::{Invoice, NewInvoice};
+use crate::events::model::Event;
+use crate::members::model::{Member, MemberType};
+use crate::schema::{invoices, members};
 use diesel::prelude::*;
-use rocket_contrib::templates::Template;
-use rocket::response::Responder;
 use rocket::http::ContentType;
-use rocket::Response;
-use rocket::Request;
 use rocket::http::Status;
+use rocket::response::Responder;
+use rocket::Request;
+use rocket::Response;
 use rocket::State;
+use rocket_contrib::templates::Template;
 
 use crate::error::Error;
 
@@ -48,14 +37,18 @@ pub fn get(connection: &SqliteConnection, id: i32) -> Result<Invoice, Error> {
         if invoices.len() == 1 {
             invoices.remove(0)
         } else {
-            return Err(Error::NotFound)
+            return Err(Error::NotFound);
         }
     };
     Ok(invoice)
 }
 
 /// Fetches the last unpaid invoice for a member from the DB.
-pub fn get_last_this_year(connection: &SqliteConnection, member: &Member, year: i32) -> Result<Invoice, Error> {
+pub fn get_last_this_year(
+    connection: &SqliteConnection,
+    member: &Member,
+    year: i32,
+) -> Result<Invoice, Error> {
     let invoice = {
         let mut invoices = invoices::table
             .filter(invoices::columns::member_id.eq(member.id))
@@ -65,43 +58,63 @@ pub fn get_last_this_year(connection: &SqliteConnection, member: &Member, year: 
         if invoices.len() > 0 {
             invoices.remove(0)
         } else {
-            return Err(Error::NotFound)
+            return Err(Error::NotFound);
         }
     };
     Ok(invoice)
 }
 
 /// Creates a new invoice in the DB.
-pub fn create(connection: &SqliteConnection, new_invoice: &NewInvoice) -> Result<Invoice, diesel::result::Error> {
+pub fn create(
+    connection: &SqliteConnection,
+    new_invoice: &NewInvoice,
+) -> Result<Invoice, diesel::result::Error> {
     diesel::insert_into(invoices::table)
         .values(new_invoice)
         .execute(connection)
         .expect("Error saving new invoice.");
-    invoices::table.order(invoices::columns::id.desc()).first(connection)
+    invoices::table
+        .order(invoices::columns::id.desc())
+        .first(connection)
 }
 
 /// Updates a invoice model in the DB.
-pub fn update(connection: &SqliteConnection, invoice: &Invoice) -> Result<(), diesel::result::Error>{
+pub fn update(
+    connection: &SqliteConnection,
+    invoice: &Invoice,
+) -> Result<(), diesel::result::Error> {
     diesel::update(invoice)
         .set(invoice)
-        .execute(connection).map(|_| ())
+        .execute(connection)
+        .map(|_| ())
 }
 
-pub fn update_paid(connection: &SqliteConnection, invoice: &Invoice, amount: i32) -> Result<(), diesel::result::Error>{
+pub fn update_paid(
+    connection: &SqliteConnection,
+    invoice: &Invoice,
+    amount: i32,
+) -> Result<(), diesel::result::Error> {
     diesel::update(invoice)
         .set(invoices::columns::paid_amount.eq(amount))
-        .execute(connection).map(|_| ())
+        .execute(connection)
+        .map(|_| ())
 }
 
-pub fn confirm_paid(connection: &SqliteConnection, invoice: &Invoice) -> Result<(), diesel::result::Error>{
+pub fn confirm_paid(
+    connection: &SqliteConnection,
+    invoice: &Invoice,
+) -> Result<(), diesel::result::Error> {
     diesel::update(invoice)
         .set(invoices::columns::paid.eq(true))
-        .execute(connection).map(|_| ())
+        .execute(connection)
+        .map(|_| ())
 }
 
-pub fn delete(connection: &SqliteConnection, invoice: &Invoice) -> Result<(), diesel::result::Error>{
-    diesel::delete(invoice)
-        .execute(connection).map(|_| ())
+pub fn delete(
+    connection: &SqliteConnection,
+    invoice: &Invoice,
+) -> Result<(), diesel::result::Error> {
+    diesel::delete(invoice).execute(connection).map(|_| ())
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -114,7 +127,12 @@ pub enum InvoiceType {
 /// Generates a new invoice at a due date.
 /// This does not store the invoice to the DB.
 /// The procedure honors all sorts of special rules and is aware of reminder invoices.
-pub fn generate_invoice(connection: &SqliteConnection, member: &Member, events: &Vec<Event>, date: &chrono::NaiveDate) -> Option<NewInvoice> {
+pub fn generate_invoice(
+    connection: &SqliteConnection,
+    member: &Member,
+    events: &Vec<Event>,
+    date: &chrono::NaiveDate,
+) -> Option<NewInvoice> {
     let events: Vec<_> = events
         .iter()
         .cloned()
@@ -127,34 +145,46 @@ pub fn generate_invoice(connection: &SqliteConnection, member: &Member, events: 
 
         let last_invoice = get_last_this_year(connection, member, year);
 
-        let (number, paid_amount, invoice_amount, invoice_passport) = if let Ok(last_invoice) = last_invoice {
-            // First invoice this year was already created.
-            
-            // If invoice this year was already paid, don't take action ofc.
-            if last_invoice.paid {
-                return None;
-            }
+        let (number, paid_amount, invoice_amount, invoice_passport) =
+            if let Ok(last_invoice) = last_invoice {
+                // First invoice this year was already created.
 
-            // Make sure we advance the invoice number to account for unpaid history.
-            (last_invoice.number + 1, last_invoice.paid_amount, last_invoice.invoice_amount, last_invoice.invoice_passport)
-        } else {
-            // First invoice this year.
-            let year = date.year();
-            let month = date.month();
+                // If invoice this year was already paid, don't take action ofc.
+                if last_invoice.paid {
+                    return None;
+                }
 
-            // Figure amount based on settings.
-            let amount = match member.member_type {
-                MemberType::Active => CONFIG.general.fee_actives,
-                MemberType::Kid => CONFIG.general.fee_kids,
-                MemberType::Student => CONFIG.general.fee_students,
-                _ => 0,
+                // Make sure we advance the invoice number to account for unpaid history.
+                (
+                    last_invoice.number + 1,
+                    last_invoice.paid_amount,
+                    last_invoice.invoice_amount,
+                    last_invoice.invoice_passport,
+                )
+            } else {
+                // First invoice this year.
+                let year = date.year();
+                let month = date.month();
+
+                // Figure amount based on settings.
+                let amount = match member.member_type {
+                    MemberType::Active => CONFIG.general.fee_actives,
+                    MemberType::Kid => CONFIG.general.fee_kids,
+                    MemberType::Student => CONFIG.general.fee_students,
+                    _ => 0,
+                };
+
+                // Return invoice data factoring in month of the year for under year entries.
+                // TODO: fix numbers after testing!
+                let factor = if month <= 3 {
+                    1.0
+                } else if month > 3 && month <= 9 {
+                    0.5
+                } else {
+                    1.0
+                };
+                (0, 0, (amount as f32 * factor) as i32, 0)
             };
-
-            // Return invoice data factoring in month of the year for under year entries.
-            // TODO: fix numbers after testing!
-            let factor = if month <= 3 { 1.0 } else if month > 3 && month <= 9 { 0.5 } else { 1.0 };
-            (0, 0, (amount as f32 * factor) as i32 , 0)
-        };
 
         // If there was no passport ordered and no fee is due
         // (members with a passport and club entry in months 10 to 12), do not create a invoice.
@@ -186,27 +216,45 @@ pub fn generate_invoice(connection: &SqliteConnection, member: &Member, events: 
     return None;
 }
 
-fn try_generate_late_notice(connection: &SqliteConnection, invoice: &NewInvoice, member: &Member) -> bool {
+fn try_generate_late_notice(
+    connection: &SqliteConnection,
+    invoice: &NewInvoice,
+    member: &Member,
+) -> bool {
     if invoice.number > 0 && invoice.due_date < chrono::Utc::now().date().naive_utc() {
         create(connection, &invoice);
-        println!("Generated {}. late notice for {} {}.", invoice.number, member.first_name, member.last_name);
+        println!(
+            "Generated {}. late notice for {} {}.",
+            invoice.number, member.first_name, member.last_name
+        );
         true
     } else {
         false
     }
 }
 
-fn try_generate_first(connection: &SqliteConnection, invoice: &NewInvoice, member: &Member) -> bool {
+fn try_generate_first(
+    connection: &SqliteConnection,
+    invoice: &NewInvoice,
+    member: &Member,
+) -> bool {
     if invoice.number == 0 {
         create(connection, &invoice);
-        println!("Generated first invoice for {} {}.", member.first_name, member.last_name);
+        println!(
+            "Generated first invoice for {} {}.",
+            member.first_name, member.last_name
+        );
         true
     } else {
         false
     }
 }
 
-pub fn generate_invoices(connection: &SqliteConnection, date: &chrono::NaiveDate, invoice_type: InvoiceType) {
+pub fn generate_invoices(
+    connection: &SqliteConnection,
+    date: &chrono::NaiveDate,
+    invoice_type: InvoiceType,
+) {
     let members = crate::members::actions::list_all(connection).unwrap();
 
     let mut count = 0;
@@ -214,14 +262,30 @@ pub fn generate_invoices(connection: &SqliteConnection, date: &chrono::NaiveDate
         if let Some(invoice) = generate_invoice(connection, &member.0, &member.1, date) {
             match invoice_type {
                 InvoiceType::All => {
-                    count += if try_generate_late_notice(connection, &invoice, &member.0) { 1 } else { 0 };
-                    count += if try_generate_first(connection, &invoice, &member.0) { 1 } else { 0 };
-                },
+                    count += if try_generate_late_notice(connection, &invoice, &member.0) {
+                        1
+                    } else {
+                        0
+                    };
+                    count += if try_generate_first(connection, &invoice, &member.0) {
+                        1
+                    } else {
+                        0
+                    };
+                }
                 InvoiceType::First => {
-                    count += if try_generate_first(connection, &invoice, &member.0) { 1 } else { 0 };
-                },
+                    count += if try_generate_first(connection, &invoice, &member.0) {
+                        1
+                    } else {
+                        0
+                    };
+                }
                 InvoiceType::LateNotice => {
-                    count += if try_generate_late_notice(connection, &invoice, &member.0) { 1 } else { 0 };
+                    count += if try_generate_late_notice(connection, &invoice, &member.0) {
+                        1
+                    } else {
+                        0
+                    };
                 }
             }
         }
@@ -230,17 +294,24 @@ pub fn generate_invoices(connection: &SqliteConnection, date: &chrono::NaiveDate
     println!("Generated {} invoices.", count);
 }
 
-pub fn send_invoice(connection: &SqliteConnection, member: &Member, today: &chrono::NaiveDate, last_invoice: Result<Invoice, Error>, invoice_type: InvoiceType, force: bool) -> bool {
+pub fn send_invoice(
+    connection: &SqliteConnection,
+    member: &Member,
+    today: &chrono::NaiveDate,
+    last_invoice: Result<Invoice, Error>,
+    invoice_type: InvoiceType,
+    force: bool,
+) -> bool {
     // Check if the invoice to send even exists.
     if let Ok(mut last_invoice) = last_invoice {
         match invoice_type {
-            InvoiceType::All => {},
+            InvoiceType::All => {}
             // If we only want to send first time invoices and the invoice is not of that type, return false.
             InvoiceType::First => {
                 if last_invoice.number > 0 {
                     return false;
                 }
-            },
+            }
             // If we only want to send late notice invoices and the invoice is not of that type, return false.
             InvoiceType::LateNotice => {
                 if last_invoice.number == 0 {
@@ -254,7 +325,7 @@ pub fn send_invoice(connection: &SqliteConnection, member: &Member, today: &chro
             log::info!("Invoice was already sent. Not sending it again.");
             return false;
         }
-        
+
         // Try send the email.
         let content = format!(
             "Hallo {}
@@ -268,14 +339,16 @@ Noah",
         );
 
         println!("{}", content);
-        
+
         // All checks have passed until here, so try send the email.
         if crate::email::send(
             CONFIG.general.email.clone(),
             member.email.clone(),
             "Neue Mitgliederrechnung".into(),
-            content
-        ).is_ok() {
+            content,
+        )
+        .is_ok()
+        {
             // If all checks are passed, update the sent date for the DB entry of the invoice.
             last_invoice.sent = Some(*today);
             update(connection, &last_invoice);
@@ -297,7 +370,14 @@ pub fn send_invoices(connection: &SqliteConnection, invoice_type: InvoiceType, f
         let today = chrono::Utc::now().date().naive_utc();
         let year = today.year();
         let last_invoice = get_last_this_year(connection, &member.0, year);
-        if send_invoice(connection, &member.0, &today, last_invoice, invoice_type, force) {
+        if send_invoice(
+            connection,
+            &member.0,
+            &today,
+            last_invoice,
+            invoice_type,
+            force,
+        ) {
             count += 1;
             log::info!("Sent invoice to {}.", member.0.email);
         }

@@ -2,8 +2,10 @@ use crate::schema::*;
 
 use crate::events::model::EventDivision;
 
-#[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug, Copy, Clone)]
-#[derivative(Default(bound=""))]
+#[derive(
+    Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug, Copy, Clone,
+)]
+#[derivative(Default(bound = ""))]
 pub enum MemberType {
     #[derivative(Default)]
     Active,
@@ -14,7 +16,17 @@ pub enum MemberType {
     Extern,
 }
 
-#[derive(Queryable, Identifiable, AsChangeset, Associations, Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[derive(
+    Queryable,
+    Identifiable,
+    AsChangeset,
+    Associations,
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Debug,
+    Clone,
+)]
 #[belongs_to(Member, foreign_key = "family_id")]
 pub struct Member {
     pub id: i32,
@@ -47,14 +59,14 @@ pub struct Member {
 
 #[derive(Insertable, Derivative, Associations)]
 #[derivative(Default)]
-#[table_name="members"]
+#[table_name = "members"]
 pub struct NewMember {
     pub family_id: Option<i32>,
     pub first_name: String,
     pub middle_name: String,
     pub last_name: String,
     pub sex: String,
-    #[derivative(Default(value="chrono::NaiveDate::from_ymd(2019, 01, 12)"))]
+    #[derivative(Default(value = "chrono::NaiveDate::from_ymd(2019, 01, 12)"))]
     pub birthday: chrono::NaiveDate,
     pub email: String,
     pub phone_p: String,
@@ -126,7 +138,7 @@ impl From<EventDivision> for Division {
         match division {
             EventDivision::Judo => Division::Judo,
             EventDivision::Jujitsu => Division::JuJitsu,
-            EventDivision::Club => panic!("This is a bug. Please report it.")
+            EventDivision::Club => panic!("This is a bug. Please report it."),
         }
     }
 }

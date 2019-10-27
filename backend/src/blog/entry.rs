@@ -1,7 +1,7 @@
-use std::fs;
-use std::io::{Read, BufRead, BufReader};
 use chrono::offset::Utc;
 use chrono::DateTime;
+use std::fs;
+use std::io::{BufRead, BufReader, Read};
 
 #[derive(Deserialize, Serialize)]
 pub struct Entry {
@@ -20,9 +20,7 @@ impl Entry {
             Err(_) => panic!("Unable to read title from {:?}", path),
         };
 
-        let name = path
-            .split('/').last().unwrap()
-            .split('.').next().unwrap();
+        let name = path.split('/').last().unwrap().split('.').next().unwrap();
 
         let created: Vec<&str> = name.split('-').collect();
         let modified: DateTime<Utc> = file.metadata().unwrap().modified().unwrap().into();
@@ -36,13 +34,16 @@ impl Entry {
         Self {
             name: name.to_string(),
             title,
-            created: format!("{}/{}/{} {}:{}", created[0], created[1], created[2], created[3], created[4]),
+            created: format!(
+                "{}/{}/{} {}:{}",
+                created[0], created[1], created[2], created[3], created[4]
+            ),
             modified: modified.format("%d/%m/%Y %hh:%mm").to_string(),
             body,
         }
     }
 
-    pub fn new()-> Self {
+    pub fn new() -> Self {
         let now = Utc::now();
 
         Self {
