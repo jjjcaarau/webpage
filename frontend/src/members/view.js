@@ -18,6 +18,7 @@ export const MemberView = {
             section_jujitsu: false,
             section_judo: false,
             section_judo_kids: false,
+            can_edit_members: false,
         };
         vnode.state.events = [];
         vnode.state.family = [];
