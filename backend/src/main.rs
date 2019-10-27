@@ -18,6 +18,7 @@ extern crate lazy_static;
 #[macro_use] extern crate tera;
 
 mod blog;
+#[cfg(not(target_os = "windows"))]
 mod commander;
 mod config;
 mod db;
@@ -58,6 +59,7 @@ fn main() {
     .finalize()
     .expect("Failed to create rocket config.");
 
+    #[cfg(not(target_os = "windows"))]
     let handle = commander::init();
 
     rocket::custom(config)
