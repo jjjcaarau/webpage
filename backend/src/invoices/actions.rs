@@ -227,7 +227,7 @@ pub fn generate_invoices(connection: &SqliteConnection, date: &chrono::NaiveDate
         }
     }
 
-    println!("Genrated {} invoices.", count);
+    println!("Generated {} invoices.", count);
 }
 
 pub fn send_invoice(connection: &SqliteConnection, member: &Member, today: &chrono::NaiveDate, last_invoice: Result<Invoice, Error>, invoice_type: InvoiceType, force: bool) -> bool {
