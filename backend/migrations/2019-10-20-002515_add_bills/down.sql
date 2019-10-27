@@ -1,1 +1,1 @@
-DROP TABLE bills;
+DROP TABLE invoices;

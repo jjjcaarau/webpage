@@ -1,5 +1,5 @@
 mod cli;
-mod bills;
+mod invoices;
 
 use std::io::{BufRead, Write};
 use bufstream::BufStream;
@@ -26,18 +26,18 @@ fn handle_client(stream: UnixStream) {
                 cli::Invoice::Generate {
                     typ,
                 } => match &typ[..] {
-                    "all" => bills::generate_all(),
-                    "first" => bills::generate_first(),
-                    "late" => bills::generate_late_notice(),
+                    "all" => invoices::generate_all(),
+                    "first" => invoices::generate_first(),
+                    "late" => invoices::generate_late_notice(),
                     t => println!("Action type \"{}\" does not exist.", t),
                 },
                 cli::Invoice::Send {
                     typ,
                     force,
                 } => match &typ[..] {
-                    "all" => bills::send_all(force),
-                    "first" => bills::send_first(force),
-                    "late" => bills::send_late_notice(force),
+                    "all" => invoices::send_all(force),
+                    "first" => invoices::send_first(force),
+                    "late" => invoices::send_late_notice(force),
                     t => println!("Action type \"{}\" does not exist.", t),
                 },
             }

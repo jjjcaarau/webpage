@@ -20,7 +20,7 @@ mod config;
 mod db;
 mod members;
 mod events;
-mod bills;
+mod invoices;
 mod schema;
 mod routes;
 mod blog;
@@ -77,19 +77,19 @@ fn main() {
             crate::routes::members::update_family_json,
             crate::routes::members::stats,
             crate::routes::members::stats_redirect,
-            // crate::routes::members::generate_bills_redirect,
+            // crate::routes::members::generate_invoices_redirect,
         ])
         .mount("/events", routes![
             crate::routes::events::create_json,
         ])
-        .mount("/bills", routes![
-            crate::routes::bills::update,
-            crate::routes::bills::pay,
-            crate::routes::bills::delete,
-            crate::routes::bills::pdf,
-            crate::routes::bills::generate_all,
-            crate::routes::bills::generate_first,
-            crate::routes::bills::generate_late_notice,
+        .mount("/invoices", routes![
+            crate::routes::invoices::update,
+            crate::routes::invoices::pay,
+            crate::routes::invoices::delete,
+            crate::routes::invoices::pdf,
+            crate::routes::invoices::generate_all,
+            crate::routes::invoices::generate_first,
+            crate::routes::invoices::generate_late_notice,
         ])
         .mount("/blog", routes![
             crate::routes::blog::edit_get,

@@ -11,7 +11,7 @@ pub enum SentAs {
 
 #[derive(Queryable, Identifiable, AsChangeset, Associations, Serialize, Deserialize, PartialEq, Debug, Clone)]
 #[belongs_to(Member, foreign_key = "member_id")]
-pub struct Bill {
+pub struct Invoice {
     pub id: i32,
     pub member_id: i32,
     pub year: i32,
@@ -20,8 +20,8 @@ pub struct Bill {
     pub sent: Option<chrono::NaiveDate>,
     pub sent_as: SentAs,
     pub number: i32,
-    pub bill_passport: i32,
-    pub bill_amount: i32,
+    pub invoice_passport: i32,
+    pub invoice_amount: i32,
     pub paid_amount: i32,
     pub paid: bool,
     pub comment: String,
@@ -29,8 +29,8 @@ pub struct Bill {
 
 #[derive(Insertable, Derivative, Associations)]
 #[derivative(Default)]
-#[table_name="bills"]
-pub struct NewBill {
+#[table_name="invoices"]
+pub struct NewInvoice {
     pub member_id: i32,
     pub year: i32,
     #[derivative(Default(value="chrono::NaiveDate::from_ymd(2019, 01, 12)"))]
@@ -40,14 +40,14 @@ pub struct NewBill {
     pub sent: Option<chrono::NaiveDate>,
     pub sent_as: SentAs,
     pub number: i32,
-    pub bill_passport: i32,
-    pub bill_amount: i32,
+    pub invoice_passport: i32,
+    pub invoice_amount: i32,
     pub paid_amount: i32,
     pub paid: bool,
     pub comment: String,
 }
 
-impl NewBill {
+impl NewInvoice {
     pub fn new() -> Self {
         Self {
             ..Default::default()

@@ -1,23 +1,4 @@
 table! {
-    bills (id) {
-        id -> Integer,
-        member_id -> Integer,
-        year -> Integer,
-        date -> Date,
-        due_date -> Date,
-        sent -> Nullable<Date>,
-        sent_as -> crate::bills::model::SentAsMapping,
-        number -> Integer,
-        bill_passport -> Integer,
-        bill_amount -> Integer,
-        paid_amount -> Integer,
-        paid -> Bool,
-        comment -> Text,
-    }
-}
-
-
-table! {
     courses (id) {
         id -> Integer,
         name -> Text,
@@ -34,6 +15,24 @@ table! {
         division -> crate::events::model::EventDivisionMapping,
         comment -> Nullable<Text>,
         date -> Date,
+    }
+}
+
+table! {
+    invoices (id) {
+        id -> Integer,
+        member_id -> Integer,
+        year -> Integer,
+        date -> Date,
+        due_date -> Date,
+        sent -> Nullable<Date>,
+        sent_as -> crate::invoices::model::SentAsMapping,
+        number -> Integer,
+        invoice_passport -> Integer,
+        invoice_amount -> Integer,
+        paid_amount -> Integer,
+        paid -> Bool,
+        comment -> Text,
     }
 }
 
@@ -69,8 +68,8 @@ table! {
 }
 
 allow_tables_to_appear_in_same_query!(
-    bills,
     courses,
     events,
+    invoices,
     members,
 );
