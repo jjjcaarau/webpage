@@ -2,7 +2,6 @@ use crate::error::Error;
 use rocket::http::Status;
 use rocket::request::Form;
 use rocket::response::{Flash, Redirect};
-use rocket_contrib::json::Json;
 
 #[derive(FromForm)]
 pub struct Update {
@@ -16,7 +15,7 @@ pub struct Update {
 #[post("/update/<id>", data = "<update>")]
 pub fn update(id: i32, update: Form<Update>) -> Flash<Redirect> {
     let connection = crate::db::establish_connection();
-    let mut invoice = crate::invoices::actions::get(&connection, id);
+    let invoice = crate::invoices::actions::get(&connection, id);
     match invoice {
         Ok(mut invoice) => {
             if let Some(invoice_passport) = update.invoice_passport {
@@ -50,7 +49,7 @@ pub fn update(id: i32, update: Form<Update>) -> Flash<Redirect> {
 #[post("/pay/<id>")]
 pub fn pay(id: i32) -> Flash<Redirect> {
     let connection = crate::db::establish_connection();
-    let mut invoice = crate::invoices::actions::get(&connection, id);
+    let invoice = crate::invoices::actions::get(&connection, id);
     dbg!(id);
     match invoice {
         Ok(mut invoice) => {
@@ -73,7 +72,7 @@ pub fn pay(id: i32) -> Flash<Redirect> {
 #[post("/delete/<id>")]
 pub fn delete(id: i32) -> Flash<Redirect> {
     let connection = crate::db::establish_connection();
-    let mut invoice = crate::invoices::actions::get(&connection, id);
+    let invoice = crate::invoices::actions::get(&connection, id);
     match invoice {
         Ok(mut invoice) => {
             invoice.paid = true;
@@ -95,10 +94,10 @@ pub fn delete(id: i32) -> Flash<Redirect> {
 #[get("/pdf/<id>")]
 pub fn pdf(id: i32) -> Result<crate::invoices::actions::InvoiceData, Status> {
     let connection = crate::db::establish_connection();
-    let mut invoice = crate::invoices::actions::get(&connection, id);
+    let invoice = crate::invoices::actions::get(&connection, id);
     match invoice {
-        Ok(mut invoice) => {
-            let mut member = crate::members::actions::get(&connection, invoice.member_id)
+        Ok(invoice) => {
+            let member = crate::members::actions::get(&connection, invoice.member_id)
                 .unwrap()
                 .0;
             Ok(crate::invoices::actions::InvoiceData { invoice, member })

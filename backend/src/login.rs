@@ -1,5 +1,4 @@
 use rocket::http::{Cookie, Cookies};
-use rocket::outcome::IntoOutcome;
 use rocket::request::{self, FlashMessage, Form, FromRequest, Request};
 use rocket::response::{Flash, Redirect};
 
@@ -47,11 +46,11 @@ pub fn login(mut cookies: Cookies<'_>, login: Form<Login>) -> Result<Redirect, F
 
     // Request recovery password.
     if login.submit == "recovery" {
-        if let Ok(mut member) = crate::members::actions::get_by_email(&connection, &login.username)
+        if let Ok(member) = crate::members::actions::get_by_email(&connection, &login.username)
         {
             let hash = uuid::Uuid::new_v4().to_string();
 
-            crate::members::actions::update_recovery(&connection, &member.0, Some(hash.clone()));
+            crate::members::actions::update_recovery(&connection, &member.0, Some(hash.clone())).unwrap();
 
             let content = format!(
                 "Hallo {}
@@ -76,7 +75,7 @@ Dein Website-Team",
                 "Passwort zurücksetzen".into(),
                 content,
                 None,
-            );
+            ).unwrap();
         } else {
             log::error!("No member with this email found.");
         }
@@ -138,6 +137,7 @@ pub fn password_recovery_get(flash: Option<FlashMessage<'_, '_>>, hash: String) 
 }
 
 #[derive(FromForm)]
+#[allow(dead_code)]
 pub struct Recovery {
     password: String,
     hash: String,
@@ -147,7 +147,7 @@ pub struct Recovery {
 #[post("/password_recovery", data = "<recovery>")]
 pub fn password_recovery_post(recovery: Form<Recovery>) -> Flash<Redirect> {
     let connection = crate::db::establish_connection();
-    if let Ok(mut member) = crate::members::actions::get_by_recovery(&connection, &recovery.hash) {
+    if let Ok(member) = crate::members::actions::get_by_recovery(&connection, &recovery.hash) {
         crate::members::actions::update_recovery(&connection, &member, None).unwrap();
         crate::members::actions::update_password(
             &connection,

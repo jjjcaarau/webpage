@@ -14,10 +14,6 @@ pub fn list_all(
         .order_by(members::columns::first_name)
         .load::<Member>(connection)?;
 
-    let ids = member_list
-        .iter()
-        .map(|member| (member.id, member.family_id))
-        .unzip::<i32, Option<i32>, Vec<i32>, Vec<Option<i32>>>();
     let event_list = Event::belonging_to(&member_list)
         .order_by((events::columns::date, events::columns::id))
         .load::<Event>(connection)?

@@ -3,7 +3,7 @@ use crate::events::model::Event;
 use crate::members::actions::get_stats;
 use crate::members::model::{JsonMember, Member, NewMember, Tag};
 use chrono::NaiveDate;
-use rocket::response::{Flash, Redirect};
+use rocket::response::{Redirect};
 use rocket_contrib::json::Json;
 use rocket_contrib::templates::Template;
 
@@ -29,16 +29,16 @@ pub fn list_redirect() -> Redirect {
     Redirect::to(uri!(crate::login::login_page))
 }
 
-#[get("/view/<id>")]
-pub fn view(_user: crate::login::User, id: i32) -> Template {
+#[get("/view/<_id>")]
+pub fn view(_user: crate::login::User, _id: i32) -> Template {
     Template::render(
         "pages/members/view",
         std::collections::HashMap::<i32, i32>::new(),
     )
 }
 
-#[get("/view/<id>", rank = 2)]
-pub fn view_redirect(id: i32) -> Redirect {
+#[get("/view/<_id>", rank = 2)]
+pub fn view_redirect(_id: i32) -> Redirect {
     Redirect::to(uri!(crate::login::login_page))
 }
 
@@ -69,7 +69,7 @@ pub fn list_json_redirect() -> Redirect {
 #[get("/view_json/<id>")]
 pub fn view_json(_user: crate::login::User, id: i32) -> Json<ViewResult> {
     let connection = crate::db::establish_connection();
-    let mut member = crate::members::actions::get(&connection, id);
+    let member = crate::members::actions::get(&connection, id);
     match member {
         Ok(mut member) => {
             // Do not show password hash/salt.
@@ -82,8 +82,8 @@ pub fn view_json(_user: crate::login::User, id: i32) -> Json<ViewResult> {
     }
 }
 
-#[get("/view_json/<id>", rank = 2)]
-pub fn view_json_redirect(id: i32) -> Redirect {
+#[get("/view_json/<_id>", rank = 2)]
+pub fn view_json_redirect(_id: i32) -> Redirect {
     Redirect::to(uri!(crate::login::login_page))
 }
 

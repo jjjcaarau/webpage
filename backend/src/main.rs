@@ -15,7 +15,7 @@ extern crate serde_derive;
 extern crate itertools;
 #[macro_use]
 extern crate lazy_static;
-#[macro_use] extern crate tera;
+extern crate tera;
 
 mod blog;
 #[cfg(not(target_os = "windows"))]
