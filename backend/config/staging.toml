@@ -1,0 +1,17 @@
+[general]
+site_url = "https://new.jjjcaarau.ch"
+smtp_server = "lx1.hoststar.hosting"
+smtp_port = 25
+smtp_username = "noreply@jjjcaarau.ch"
+smtp_password = "London.21"
+
+blog_root = "/app/data/blog"
+
+[rocket]
+environment = "Development"
+address = "0.0.0.0"
+port = "1337"
+log_level = "Warn"
+static_root = "/app/static"
+recaptcha_private_key = ""
+recaptcha_url = "https://www.google.com/recaptcha/api/siteverify"

@@ -75,6 +75,7 @@ Dein Website-Team",
                 login.username.clone(),
                 "Passwort zurücksetzen".into(),
                 content,
+                None,
             );
         } else {
             log::error!("No member with this email found.");

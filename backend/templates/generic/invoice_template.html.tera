@@ -4,11 +4,11 @@
 @charset "UTF-8";
 @font-face {
   font-family: "Source Sans Pro";
-  src: url("templates/pages/members/fonts/SourceSansPro-Regular.ttf") format("ttf");
+  src: url("templates/generic/fonts/SourceSansPro-Regular.ttf") format("ttf");
 }
 @font-face {
   font-family: "Pacifico";
-  src: url("templates/pages/members/fonts/Pacifico-Regular.ttf") format("ttf");
+  src: url("templates/generic/fonts/Pacifico-Regular.ttf") format("ttf");
 }
 @page {
     margin: 3cm;
@@ -127,7 +127,7 @@ html #small-address {
         </style>
     </head>
     <body>
-        <img id="logo" src="templates/pages/members/logo.svg" />
+        <img id="logo" src="templates/generic/logo.svg" />
         <address id="to">
             {{ member.first_name }} {{ member.last_name }}
             {{ member.address }} {{ member.address_no }}
@@ -135,31 +135,31 @@ html #small-address {
         </address>
 
         <dl id="informations">
-            {% if bill.number > 0 %}
-            <dt>{{ bill.number }}. Mahnung</dt>
-            <dd>RE {{ bill.id }}</dd>
+            {% if invoice.number > 0 %}
+            <dt>{{ invoice.number }}. Mahnung</dt>
+            <dd>RE {{ invoice.id }}</dd>
             {% else %}
             <dt>Rechnung</dt>
-            <dd>RE {{ bill.id }}</dd>
+            <dd>RE {{ invoice.id }}</dd>
             {% endif %}
             <br>
             <dt>Rechnungsdatum</dt>
-            <dd>{{ bill.date }}</dd>
+            <dd>{{ invoice.date }}</dd>
             <br>
             <dt>Zahlbar bis</dt>
-            <dd>{{ bill.due_date }}</dd>
+            <dd>{{ invoice.due_date }}</dd>
         </dl>
 
-        {% if bill.number > 0 %}
-        <h3>{{ bill.number }}. Mahnung, RE {{ bill.id }}</h3>
+        {% if invoice.number > 0 %}
+        <h3>{{ invoice.number }}. Mahnung, RE {{ invoice.id }}</h3>
         {% else %}
-        <h3>RE {{ bill.id }}</h3>
+        <h3>RE {{ invoice.id }}</h3>
         {% endif %}
 
         Liebe{% if member.sex == "M" %}r{% endif %} {{ member.first_name }}
 
         <p>
-            Im Namen des JJJAC stelle ich Dir den Mitgliederbeitrag für das Jahr {{ bill.year }} in Rechnung.
+            Im Namen des JJJAC stelle ich Dir den Mitgliederbeitrag für das Jahr {{ invoice.year }} in Rechnung.
         </p>
 
         <p>
@@ -183,11 +183,11 @@ html #small-address {
             <tbody>
                 <tr>
                     <td>Grundbeitrag</td>
-                    <td>{{ bill.bill_amount }} CHF</td>
+                    <td>{{ invoice.invoice_amount }} CHF</td>
                 </tr>
                 <tr>
                     <td>Pass (einmalig beim Eintritt)</td>
-                    <td>{{ bill.bill_passport }} CHF</td>
+                    <td>{{ invoice.invoice_passport }} CHF</td>
                 </tr>
             </tbody>
         </table>
@@ -200,7 +200,7 @@ html #small-address {
             </thead>
             <tbody>
                 <tr>
-                <td>{{ bill.due_date }}</td>
+                <td>{{ invoice.due_date }}</td>
                 <td>
                     IBAN CH94 0588 1077 2509 6100 0<br>
                     <p id="small-address">
@@ -209,7 +209,7 @@ html #small-address {
                         5004 Aarau
                     </p>
                 </td>
-                <td>{{ bill.bill_passport + bill.bill_amount }} CHF</td>
+                <td>{{ invoice.invoice_passport + invoice.invoice_amount }} CHF</td>
                 </tr>
             </tbody>
         </table>

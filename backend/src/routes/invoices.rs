@@ -93,7 +93,7 @@ pub fn delete(id: i32) -> Flash<Redirect> {
 }
 
 #[get("/pdf/<id>")]
-pub fn pdf(id: i32) -> Result<crate::invoices::actions::PDFFile, Status> {
+pub fn pdf(id: i32) -> Result<crate::invoices::actions::InvoiceData, Status> {
     let connection = crate::db::establish_connection();
     let mut invoice = crate::invoices::actions::get(&connection, id);
     match invoice {
@@ -101,11 +101,7 @@ pub fn pdf(id: i32) -> Result<crate::invoices::actions::PDFFile, Status> {
             let mut member = crate::members::actions::get(&connection, invoice.member_id)
                 .unwrap()
                 .0;
-            let pdf = crate::invoices::actions::generate_pdf(
-                &connection,
-                crate::invoices::actions::InvoiceData { invoice, member },
-            );
-            Ok(pdf)
+            Ok(crate::invoices::actions::InvoiceData { invoice, member })
         }
         Err(Error::Diesel(_)) => Err(Status::InternalServerError),
         Err(Error::NotFound) => Err(Status::NotFound),

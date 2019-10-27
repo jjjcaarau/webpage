@@ -341,11 +341,19 @@ Noah",
         println!("{}", content);
 
         // All checks have passed until here, so try send the email.
+        let mut pdf_stream = generate_pdf(&crate::invoices::actions::InvoiceData { invoice: last_invoice.clone(), member: member.clone() });
+        let mut pdf_data = vec![];
+        use std::io::Read;
+        pdf_stream.read_to_end(&mut pdf_data);
         if crate::email::send(
             CONFIG.general.email.clone(),
             member.email.clone(),
             "Neue Mitgliederrechnung".into(),
             content,
+            Some((
+                &pdf_data,
+                "Rechnung.pdf"
+            ))
         )
         .is_ok()
         {
@@ -386,38 +394,15 @@ pub fn send_invoices(connection: &SqliteConnection, invoice_type: InvoiceType, f
     println!("Sent {} invoices.", count);
 }
 
-pub struct PDFFile(String, InvoiceData);
+#[derive(Debug, Serialize)]
+pub struct InvoiceData {
+    pub invoice: crate::invoices::model::Invoice,
+    pub member: crate::members::model::Member,
+}
 
-impl Responder<'static> for PDFFile {
+impl Responder<'static> for InvoiceData {
     fn respond_to(mut self, req: &Request) -> Result<Response<'static>, Status> {
-        let render = Template::render(self.0, &self.1)
-            .respond_to(&req)
-            .expect("Unable to render template.")
-            .body()
-            .unwrap()
-            .into_string()
-            .unwrap();
-
-        let weasyprint = Command::new("python3")
-            .arg("-m")
-            .arg("weasyprint")
-            .arg("-f")
-            .arg("pdf")
-            .arg("-e")
-            .arg("utf8")
-            .arg("-")
-            .arg("-")
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .stderr(Stdio::inherit())
-            .spawn()
-            .expect("failed to execute process");
-
-        let mut stdin = weasyprint.stdin.unwrap();
-        let mut stdout = weasyprint.stdout.unwrap();
-        let mut writer = BufWriter::new(&mut stdin);
-
-        writer.write_all(&render.into_bytes()).unwrap();
+        let stdout = generate_pdf(&self);
 
         Response::build()
             .header(ContentType::new("application", "pdf"))
@@ -426,12 +411,32 @@ impl Responder<'static> for PDFFile {
     }
 }
 
-#[derive(Debug, Serialize)]
-pub struct InvoiceData {
-    pub invoice: crate::invoices::model::Invoice,
-    pub member: crate::members::model::Member,
-}
+pub fn generate_pdf(data: &InvoiceData) -> std::process::ChildStdout {
+    let mut context = tera::Context::new();
+    context.insert("invoice", &data.invoice);
+    context.insert("member", &data.member);
+    let render = crate::tera_engine::TERA.render("invoice_template.html.tera", &context).unwrap();
 
-pub fn generate_pdf(connection: &SqliteConnection, data: InvoiceData) -> PDFFile {
-    PDFFile("pages/members/invoice_template".to_string(), data)
+    let weasyprint = Command::new("python3")
+        .arg("-m")
+        .arg("weasyprint")
+        .arg("-f")
+        .arg("pdf")
+        .arg("-e")
+        .arg("utf8")
+        .arg("-")
+        .arg("-")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::inherit())
+        .spawn()
+        .expect("failed to execute process");
+
+    let mut stdin = weasyprint.stdin.unwrap();
+    let mut stdout = weasyprint.stdout.unwrap();
+    let mut writer = BufWriter::new(&mut stdin);
+
+    writer.write_all(&render.into_bytes()).unwrap();
+
+    stdout
 }

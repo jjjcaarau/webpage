@@ -13,14 +13,14 @@
     </div>
     <div class="row">
         <div class="col">
-            <form class="mark-pay" action="/bills/generate_all" method="POST">
-                <input class="btn btn-primary" type="submit" value="Generate all types of bills" />
+            <form class="mark-pay" action="/invoices/generate_all" method="POST">
+                <input class="btn btn-primary" type="submit" value="Generate all types of invoices" />
             </form>
-            <form class="mark-pay" action="/bills/generate_late_notice" method="POST">
-                <input class="btn btn-primary" type="submit" value="Generate late notice bills only" />
+            <form class="mark-pay" action="/invoices/generate_late_notice" method="POST">
+                <input class="btn btn-primary" type="submit" value="Generate late notice invoices only" />
             </form>
-            <form class="mark-pay" action="/bills/generate_first" method="POST">
-                <input class="btn btn-primary" type="submit" value="Generate first bills only" />
+            <form class="mark-pay" action="/invoices/generate_first" method="POST">
+                <input class="btn btn-primary" type="submit" value="Generate first invoices only" />
             </form>
             <h3>Paying members: {{ number_of_paying_members }}</h3>
             {% for member in paying_members %}
@@ -43,21 +43,21 @@
                         {{ member.2.comment }}
                     </span>
                     {% if not member.2.paid %}
-                    <form class="mark-pay" action="/bills/pay/{{ member.2.id }}" method="POST">
+                    <form class="mark-pay" action="/invoices/pay/{{ member.2.id }}" method="POST">
                         <input class="btn btn-success" type="submit" value="Mark as paid" />
                     </form>
-                    <form class="mark-pay" action="/bills/delete/{{ member.2.id }}" method="POST">
+                    <form class="mark-pay" action="/invoices/delete/{{ member.2.id }}" method="POST">
                         <input class="btn btn-danger" type="submit" value="Delete" />
                     </form>
                     <br>
                     <br>
-                    <form action="/bills/update/{{ member.2.id }}" method="POST">
+                    <form action="/invoices/update/{{ member.2.id }}" method="POST">
                         <div class="form-row">
                             <div class="col">
-                                <input name="bill_passport" type="text" value="{{ member.2.bill_passport }}" class="form-control">
+                                <input name="invoice_passport" type="text" value="{{ member.2.invoice_passport }}" class="form-control">
                             </div>
                             <div class="col">
-                                <input name="bill_amount" type="text" value="{{ member.2.bill_amount }}" class="form-control">
+                                <input name="invoice_amount" type="text" value="{{ member.2.invoice_amount }}" class="form-control">
                             </div>
                             <div class="col">
                                 <input name="paid_amount" type="text" value="{{ member.2.paid_amount }}" class="form-control">
@@ -70,7 +70,7 @@
                             </div>
                         </div>
                     </form>
-                    <a href="/bills/pdf/{{ member.2.id }}">PDF</a>
+                    <a href="/invoices/pdf/{{ member.2.id }}">PDF</a>
                     {% endif %}
                 {% else %}
                     <span class="badge badge-warning">

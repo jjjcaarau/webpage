@@ -15,6 +15,7 @@ extern crate serde_derive;
 extern crate itertools;
 #[macro_use]
 extern crate lazy_static;
+#[macro_use] extern crate tera;
 
 mod blog;
 mod commander;
@@ -28,6 +29,7 @@ mod login;
 mod members;
 mod routes;
 mod schema;
+mod tera_engine;
 
 use crate::config::CONFIG;
 

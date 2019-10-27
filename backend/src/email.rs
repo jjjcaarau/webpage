@@ -34,12 +34,17 @@ pub fn send(
     to: String,
     subject: String,
     content_text: String,
+    attachment: Option<(&[u8], &str)>
 ) -> Result<(), EmailError> {
     let mut builder = lettre_email::Email::builder()
         .to(to)
         .from(from)
         .subject(subject)
         .text(content_text);
+
+    if let Some(attachment) = attachment {
+        builder = builder.attachment(attachment.0, attachment.1, &mime::APPLICATION_PDF)?;
+    }
 
     let build_result = builder.build();
     let email = build_result?;
