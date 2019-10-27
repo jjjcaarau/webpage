@@ -10,9 +10,9 @@ table! {
     events (id) {
         id -> Integer,
         member_id -> Integer,
-        event_type -> Text,
-        class -> Text,
-        division -> Text,
+        event_type -> crate::events::model::EventTypeMapping,
+        class -> crate::events::model::EventClassMapping,
+        division -> crate::events::model::EventDivisionMapping,
         comment -> Nullable<Text>,
         date -> Date,
     }
@@ -26,7 +26,7 @@ table! {
         date -> Date,
         due_date -> Date,
         sent -> Nullable<Date>,
-        sent_as -> Text,
+        sent_as -> crate::invoices::model::SentAsMapping,
         number -> Integer,
         invoice_passport -> Integer,
         invoice_amount -> Integer,
@@ -56,7 +56,7 @@ table! {
         comment -> Text,
         email_allowed -> Bool,
         passport_no -> Text,
-        member_type -> Text,
+        member_type -> crate::members::model::MemberTypeMapping,
         needs_mark -> Bool,
         section_jujitsu -> Bool,
         section_judo -> Bool,
@@ -67,9 +67,4 @@ table! {
     }
 }
 
-allow_tables_to_appear_in_same_query!(
-    courses,
-    events,
-    invoices,
-    members,
-);
+allow_tables_to_appear_in_same_query!(courses, events, invoices, members,);
