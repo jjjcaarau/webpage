@@ -3,8 +3,11 @@ use std::collections::HashMap;
 
 use pulldown_cmark::{html, Options, Parser};
 
+use crate::context::Context;
+use crate::user::MaybeUser;
+
 #[get("/")]
-pub fn index() -> Template {
+pub fn index(maybe_user: MaybeUser) -> Template {
     #[derive(Deserialize, Serialize)]
     pub struct Blog {
         pub entries: Vec<crate::blog::entry::Entry>,
@@ -23,25 +26,25 @@ pub fn index() -> Template {
             entry
         })
         .collect();
-    Template::render("pages/index", &Blog { entries })
+    Template::render("pages/index", Context::new(*maybe_user, &Blog { entries }))
 }
 
 #[get("/club")]
-pub fn club() -> Template {
-    Template::render("pages/club", &HashMap::<String, u8>::new())
+pub fn club(maybe_user: MaybeUser) -> Template {
+    Template::render("pages/club", Context::new(*maybe_user, &HashMap::<String, u8>::new()))
 }
 
 #[get("/judo")]
-pub fn judo() -> Template {
-    Template::render("pages/judo", &HashMap::<String, u8>::new())
+pub fn judo(maybe_user: MaybeUser) -> Template {
+    Template::render("pages/judo", Context::new(*maybe_user, &HashMap::<String, u8>::new()))
 }
 
 #[get("/jujitsu")]
-pub fn jujitsu() -> Template {
-    Template::render("pages/jujitsu", &HashMap::<String, u8>::new())
+pub fn jujitsu(maybe_user: MaybeUser) -> Template {
+    Template::render("pages/jujitsu", Context::new(*maybe_user, &HashMap::<String, u8>::new()))
 }
 
 #[get("/kontakt")]
-pub fn kontakt() -> Template {
-    Template::render("pages/kontakt", &HashMap::<String, u8>::new())
+pub fn kontakt(maybe_user: MaybeUser) -> Template {
+    Template::render("pages/kontakt", Context::new(*maybe_user, &HashMap::<String, u8>::new()))
 }

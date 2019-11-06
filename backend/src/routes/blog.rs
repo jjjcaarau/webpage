@@ -3,17 +3,19 @@ use rocket_contrib::json::Json;
 use rocket_contrib::templates::Template;
 use std::io::Write;
 
+use crate::context::Context;
+use crate::user::User;
 use crate::config::CONFIG;
 
 #[get("/edit/<date>")]
-pub fn edit_get(date: Option<String>) -> Template {
+pub fn edit_get(user: User, date: Option<String>) -> Template {
     let entry = if let Some(date) = date {
         Entry::new_from_path(CONFIG.general.blog_root.clone() + &date + ".md")
     } else {
         Entry::new()
     };
 
-    Template::render("pages/blog/edit", &entry)
+    Template::render("pages/blog/edit", Context::new(Some(user), &entry))
 }
 
 #[post("/edit/<date>", format = "json", data = "<entry>")]

@@ -1,11 +1,13 @@
-use crate::error::Error;
-use crate::events::model::Event;
-use crate::members::actions::get_stats;
-use crate::members::model::{JsonMember, Member, NewMember, Tag};
 use chrono::NaiveDate;
 use rocket::response::{Flash, Redirect};
 use rocket_contrib::json::Json;
 use rocket_contrib::templates::Template;
+use crate::error::Error;
+use crate::events::model::Event;
+use crate::members::actions::get_stats;
+use crate::members::model::{JsonMember, Member, NewMember, Tag};
+use crate::user::{User, MaybeUser};
+use crate::context::Context;
 
 #[derive(Serialize)]
 struct ListResult {
@@ -18,10 +20,10 @@ pub struct ViewResult {
 }
 
 #[get("/list")]
-pub fn list(_user: crate::login::User) -> Result<Template, diesel::result::Error> {
+pub fn list(user: User) -> Result<Template, diesel::result::Error> {
     let connection = crate::db::establish_connection();
     let members = crate::members::actions::list_all(&connection);
-    members.map(|v| Template::render("pages/members/list", ListResult { members: v }))
+    members.map(|v| Template::render("pages/members/list", Context::new(Some(user), ListResult { members: v })))
 }
 
 #[get("/list", rank = 2)]
@@ -30,10 +32,10 @@ pub fn list_redirect() -> Redirect {
 }
 
 #[get("/view/<id>")]
-pub fn view(_user: crate::login::User, id: i32) -> Template {
+pub fn view(user: User, id: i32) -> Template {
     Template::render(
         "pages/members/view",
-        std::collections::HashMap::<i32, i32>::new(),
+        Context::new(Some(user), std::collections::HashMap::<i32, i32>::new()),
     )
 }
 
@@ -43,9 +45,9 @@ pub fn view_redirect(id: i32) -> Redirect {
 }
 
 #[get("/stats")]
-pub fn stats() -> Template {
+pub fn stats(user: User) -> Template {
     let connection = crate::db::establish_connection();
-    Template::render("pages/members/stats", get_stats(&connection))
+    Template::render("pages/members/stats", Context::new(Some(user), get_stats(&connection)))
 }
 
 #[get("/stats", rank = 2)]
@@ -55,7 +57,7 @@ pub fn stats_redirect() -> Redirect {
 
 #[get("/list_json")]
 pub fn list_json(
-    _user: crate::login::User,
+    _user: User,
 ) -> Json<Vec<(Member, Vec<Event>, Vec<Member>, Vec<Tag>)>> {
     let connection = crate::db::establish_connection();
     Json(crate::members::actions::list_all(&connection).unwrap())
@@ -67,7 +69,7 @@ pub fn list_json_redirect() -> Redirect {
 }
 
 #[get("/view_json/<id>")]
-pub fn view_json(_user: crate::login::User, id: i32) -> Json<ViewResult> {
+pub fn view_json(_user: User, id: i32) -> Json<ViewResult> {
     let connection = crate::db::establish_connection();
     let mut member = crate::members::actions::get(&connection, id);
     match member {
@@ -93,7 +95,7 @@ pub struct UpdateResponse {
 }
 
 #[post("/update_json", format = "json", data = "<member>")]
-pub fn update_json(user: crate::login::User, member: Json<JsonMember>) -> Json<UpdateResponse> {
+pub fn update_json(user: User, member: Json<JsonMember>) -> Json<UpdateResponse> {
     if user.can_edit_members {
         let connection = crate::db::establish_connection();
 
@@ -179,7 +181,7 @@ pub struct MemberFamilyUpdate {
 }
 
 #[post("/update_family_json", format = "json", data = "<update>")]
-pub fn update_family_json(user: crate::login::User, update: Json<MemberFamilyUpdate>) {
+pub fn update_family_json(user: User, update: Json<MemberFamilyUpdate>) {
     if user.can_edit_members {
         let connection = crate::db::establish_connection();
         crate::members::actions::update_family(&connection, update.member_id, update.family_id)

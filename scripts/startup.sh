@@ -27,13 +27,6 @@ mkdir -p data/config/
 mkdir -p data/templates/
 mkdir -p data/blog/
 
-if [ "$(ls -A data/config)" ]; then
-     echo "Config found, not taking any action."
-else
-    echo "No config found. Setting up a default one."
-    cp -R defaults/config/* data/config/
-fi
-
 if [ "$(ls -A data/templates)" ]; then
      echo "Templates found, not taking any action."
 else

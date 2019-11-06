@@ -16,6 +16,7 @@ pub struct Rocket {
     pub address: String,
     pub port: u16,
     pub log_level: log::Level,
+    pub secret_key: Option<String>,
     pub static_root: String,
     pub recaptcha_url: String,
     pub recaptcha_private_key: String,

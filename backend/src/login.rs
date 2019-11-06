@@ -5,6 +5,8 @@ use rocket::response::{Flash, Redirect};
 
 use rocket_contrib::templates::Template;
 
+use crate::user::User;
+use crate::context::Context;
 use crate::config::CONFIG;
 
 #[derive(FromForm)]
@@ -12,33 +14,6 @@ pub struct Login {
     username: String,
     password: String,
     submit: String,
-}
-
-#[derive(Debug)]
-pub struct User {
-    id: usize,
-    pub can_edit_members: bool,
-}
-
-impl<'a, 'r> FromRequest<'a, 'r> for User {
-    type Error = std::convert::Infallible;
-
-    fn from_request(request: &'a Request<'r>) -> request::Outcome<User, Self::Error> {
-        let value = request
-            .cookies()
-            .get_private("user_id")
-            .and_then(|cookie| cookie.value().parse().ok());
-        if let Some(id) = value {
-            let connection = crate::db::establish_connection();
-            if let Ok(member) = crate::members::actions::get(&connection, id) {
-                return request::Outcome::Success(User {
-                    id: id as usize,
-                    can_edit_members: member.0.can_edit_members,
-                });
-            }
-        }
-        return request::Outcome::Forward(());
-    }
 }
 
 #[post("/login", data = "<login>")]
@@ -121,7 +96,7 @@ pub fn login_page(flash: Option<FlashMessage<'_, '_>>) -> Template {
         }
     }
 
-    Template::render("login", &context)
+    Template::render("login", Context::new(None, &context))
 }
 
 #[get("/password_recovery/<hash>")]
@@ -134,7 +109,7 @@ pub fn password_recovery_get(flash: Option<FlashMessage<'_, '_>>, hash: String) 
         }
     }
     context.insert("hash", &hash);
-    Template::render("password_recovery", &context)
+    Template::render("password_recovery", Context::new(None, &context))
 }
 
 #[derive(FromForm)]

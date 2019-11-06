@@ -30,6 +30,8 @@ mod members;
 mod routes;
 mod schema;
 mod tera_engine;
+mod context;
+mod user;
 
 use crate::config::CONFIG;
 
@@ -54,7 +56,12 @@ fn main() {
         log::Level::Error | log::Level::Warn => rocket::config::LoggingLevel::Critical,
         log::Level::Info => rocket::config::LoggingLevel::Normal,
         log::Level::Debug | log::Level::Trace => rocket::config::LoggingLevel::Debug,
-    })
+    });
+    let config = if let Some(secret_key) = CONFIG.rocket.secret_key.as_ref() {
+        config.secret_key(secret_key)
+    } else {
+        config
+    }
     .finalize()
     .expect("Failed to create rocket config.");
 

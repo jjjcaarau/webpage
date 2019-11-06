@@ -2,7 +2,7 @@ use crate::error::Error;
 use rocket::http::Status;
 use rocket::request::Form;
 use rocket::response::{Flash, Redirect};
-use rocket_contrib::json::Json;
+use crate::user::User;
 
 #[derive(FromForm)]
 pub struct Update {
@@ -12,7 +12,7 @@ pub struct Update {
     comment: Option<String>,
 }
 
-// _user: crate::login::User,
+// _user: User,
 #[post("/update/<id>", data = "<update>")]
 pub fn update(id: i32, update: Form<Update>) -> Flash<Redirect> {
     let connection = crate::db::establish_connection();
@@ -46,7 +46,7 @@ pub fn update(id: i32, update: Form<Update>) -> Flash<Redirect> {
     }
 }
 
-// _user: crate::login::User,
+// _user: User,
 #[post("/pay/<id>")]
 pub fn pay(id: i32) -> Flash<Redirect> {
     let connection = crate::db::establish_connection();
@@ -109,7 +109,7 @@ pub fn pdf(id: i32) -> Result<crate::invoices::actions::InvoiceData, Status> {
 }
 
 #[post("/generate_all")]
-pub fn generate_all(_user: crate::login::User) -> Redirect {
+pub fn generate_all(_user: User) -> Redirect {
     let connection = crate::db::establish_connection();
     crate::invoices::actions::generate_invoices(
         &connection,
@@ -120,7 +120,7 @@ pub fn generate_all(_user: crate::login::User) -> Redirect {
 }
 
 #[post("/generate_late_notice")]
-pub fn generate_late_notice(_user: crate::login::User) -> Redirect {
+pub fn generate_late_notice(_user: User) -> Redirect {
     let connection = crate::db::establish_connection();
     crate::invoices::actions::generate_invoices(
         &connection,
@@ -131,7 +131,7 @@ pub fn generate_late_notice(_user: crate::login::User) -> Redirect {
 }
 
 #[post("/generate_first")]
-pub fn generate_first(_user: crate::login::User) -> Redirect {
+pub fn generate_first(_user: User) -> Redirect {
     let connection = crate::db::establish_connection();
     crate::invoices::actions::generate_invoices(
         &connection,
