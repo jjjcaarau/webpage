@@ -98,6 +98,10 @@ fn main() {
                 crate::routes::invoices::generate_all,
                 crate::routes::invoices::generate_first,
                 crate::routes::invoices::generate_late_notice,
+                crate::routes::invoices::send,
+                crate::routes::invoices::send_all,
+                crate::routes::invoices::send_first,
+                crate::routes::invoices::send_late_notice,
             ],
         )
         .mount(

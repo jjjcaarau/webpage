@@ -1,3 +1,4 @@
+use crate::invoices::actions::get_last_this_year;
 use crate::error::Error;
 use rocket::http::Status;
 use rocket::request::Form;
@@ -137,6 +138,59 @@ pub fn generate_first(_user: User) -> Redirect {
         &connection,
         &chrono::Utc::now().date().naive_utc(),
         crate::invoices::actions::InvoiceType::First,
+    );
+    Redirect::to("/members/stats")
+}
+
+#[post("/send/<id>")]
+pub fn send(_user: User, id: i32) -> Redirect {
+    let connection = crate::db::establish_connection();
+    let today = chrono::Utc::now().date().naive_utc();
+    let last_invoice = crate::invoices::actions::get(&connection, id);
+    // Diesel is retarded and does not implement Clone, so we are forced to use this for now.
+    // TODO: FIX ASAP; MY EYES BLEED!
+    let last_invoice2 = crate::invoices::actions::get(&connection, id);
+    let member = crate::members::actions::get(&connection, last_invoice.unwrap().member_id).unwrap();
+    crate::invoices::actions::send_invoice(
+        &connection,
+        &member.0,
+        &today,
+        last_invoice2,
+        crate::invoices::actions::InvoiceType::All,
+        false,
+    );
+    Redirect::to("/members/stats")
+}
+
+#[post("/send_all")]
+pub fn send_all(_user: User) -> Redirect {
+    let connection = crate::db::establish_connection();
+    crate::invoices::actions::send_invoices(
+        &connection,
+        crate::invoices::actions::InvoiceType::All,
+        false,
+    );
+    Redirect::to("/members/stats")
+}
+
+#[post("/send_late_notice")]
+pub fn send_late_notice(_user: User) -> Redirect {
+    let connection = crate::db::establish_connection();
+    crate::invoices::actions::send_invoices(
+        &connection,
+        crate::invoices::actions::InvoiceType::LateNotice,
+        false,
+    );
+    Redirect::to("/members/stats")
+}
+
+#[post("/send_first")]
+pub fn send_first(_user: User) -> Redirect {
+    let connection = crate::db::establish_connection();
+    crate::invoices::actions::send_invoices(
+        &connection,
+        crate::invoices::actions::InvoiceType::First,
+        false,
     );
     Redirect::to("/members/stats")
 }

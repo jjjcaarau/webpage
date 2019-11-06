@@ -3,14 +3,27 @@
     padding: 10px;
     border-radius: 5px;
     margin-bottom: 20px;
+    font-size: 1.4em;
+    line-height: 1;
 }
 
 .badge {
-    font-size: 1.4em;
     padding: 0.375em 0.4em;
     line-height: 1;
 }
 
 .mark-pay {
     display: inline;
+}
+
+.member-form-fields {
+    margin-top: 1em;
+}
+
+.generate-form {
+    margin-bottom: 1em;
+}
+
+.send-form {
+    margin-bottom: 1em;
 }

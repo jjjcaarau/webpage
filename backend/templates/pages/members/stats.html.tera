@@ -13,64 +13,74 @@
     </div>
     <div class="row">
         <div class="col">
-            <form class="mark-pay" action="/invoices/generate_all" method="POST">
-                <input class="btn btn-primary" type="submit" value="Generate all types of invoices" />
+            <form class="generate-form" method="POST">
+                <input class="btn btn-primary" formaction="/invoices/generate_all" type="submit" value="Generate all types of invoices" />
+                <input class="btn btn-primary" formaction="/invoices/generate_late_notice" type="submit" value="Generate late notice invoices only" />
+                <input class="btn btn-primary" formaction="/invoices/generate_first" type="submit" value="Generate first invoices only" />
             </form>
-            <form class="mark-pay" action="/invoices/generate_late_notice" method="POST">
-                <input class="btn btn-primary" type="submit" value="Generate late notice invoices only" />
-            </form>
-            <form class="mark-pay" action="/invoices/generate_first" method="POST">
-                <input class="btn btn-primary" type="submit" value="Generate first invoices only" />
+            <form class="send-form" method="POST">
+                <input class="btn btn-warning" formaction="/invoices/send_all" type="submit" value="Send all types of invoices" />
+                <input class="btn btn-warning" formaction="/invoices/send_late_notice" type="submit" value="Send late notice invoices only" />
+                <input class="btn btn-warning" formaction="/invoices/send_first" type="submit" value="Send first invoices only" />
             </form>
             <h3>Paying members: {{ number_of_paying_members }}</h3>
             {% for member in paying_members %}
-                <div class="member">
+                {% if member.2.paid %}
+                    {% set color = "#28a745" %}
+                    {% set badge_color = "light" %}
+                {% else %}
+                    {% set color = "transparent" %}
+                    {% set badge_color = "dark" %}
+                {% endif %}
+                <div class="member" style="background-color:{{ color }}">
                     {{ member.0.first_name }}
                     {{ member.0.last_name }}
                 {% if member.2 %}
-                    {% if member.2.paid %}
-                        {% set color = "success" %}
-                    {% else %}
-                        {% set color = "danger" %}
-                    {% endif %}
-                    <span class="badge badge-{{ color }}">
+                    <span class="badge badge-{{ badge_color }}">
+                        RE-{{ member.2.id }}
+                    </span>
+                    <span class="badge badge-{{ badge_color }}">
                         {{ member.2.number }}
-                        :
+                    </span>
+                    <span class="badge badge-{{ badge_color }}">
                         {{ member.2.date }}
-                        :
-                        {{ member.2.paid_amount }}
-                        :
+                    </span>
+                    {% if member.2.comment %}
+                    <span class="badge badge-{{ badge_color }}">
                         {{ member.2.comment }}
                     </span>
+                    {% endif %}
                     {% if not member.2.paid %}
-                    <form class="mark-pay" action="/invoices/pay/{{ member.2.id }}" method="POST">
-                        <input class="btn btn-success" type="submit" value="Mark as paid" />
+                    <form class="mark-pay" method="POST">
+                        <input class="btn btn-warning" type="submit" formaction="/invoices/send/{{ member.2.id }}" value="Send" />
+                        <input class="btn btn-success" type="submit" formaction="/invoices/pay/{{ member.2.id }}" value="Mark as paid" />
+                        <input class="btn btn-danger" type="submit" formaction="/invoices/delete/{{ member.2.id }}" value="Delete" />
+                        <a class="btn btn-primary" href="/invoices/pdf/{{ member.2.id }}">PDF</a>
                     </form>
-                    <form class="mark-pay" action="/invoices/delete/{{ member.2.id }}" method="POST">
-                        <input class="btn btn-danger" type="submit" value="Delete" />
-                    </form>
-                    <br>
-                    <br>
-                    <form action="/invoices/update/{{ member.2.id }}" method="POST">
+                    <form class="member-form-fields" action="/invoices/update/{{ member.2.id }}" method="POST">
                         <div class="form-row">
                             <div class="col">
+                                <label>Passport fee</label>
                                 <input name="invoice_passport" type="text" value="{{ member.2.invoice_passport }}" class="form-control">
                             </div>
                             <div class="col">
+                                <label>Membership fee</label>
                                 <input name="invoice_amount" type="text" value="{{ member.2.invoice_amount }}" class="form-control">
                             </div>
                             <div class="col">
+                                <label>Already paid amount</label>
                                 <input name="paid_amount" type="text" value="{{ member.2.paid_amount }}" class="form-control">
                             </div>
                             <div class="col">
+                                <label>Comment</label>
                                 <input name="comment" type="text" value="{{ member.2.comment }}" class="form-control">
                             </div>
                             <div class="col">
-                                <input class="btn btn-primary" type="submit" value="Update" />
+                                <label>Actions</label>
+                                <input class="btn btn-primary form-control" type="submit" value="Update" />
                             </div>
                         </div>
                     </form>
-                    <a href="/invoices/pdf/{{ member.2.id }}">PDF</a>
                     {% endif %}
                 {% else %}
                     <span class="badge badge-warning">
