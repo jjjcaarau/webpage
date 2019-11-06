@@ -18,8 +18,8 @@ pub fn edit_get(user: User, date: Option<String>) -> Template {
     Template::render("pages/blog/edit", Context::new(Some(user), &entry))
 }
 
-#[post("/edit/<date>", format = "json", data = "<entry>")]
-pub fn edit_post(date: String, entry: Json<Entry>) {
+#[post("/edit/<_date>", format = "json", data = "<entry>")]
+pub fn edit_post(_date: String, entry: Json<Entry>) {
     let entry = entry.0;
     let mut file = match std::fs::File::create(
         CONFIG.general.blog_root.clone() + &entry.name.clone() + ".tmp",
@@ -31,11 +31,11 @@ pub fn edit_post(date: String, entry: Json<Entry>) {
         ),
     };
 
-    writeln!(file, "{}", entry.title);
-    write!(file, "{}", entry.body);
-    file.flush();
+    writeln!(file, "{}", entry.title).unwrap();
+    write!(file, "{}", entry.body).unwrap();
+    file.flush().unwrap();
     std::fs::rename(
         CONFIG.general.blog_root.clone() + &entry.name.clone() + ".tmp",
         CONFIG.general.blog_root.clone() + &entry.name + ".md",
-    );
+    ).unwrap();
 }

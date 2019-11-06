@@ -5,22 +5,20 @@ use std::process::{Command, Stdio};
 use super::model::{Invoice, NewInvoice};
 use crate::events::model::Event;
 use crate::members::model::{Member, MemberType};
-use crate::schema::{invoices, members};
+use crate::schema::{invoices};
 use diesel::prelude::*;
 use rocket::http::ContentType;
 use rocket::http::Status;
 use rocket::response::Responder;
 use rocket::Request;
 use rocket::Response;
-use rocket::State;
-use rocket_contrib::templates::Template;
 
 use crate::error::Error;
 
 use crate::config::CONFIG;
 
 /// Fetches all known invoices from the DB.
-pub fn list_all(connection: &SqliteConnection) -> Result<Vec<Invoice>, diesel::result::Error> {
+pub fn _list_all(connection: &SqliteConnection) -> Result<Vec<Invoice>, diesel::result::Error> {
     let invoice_list = invoices::table
         .order_by(invoices::columns::id)
         .load::<Invoice>(connection)?;
@@ -89,7 +87,7 @@ pub fn update(
         .map(|_| ())
 }
 
-pub fn update_paid(
+pub fn _update_paid(
     connection: &SqliteConnection,
     invoice: &Invoice,
     amount: i32,
@@ -100,7 +98,7 @@ pub fn update_paid(
         .map(|_| ())
 }
 
-pub fn confirm_paid(
+pub fn _confirm_paid(
     connection: &SqliteConnection,
     invoice: &Invoice,
 ) -> Result<(), diesel::result::Error> {
@@ -163,7 +161,6 @@ pub fn generate_invoice(
                 )
             } else {
                 // First invoice this year.
-                let year = date.year();
                 let month = date.month();
 
                 // Figure amount based on settings.
@@ -222,7 +219,7 @@ fn try_generate_late_notice(
     member: &Member,
 ) -> bool {
     if invoice.number > 0 && invoice.due_date < chrono::Utc::now().date().naive_utc() {
-        create(connection, &invoice);
+        create(connection, &invoice).unwrap();
         println!(
             "Generated {}. late notice for {} {}.",
             invoice.number, member.first_name, member.last_name
@@ -239,7 +236,7 @@ fn try_generate_first(
     member: &Member,
 ) -> bool {
     if invoice.number == 0 {
-        create(connection, &invoice);
+        create(connection, &invoice).unwrap();
         println!(
             "Generated first invoice for {} {}.",
             member.first_name, member.last_name
@@ -344,7 +341,7 @@ Noah",
         let mut pdf_stream = generate_pdf(&crate::invoices::actions::InvoiceData { invoice: last_invoice.clone(), member: member.clone() });
         let mut pdf_data = vec![];
         use std::io::Read;
-        pdf_stream.read_to_end(&mut pdf_data);
+        pdf_stream.read_to_end(&mut pdf_data).unwrap();
         if crate::email::send(
             CONFIG.general.email.clone(),
             member.email.clone(),
@@ -359,7 +356,7 @@ Noah",
         {
             // If all checks are passed, update the sent date for the DB entry of the invoice.
             last_invoice.sent = Some(*today);
-            update(connection, &last_invoice);
+            update(connection, &last_invoice).unwrap();
             true
         } else {
             false
@@ -401,7 +398,7 @@ pub struct InvoiceData {
 }
 
 impl Responder<'static> for InvoiceData {
-    fn respond_to(mut self, req: &Request) -> Result<Response<'static>, Status> {
+    fn respond_to(self, _req: &Request) -> Result<Response<'static>, Status> {
         let stdout = generate_pdf(&self);
 
         Response::build()
@@ -433,7 +430,7 @@ pub fn generate_pdf(data: &InvoiceData) -> std::process::ChildStdout {
         .expect("failed to execute process");
 
     let mut stdin = weasyprint.stdin.unwrap();
-    let mut stdout = weasyprint.stdout.unwrap();
+    let stdout = weasyprint.stdout.unwrap();
     let mut writer = BufWriter::new(&mut stdin);
 
     writer.write_all(&render.into_bytes()).unwrap();
