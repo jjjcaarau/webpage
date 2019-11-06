@@ -1,8 +1,7 @@
-use crate::invoices::actions::get_last_this_year;
-use crate::error::Error;
 use rocket::http::Status;
 use rocket::request::Form;
 use rocket::response::{Flash, Redirect};
+use crate::error::Error;
 use crate::user::User;
 
 #[derive(FromForm)]

@@ -1,5 +1,5 @@
 use rocket::http::{Cookie, Cookies};
-use rocket::request::{self, FlashMessage, Form, FromRequest, Request};
+use rocket::request::{FlashMessage, Form};
 use rocket::response::{Flash, Redirect};
 
 use rocket_contrib::templates::Template;
@@ -27,28 +27,19 @@ pub fn login(mut cookies: Cookies<'_>, login: Form<Login>) -> Result<Redirect, F
 
             crate::members::actions::update_recovery(&connection, &member.0, Some(hash.clone())).unwrap();
 
-            let content = format!(
-                "Hallo {}
-Es wurde soeben ein neues Passwort für deinen Account auf der Website des JJJCA angefordert.
-Falls Du dies nicht warst, melde dies doch bitte an aktuar@jjjcaarau.ch.
-Ansonsten kannst Du Dein Passwort unter folgendem Link zurücksetzen:
+            let mut context = tera::Context::new();
+            context.insert("member", &member);
+            let recovery_url = format!("{}/password_recovery/{}", CONFIG.general.site_url.clone(), hash);
+            context.insert("recovery_url", &recovery_url);
+            let render = crate::tera_engine::TERA.render("password_recovery_email.tera", &context).unwrap();
 
-{}/password_recovery/{}
-
-Liebe Grüsse
-Dein Website-Team",
-                member.0.first_name,
-                CONFIG.general.site_url.clone(),
-                hash
-            );
-
-            println!("{}", content);
+            println!("{}", render);
 
             crate::email::send(
                 CONFIG.general.email.clone(),
                 login.username.clone(),
                 "Passwort zurücksetzen".into(),
-                content,
+                render,
                 None,
             ).unwrap();
         } else {

@@ -324,18 +324,11 @@ pub fn send_invoice(
         }
 
         // Try send the email.
-        let content = format!(
-            "Hallo {}
+        let mut context = tera::Context::new();
+        context.insert("member", &member);
+        let render = crate::tera_engine::TERA.render("invoice_email.tera", &context).unwrap();
 
-Du hast soeben eine neue Rechnung des Judo und Ju Jitsu Clubs Aarau erhalten.
-Im Anhang findest du das PDF mit den genauen Informationen.
-
-Liebe Grüsse,
-Noah",
-            member.first_name
-        );
-
-        println!("{}", content);
+        println!("{}", &render);
 
         // All checks have passed until here, so try send the email.
         let mut pdf_stream = generate_pdf(&crate::invoices::actions::InvoiceData { invoice: last_invoice.clone(), member: member.clone() });
@@ -346,7 +339,7 @@ Noah",
             CONFIG.general.email.clone(),
             member.email.clone(),
             "Neue Mitgliederrechnung".into(),
-            content,
+            render,
             Some((
                 &pdf_data,
                 "Rechnung.pdf"
@@ -412,15 +405,12 @@ pub fn generate_pdf(data: &InvoiceData) -> std::process::ChildStdout {
     let mut context = tera::Context::new();
     context.insert("invoice", &data.invoice);
     context.insert("member", &data.member);
-    let render = crate::tera_engine::TERA.render("invoice_template.html.tera", &context).unwrap();
+    let render = crate::tera_engine::TERA.render("invoice.html.tera", &context).unwrap();
 
     let weasyprint = Command::new("python3")
-        .arg("-m")
-        .arg("weasyprint")
-        .arg("-f")
-        .arg("pdf")
-        .arg("-e")
-        .arg("utf8")
+        .args(&["-m", "weasyprint"])
+        .args(&["-f", "pdf"])
+        .args(&["-e", "utf8"])
         .arg("-")
         .arg("-")
         .stdin(Stdio::piped())

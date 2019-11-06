@@ -67,7 +67,7 @@ fn main() {
     .expect("Failed to create rocket config.");
 
     #[cfg(not(target_os = "windows"))]
-    let handle = commander::init();
+    let _handle = commander::init();
 
     rocket::custom(config)
         .mount("/static", StaticFiles::from(static_root))

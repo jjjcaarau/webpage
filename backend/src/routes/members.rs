@@ -6,7 +6,7 @@ use crate::error::Error;
 use crate::events::model::Event;
 use crate::members::actions::get_stats;
 use crate::members::model::{JsonMember, Member, NewMember, Tag};
-use crate::user::{User, MaybeUser};
+use crate::user::{User};
 use crate::context::Context;
 
 #[derive(Serialize)]
@@ -35,7 +35,7 @@ pub fn list_redirect() -> Redirect {
 pub fn view(user: User, id: i32) -> Template {
     Template::render(
         "pages/members/view",
-        Context::new(Some(user), std::collections::HashMap::<i32, i32>::new()),
+        Context::new(Some(user), id),
     )
 }
 

@@ -14,8 +14,7 @@ fn handle_client(stream: UnixStream) {
     loop {
         let mut s = String::new();
         s += "cli ";
-        stream.read_line(&mut s);
-        s.trim();
+        stream.read_line(&mut s).unwrap();
         let opt = cli::Opt::from_iter(s.trim().split(" "));
 
         match opt {
@@ -35,7 +34,7 @@ fn handle_client(stream: UnixStream) {
             },
         }
 
-        stream.flush();
+        stream.flush().unwrap();
     }
 }
 

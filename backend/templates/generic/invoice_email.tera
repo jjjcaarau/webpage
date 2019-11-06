@@ -1,0 +1,7 @@
+Hallo {{ member.first_name }}
+
+Du hast soeben eine neue Rechnung des Judo und Ju Jitsu Clubs Aarau erhalten.
+Im Anhang findest du das PDF mit den genauen Informationen.
+
+Liebe Grüsse,
+Noah
