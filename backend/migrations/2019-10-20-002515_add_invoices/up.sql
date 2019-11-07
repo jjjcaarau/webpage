@@ -7,9 +7,12 @@ CREATE TABLE invoices (
     sent DATE NULL,
     sent_as TEXT CHECK(sent_as IN ('snail_mail', 'email')) NOT NULL,
     number INTEGER NOT NULL,
-    invoice_passport INTEGER NOT NULL,
-    invoice_amount INTEGER NOT NULL,
-    paid_amount INTEGER NOT NULL,
+    amount_passport INTEGER NOT NULL,
+    amount_membership INTEGER NOT NULL,
+    amount_paid INTEGER NOT NULL,
+    amount_rebate INTEGER NOT NULL,
+    percentage_rebate INTEGER NOT NULL,
+    rebate_reason TEXT NOT NULL,
     paid BOOLEAN NOT NULL,
     comment TEXT NOT NULL
 );

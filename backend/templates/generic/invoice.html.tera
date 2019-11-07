@@ -158,9 +158,16 @@ html #small-address {
 
         Liebe{% if member.sex == "M" %}r{% endif %} {{ member.first_name }}
 
+        {% if not invoice.paid and invoice.number > 0 %}
+        <p>
+            Leider ist Dein Mitgliederbeitrag für den JJJCA bisher nicht oder nur teilweise eingegangen.
+            Bitte hole dies bis zum unten genannten Datum nach.
+        </p>
+        {% else %}
         <p>
             Im Namen des JJJAC stelle ich Dir den Mitgliederbeitrag für das Jahr {{ invoice.year }} in Rechnung.
         </p>
+        {% endif %}
 
         <p>
             Ich möchte darauf hinweisen, dass der Beitrag auch dann geschuldet ist, wenn keine Trainings besucht werden. Ein Austritt kann jeweils bis zum 31.12 des Vorjahres schriftlich beim Vorstand eingereicht werden und wird für den Beitrag des Folgejahres berücksichtigt.
@@ -183,12 +190,32 @@ html #small-address {
             <tbody>
                 <tr>
                     <td>Grundbeitrag</td>
-                    <td>{{ invoice.invoice_amount }} CHF</td>
+                    <td>{{ invoice.amount_membership }} CHF</td>
                 </tr>
                 <tr>
                     <td>Pass (einmalig beim Eintritt)</td>
-                    <td>{{ invoice.invoice_passport }} CHF</td>
+                    <td>{{ invoice.amount_passport }} CHF</td>
                 </tr>
+                {% if invoice.amount_rebate > 0 or invoice.percentage_rebate > 0 %}
+                <tr>
+                    <td>{{ invoice.rebate_reason }}</td>
+                    <td>
+                    {% if invoice.amount_rebate > 0 %}
+                        {{ invoice.amount_rebate }} CHF
+                    {% elif invoice.percentage_rebate > 0 %}
+                        {{ invoice.percentage_rebate }} %
+                    {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+                {% if invoice.amount_paid > 0 %}
+                <tr>
+                    <td>Eingegangene Zahlungen</td>
+                    <td>
+                        {{ invoice.amount_paid }} CHF
+                    </td>
+                </tr>
+                {% endif %}
             </tbody>
         </table>
 
@@ -209,7 +236,9 @@ html #small-address {
                         5004 Aarau
                     </p>
                 </td>
-                <td>{{ invoice.invoice_passport + invoice.invoice_amount }} CHF</td>
+                <td>
+                {{ invoice_total }} CHF
+                </td>
                 </tr>
             </tbody>
         </table>

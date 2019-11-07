@@ -55,21 +55,35 @@
                         <input class="btn btn-warning" type="submit" formaction="/invoices/send/{{ member.2.id }}" value="Send" />
                         <input class="btn btn-success" type="submit" formaction="/invoices/pay/{{ member.2.id }}" value="Mark as paid" />
                         <input class="btn btn-danger" type="submit" formaction="/invoices/delete/{{ member.2.id }}" value="Delete" />
-                        <a class="btn btn-primary" href="/invoices/pdf/{{ member.2.id }}">PDF</a>
+                        <a class="btn btn-primary" href="/invoices/pdf/{{ member.2.id }}" target="_BLANK">PDF</a>
                     </form>
                     <form class="member-form-fields" action="/invoices/update/{{ member.2.id }}" method="POST">
                         <div class="form-row">
                             <div class="col">
                                 <label>Passport fee</label>
-                                <input name="invoice_passport" type="text" value="{{ member.2.invoice_passport }}" class="form-control">
+                                <input name="amount_passport" type="text" value="{{ member.2.amount_passport }}" class="form-control">
                             </div>
                             <div class="col">
                                 <label>Membership fee</label>
-                                <input name="invoice_amount" type="text" value="{{ member.2.invoice_amount }}" class="form-control">
+                                <input name="amount_membership" type="text" value="{{ member.2.amount_membership }}" class="form-control">
+                            </div>
+                            <div class="col">
+                                <label>Rebate amount</label>
+                                <input name="amount_rebate" type="text" value="{{ member.2.amount_rebate }}" class="form-control">
+                            </div>
+                            <div class="col">
+                                <label>Rebate percentage</label>
+                                <input name="percentage_rebate" type="text" value="{{ member.2.percentage_rebate }}" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col">
+                                <label>Rebate reason</label>
+                                <input name="rebate_reason" type="text" value="{{ member.2.rebate_reason }}" class="form-control">
                             </div>
                             <div class="col">
                                 <label>Already paid amount</label>
-                                <input name="paid_amount" type="text" value="{{ member.2.paid_amount }}" class="form-control">
+                                <input name="amount_paid" type="text" value="{{ member.2.amount_paid }}" class="form-control">
                             </div>
                             <div class="col">
                                 <label>Comment</label>

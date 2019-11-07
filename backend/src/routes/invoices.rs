@@ -6,9 +6,12 @@ use crate::user::User;
 
 #[derive(FromForm)]
 pub struct Update {
-    invoice_passport: Option<i32>,
-    invoice_amount: Option<i32>,
-    paid_amount: Option<i32>,
+    amount_passport: Option<i32>,
+    amount_membership: Option<i32>,
+    amount_paid: Option<i32>,
+    amount_rebate: Option<i32>,
+    percentage_rebate: Option<i32>,
+    rebate_reason: Option<String>,
     comment: Option<String>,
 }
 
@@ -19,14 +22,23 @@ pub fn update(id: i32, update: Form<Update>) -> Flash<Redirect> {
     let invoice = crate::invoices::actions::get(&connection, id);
     match invoice {
         Ok(mut invoice) => {
-            if let Some(invoice_passport) = update.invoice_passport {
-                invoice.invoice_passport = invoice_passport;
+            if let Some(amount_passport) = update.amount_passport {
+                invoice.amount_passport = amount_passport;
             }
-            if let Some(invoice_amount) = update.invoice_amount {
-                invoice.invoice_amount = invoice_amount;
+            if let Some(amount_membership) = update.amount_membership {
+                invoice.amount_membership = amount_membership;
             }
-            if let Some(paid_amount) = update.paid_amount {
-                invoice.paid_amount = paid_amount;
+            if let Some(amount_paid) = update.amount_paid {
+                invoice.amount_paid = amount_paid;
+            }
+            if let Some(amount_rebate) = update.amount_rebate {
+                invoice.amount_rebate = amount_rebate;
+            }
+            if let Some(percentage_rebate) = update.percentage_rebate {
+                invoice.percentage_rebate = percentage_rebate;
+            }
+            if let Some(rebate_reason) = update.rebate_reason.clone() {
+                invoice.rebate_reason = rebate_reason;
             }
             if let Some(comment) = update.comment.clone() {
                 invoice.comment = comment;

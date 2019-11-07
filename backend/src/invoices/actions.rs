@@ -93,7 +93,7 @@ pub fn _update_paid(
     amount: i32,
 ) -> Result<(), diesel::result::Error> {
     diesel::update(invoice)
-        .set(invoices::columns::paid_amount.eq(amount))
+        .set(invoices::columns::amount_paid.eq(amount))
         .execute(connection)
         .map(|_| ())
 }
@@ -143,49 +143,59 @@ pub fn generate_invoice(
 
         let last_invoice = get_last_this_year(connection, member, year);
 
-        let (number, paid_amount, invoice_amount, invoice_passport) =
-            if let Ok(last_invoice) = last_invoice {
-                // First invoice this year was already created.
+        let (
+            number,
+            amount_paid,
+            amount_membership,
+            amount_passport,
+            amount_rebate,
+            percentage_rebate,
+            rebate_reason,
+        ) = if let Ok(last_invoice) = last_invoice {
+            // First invoice this year was already created.
 
-                // If invoice this year was already paid, don't take action ofc.
-                if last_invoice.paid {
-                    return None;
-                }
+            // If invoice this year was already paid, don't take action ofc.
+            if last_invoice.paid {
+                return None;
+            }
 
-                // Make sure we advance the invoice number to account for unpaid history.
-                (
-                    last_invoice.number + 1,
-                    last_invoice.paid_amount,
-                    last_invoice.invoice_amount,
-                    last_invoice.invoice_passport,
-                )
-            } else {
-                // First invoice this year.
-                let month = date.month();
+            // Make sure we advance the invoice number to account for unpaid history.
+            (
+                last_invoice.number + 1,
+                last_invoice.amount_paid,
+                last_invoice.amount_membership,
+                last_invoice.amount_passport,
+                last_invoice.amount_rebate,
+                last_invoice.percentage_rebate,
+                last_invoice.rebate_reason,
+            )
+        } else {
+            // First invoice this year.
+            let month = date.month();
 
-                // Figure amount based on settings.
-                let amount = match member.member_type {
-                    MemberType::Active => CONFIG.general.fee_actives,
-                    MemberType::Kid => CONFIG.general.fee_kids,
-                    MemberType::Student => CONFIG.general.fee_students,
-                    _ => 0,
-                };
-
-                // Return invoice data factoring in month of the year for under year entries.
-                // TODO: fix numbers after testing!
-                let factor = if month <= 3 {
-                    1.0
-                } else if month > 3 && month <= 9 {
-                    0.5
-                } else {
-                    1.0
-                };
-                (0, 0, (amount as f32 * factor) as i32, 0)
+            // Figure amount based on settings.
+            let amount = match member.member_type {
+                MemberType::Active => CONFIG.general.fee_actives,
+                MemberType::Kid => CONFIG.general.fee_kids,
+                MemberType::Student => CONFIG.general.fee_students,
+                _ => 0,
             };
+
+            // Return invoice data factoring in month of the year for under year entries.
+            // TODO: fix numbers after testing!
+            let factor = if month <= 3 {
+                1.0
+            } else if month > 3 && month <= 9 {
+                0.5
+            } else {
+                1.0
+            };
+            (0, 0, (amount as f32 * factor) as i32, 0, 0, 0, String::new())
+        };
 
         // If there was no passport ordered and no fee is due
         // (members with a passport and club entry in months 10 to 12), do not create a invoice.
-        if invoice_amount == 0 && invoice_passport == 0 {
+        if amount_membership == 0 && amount_passport == 0 {
             return None;
         }
 
@@ -201,9 +211,12 @@ pub fn generate_invoice(
             sent: None,
             sent_as: Default::default(),
             number,
-            invoice_passport,
-            invoice_amount,
-            paid_amount,
+            amount_passport,
+            amount_membership,
+            amount_paid,
+            amount_rebate,
+            percentage_rebate,
+            rebate_reason,
             paid: false,
             comment: String::default(),
         };
@@ -402,9 +415,14 @@ impl Responder<'static> for InvoiceData {
 }
 
 pub fn generate_pdf(data: &InvoiceData) -> std::process::ChildStdout {
+    let normal_total = (data.invoice.amount_passport + data.invoice.amount_membership) as f32;
+    let percentage_total = (normal_total * (1.0 - (data.invoice.percentage_rebate as f32 / 100.0)) as f32) as i32;
+    let total = percentage_total - data.invoice.amount_rebate - data.invoice.amount_paid;
+
     let mut context = tera::Context::new();
     context.insert("invoice", &data.invoice);
     context.insert("member", &data.member);
+    context.insert("invoice_total", &total);
     let render = crate::tera_engine::TERA.render("invoice.html.tera", &context).unwrap();
 
     let weasyprint = Command::new("python3")
