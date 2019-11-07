@@ -130,7 +130,7 @@ pub fn generate_invoice(
     member: &Member,
     events: &Vec<Event>,
     date: &chrono::NaiveDate,
-) -> Option<NewInvoice> {
+) -> Option<(NewInvoice, chrono::NaiveDate)> {
     let events: Vec<_> = events
         .iter()
         .cloned()
@@ -144,6 +144,7 @@ pub fn generate_invoice(
         let last_invoice = get_last_this_year(connection, member, year);
 
         let (
+            last_due_date,
             number,
             amount_paid,
             amount_membership,
@@ -161,6 +162,7 @@ pub fn generate_invoice(
 
             // Make sure we advance the invoice number to account for unpaid history.
             (
+                last_invoice.due_date,
                 last_invoice.number + 1,
                 last_invoice.amount_paid,
                 last_invoice.amount_membership,
@@ -190,7 +192,7 @@ pub fn generate_invoice(
             } else {
                 1.0
             };
-            (0, 0, (amount as f32 * factor) as i32, 0, 0, 0, String::new())
+            (chrono::Utc::now().date().naive_utc(), 0, 0, (amount as f32 * factor) as i32, 0, 0, 0, String::new())
         };
 
         // If there was no passport ordered and no fee is due
@@ -199,14 +201,13 @@ pub fn generate_invoice(
             return None;
         }
 
-        let date = chrono::Utc::now().date().naive_utc();
-        let due_date = date + chrono::Duration::days(30);
+        let due_date = date.clone() + chrono::Duration::days(30);
 
         // Create a new invoice.
         let invoice = NewInvoice {
             member_id: member.id,
             year,
-            date,
+            date: date.clone(),
             due_date,
             sent: None,
             sent_as: Default::default(),
@@ -221,17 +222,18 @@ pub fn generate_invoice(
             comment: String::default(),
         };
 
-        return Some(invoice);
+        return Some((invoice, last_due_date));
     }
     return None;
 }
 
 fn try_generate_late_notice(
     connection: &SqliteConnection,
+    last_due_date: &chrono::NaiveDate,
     invoice: &NewInvoice,
     member: &Member,
 ) -> bool {
-    if invoice.number > 0 && invoice.due_date < chrono::Utc::now().date().naive_utc() {
+    if invoice.number > 0 && last_due_date < &chrono::Utc::now().date().naive_utc() {
         create(connection, &invoice).unwrap();
         println!(
             "Generated {}. late notice for {} {}.",
@@ -269,10 +271,10 @@ pub fn generate_invoices(
 
     let mut count = 0;
     for member in members {
-        if let Some(invoice) = generate_invoice(connection, &member.0, &member.1, date) {
+        if let Some((invoice, last_due_date)) = generate_invoice(connection, &member.0, &member.1, date) {
             match invoice_type {
                 InvoiceType::All => {
-                    count += if try_generate_late_notice(connection, &invoice, &member.0) {
+                    count += if try_generate_late_notice(connection, &last_due_date, &invoice, &member.0) {
                         1
                     } else {
                         0
@@ -291,7 +293,7 @@ pub fn generate_invoices(
                     };
                 }
                 InvoiceType::LateNotice => {
-                    count += if try_generate_late_notice(connection, &invoice, &member.0) {
+                    count += if try_generate_late_notice(connection, &last_due_date, &invoice, &member.0) {
                         1
                     } else {
                         0

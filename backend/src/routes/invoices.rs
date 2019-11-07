@@ -120,34 +120,55 @@ pub fn pdf(id: i32) -> Result<crate::invoices::actions::InvoiceData, Status> {
     }
 }
 
-#[post("/generate_all")]
-pub fn generate_all(_user: User) -> Redirect {
+#[derive(FromForm, Debug)]
+pub struct Generate {
+    date: String,
+    today: bool,
+}
+
+#[post("/generate_all", data = "<generate>")]
+pub fn generate_all(_user: User, generate: Form<Generate>) -> Redirect {
+    let date = if generate.today {
+        chrono::Utc::now().date().naive_utc()
+    } else {
+        chrono::NaiveDate::parse_from_str(&generate.date, "%Y-%m-%d").unwrap()
+    };
     let connection = crate::db::establish_connection();
     crate::invoices::actions::generate_invoices(
         &connection,
-        &chrono::Utc::now().date().naive_utc(),
+        &date,
         crate::invoices::actions::InvoiceType::All,
     );
     Redirect::to("/members/stats")
 }
 
-#[post("/generate_late_notice")]
-pub fn generate_late_notice(_user: User) -> Redirect {
+#[post("/generate_late_notice", data = "<generate>")]
+pub fn generate_late_notice(_user: User, generate: Form<Generate>) -> Redirect {
+    let date = if generate.today {
+        chrono::Utc::now().date().naive_utc()
+    } else {
+        chrono::NaiveDate::parse_from_str(&generate.date, "%Y-%m-%d").unwrap()
+    };
     let connection = crate::db::establish_connection();
     crate::invoices::actions::generate_invoices(
         &connection,
-        &chrono::Utc::now().date().naive_utc(),
+        &date,
         crate::invoices::actions::InvoiceType::LateNotice,
     );
     Redirect::to("/members/stats")
 }
 
-#[post("/generate_first")]
-pub fn generate_first(_user: User) -> Redirect {
+#[post("/generate_first", data = "<generate>")]
+pub fn generate_first(_user: User, generate: Form<Generate>) -> Redirect {
+    let date = if generate.today {
+        chrono::Utc::now().date().naive_utc()
+    } else {
+        chrono::NaiveDate::parse_from_str(&generate.date, "%Y-%m-%d").unwrap()
+    };
     let connection = crate::db::establish_connection();
     crate::invoices::actions::generate_invoices(
         &connection,
-        &chrono::Utc::now().date().naive_utc(),
+        &date,
         crate::invoices::actions::InvoiceType::First,
     );
     Redirect::to("/members/stats")

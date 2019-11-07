@@ -42,7 +42,7 @@ pub struct Invoice {
     pub comment: String,
 }
 
-#[derive(Insertable, Derivative, Associations)]
+#[derive(Insertable, Derivative, Associations, Debug)]
 #[derivative(Default)]
 #[table_name = "invoices"]
 pub struct NewInvoice {

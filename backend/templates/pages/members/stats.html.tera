@@ -14,9 +14,28 @@
     <div class="row">
         <div class="col">
             <form class="generate-form" method="POST">
-                <input class="btn btn-primary" formaction="/invoices/generate_all" type="submit" value="Generate all types of invoices" />
-                <input class="btn btn-primary" formaction="/invoices/generate_late_notice" type="submit" value="Generate late notice invoices only" />
-                <input class="btn btn-primary" formaction="/invoices/generate_first" type="submit" value="Generate first invoices only" />
+                <div class="form-row">
+                    <div class="col">
+                        <label>&nbsp;</label>
+                        <input class="btn btn-primary" formaction="/invoices/generate_all" type="submit" value="Generate all types of invoices" />
+                    </div>
+                    <div class="col">
+                        <label>&nbsp;</label>
+                        <input class="btn btn-primary" formaction="/invoices/generate_late_notice" type="submit" value="Generate late notice invoices only" />
+                    </div>
+                    <div class="col">
+                        <label>&nbsp;</label>
+                        <input class="btn btn-primary" formaction="/invoices/generate_first" type="submit" value="Generate first invoices only" />
+                    </div>
+                    <div class="col">
+                        <label>Use todays date</label><br>
+                        <input type="checkbox" name="today" checked />
+                    </div>
+                    <div class="col">
+                        <label>Specific date</label>
+                        <input class="form-control" name="date" type="text" />
+                    </div>
+                </div>
             </form>
             <form class="send-form" method="POST">
                 <input class="btn btn-warning" formaction="/invoices/send_all" type="submit" value="Send all types of invoices" />
