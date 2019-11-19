@@ -3,6 +3,8 @@ use rocket::request::Form;
 use rocket::response::{Flash, Redirect};
 use crate::error::Error;
 use crate::user::User;
+use rocket_contrib::templates::Template;
+use crate::context::Context;
 
 #[derive(FromForm)]
 pub struct Update {
@@ -105,7 +107,7 @@ pub fn delete(id: i32) -> Flash<Redirect> {
 }
 
 #[get("/pdf/<id>")]
-pub fn pdf(id: i32) -> Result<crate::invoices::actions::InvoiceData, Status> {
+pub fn pdf(id: i32) -> Result<crate::invoices::actions::YearlyInvoiceData, Status> {
     let connection = crate::db::establish_connection();
     let invoice = crate::invoices::actions::get(&connection, id);
     match invoice {
@@ -113,21 +115,51 @@ pub fn pdf(id: i32) -> Result<crate::invoices::actions::InvoiceData, Status> {
             let member = crate::members::actions::get(&connection, invoice.member_id)
                 .unwrap()
                 .0;
-            Ok(crate::invoices::actions::InvoiceData { invoice, member })
+            Ok(crate::invoices::actions::YearlyInvoiceData { invoice, member })
         }
         Err(Error::Diesel(_)) => Err(Status::InternalServerError),
         Err(Error::NotFound) => Err(Status::NotFound),
     }
 }
 
-#[derive(FromForm, Debug)]
+#[derive(FromForm, Debug, Serialize)]
 pub struct Generate {
+    pub name: String,
+    pub address: String,
+    pub zip_code: String,
+    pub city: String,
+    pub date: Option<String>,
+    pub due_date: Option<String>,
+    pub title: String,
+    pub text: String,
+    pub position1: Option<String>,
+    pub position_amount1: Option<i32>,
+    pub position2: Option<String>,
+    pub position_amount2: Option<i32>,
+    pub position3: Option<String>,
+    pub position_amount3: Option<i32>,
+    pub position4: Option<String>,
+    pub position_amount4: Option<i32>,
+}
+
+#[get("/generate")]
+pub fn generate_get(user: User) -> Template {
+    Template::render("pages/invoices/generate", Context::new(Some(user), std::collections::HashMap::<u32, u32>::new()))
+}
+
+#[post("/generate", data = "<generate>")]
+pub fn generate_post(_user: User, generate: Form<Generate>) -> Generate {
+    generate.0
+}
+
+#[derive(FromForm, Debug)]
+pub struct GenerateYearly {
     date: String,
     today: bool,
 }
 
 #[post("/generate_all", data = "<generate>")]
-pub fn generate_all(_user: User, generate: Form<Generate>) -> Redirect {
+pub fn generate_all(_user: User, generate: Form<GenerateYearly>) -> Redirect {
     let date = if generate.today {
         chrono::Utc::now().date().naive_utc()
     } else {
@@ -143,7 +175,7 @@ pub fn generate_all(_user: User, generate: Form<Generate>) -> Redirect {
 }
 
 #[post("/generate_late_notice", data = "<generate>")]
-pub fn generate_late_notice(_user: User, generate: Form<Generate>) -> Redirect {
+pub fn generate_late_notice(_user: User, generate: Form<GenerateYearly>) -> Redirect {
     let date = if generate.today {
         chrono::Utc::now().date().naive_utc()
     } else {
@@ -159,7 +191,7 @@ pub fn generate_late_notice(_user: User, generate: Form<Generate>) -> Redirect {
 }
 
 #[post("/generate_first", data = "<generate>")]
-pub fn generate_first(_user: User, generate: Form<Generate>) -> Redirect {
+pub fn generate_first(_user: User, generate: Form<GenerateYearly>) -> Redirect {
     let date = if generate.today {
         chrono::Utc::now().date().naive_utc()
     } else {

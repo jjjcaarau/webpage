@@ -1,3 +1,4 @@
+use crate::routes::invoices::Generate;
 use std::io::BufWriter;
 use std::io::Write;
 use std::process::{Command, Stdio};
@@ -346,7 +347,7 @@ pub fn send_invoice(
         println!("{}", &render);
 
         // All checks have passed until here, so try send the email.
-        let mut pdf_stream = generate_pdf(&crate::invoices::actions::InvoiceData { invoice: last_invoice.clone(), member: member.clone() });
+        let mut pdf_stream = generate_yearly_pdf(&crate::invoices::actions::YearlyInvoiceData { invoice: last_invoice.clone(), member: member.clone() });
         let mut pdf_data = vec![];
         use std::io::Read;
         pdf_stream.read_to_end(&mut pdf_data).unwrap();
@@ -400,12 +401,55 @@ pub fn send_invoices(connection: &SqliteConnection, invoice_type: InvoiceType, f
 }
 
 #[derive(Debug, Serialize)]
-pub struct InvoiceData {
+pub struct YearlyInvoiceData {
     pub invoice: crate::invoices::model::Invoice,
     pub member: crate::members::model::Member,
 }
 
-impl Responder<'static> for InvoiceData {
+impl Responder<'static> for YearlyInvoiceData {
+    fn respond_to(self, _req: &Request) -> Result<Response<'static>, Status> {
+        let stdout = generate_yearly_pdf(&self);
+
+        Response::build()
+            .header(ContentType::new("application", "pdf"))
+            .streamed_body(stdout)
+            .ok()
+    }
+}
+
+pub fn generate_yearly_pdf(data: &YearlyInvoiceData) -> std::process::ChildStdout {
+    let normal_total = (data.invoice.amount_passport + data.invoice.amount_membership) as f32;
+    let percentage_total = (normal_total * (1.0 - (data.invoice.percentage_rebate as f32 / 100.0)) as f32) as i32;
+    let total = percentage_total - data.invoice.amount_rebate - data.invoice.amount_paid;
+
+    let mut context = tera::Context::new();
+    context.insert("invoice", &data.invoice);
+    context.insert("member", &data.member);
+    context.insert("invoice_total", &total);
+    let render = crate::tera_engine::TERA.render("invoice_yearly.html.tera", &context).unwrap();
+
+    let weasyprint = Command::new("python3")
+        .args(&["-m", "weasyprint"])
+        .args(&["-f", "pdf"])
+        .args(&["-e", "utf8"])
+        .arg("-")
+        .arg("-")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::inherit())
+        .spawn()
+        .expect("failed to execute process");
+
+    let mut stdin = weasyprint.stdin.unwrap();
+    let stdout = weasyprint.stdout.unwrap();
+    let mut writer = BufWriter::new(&mut stdin);
+
+    writer.write_all(&render.into_bytes()).unwrap();
+
+    stdout
+}
+
+impl Responder<'static> for Generate {
     fn respond_to(self, _req: &Request) -> Result<Response<'static>, Status> {
         let stdout = generate_pdf(&self);
 
@@ -416,15 +460,21 @@ impl Responder<'static> for InvoiceData {
     }
 }
 
-pub fn generate_pdf(data: &InvoiceData) -> std::process::ChildStdout {
-    let normal_total = (data.invoice.amount_passport + data.invoice.amount_membership) as f32;
-    let percentage_total = (normal_total * (1.0 - (data.invoice.percentage_rebate as f32 / 100.0)) as f32) as i32;
-    let total = percentage_total - data.invoice.amount_rebate - data.invoice.amount_paid;
+pub fn generate_pdf(data: &Generate) -> std::process::ChildStdout {
+    let total = data.position_amount1.unwrap_or(0)
+              + data.position_amount2.unwrap_or(0)
+              + data.position_amount3.unwrap_or(0)
+              + data.position_amount4.unwrap_or(0);
+
+
+    let date = chrono::Utc::now().date().naive_utc();
+    let due_date = chrono::Utc::now().date().naive_utc() + chrono::Duration::days(30);
 
     let mut context = tera::Context::new();
-    context.insert("invoice", &data.invoice);
-    context.insert("member", &data.member);
-    context.insert("invoice_total", &total);
+    context.insert("data", &data);
+    context.insert("total", &total);
+    context.insert("date", &date);
+    context.insert("due_date", &due_date);
     let render = crate::tera_engine::TERA.render("invoice.html.tera", &context).unwrap();
 
     let weasyprint = Command::new("python3")

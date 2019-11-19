@@ -129,57 +129,93 @@ html #small-address {
     <body>
         <img id="logo" src="templates/generic/logo.svg" />
         <address id="to">
-            {{ data.name }}
-            {{ data.address }}
-            {{ data.zip_code }} {{ data.city }}
+            {{ member.first_name }} {{ member.last_name }}
+            {{ member.address }} {{ member.address_no }}
+            {{ member.postcode }} {{ member.city }}
         </address>
 
         <dl id="informations">
-            <dt>&nbsp;</dt>
-            <dd>&nbsp;</dd>
+            {% if invoice.number > 0 %}
+            <dt>{{ invoice.number }}. Mahnung</dt>
+            <dd>RE {{ invoice.id }}</dd>
+            {% else %}
+            <dt>Rechnung</dt>
+            <dd>RE {{ invoice.id }}</dd>
+            {% endif %}
             <br>
             <dt>Rechnungsdatum</dt>
-            <dd>{{ date }}</dd>
+            <dd>{{ invoice.date }}</dd>
             <br>
             <dt>Zahlbar bis</dt>
-            <dd>{{ due_date }}</dd>
+            <dd>{{ invoice.due_date }}</dd>
         </dl>
 
-        <h3>{{ data.title }}</h3>
+        {% if invoice.number > 0 %}
+        <h3>{{ invoice.number }}. Mahnung, RE {{ invoice.id }}</h3>
+        {% else %}
+        <h3>RE {{ invoice.id }}</h3>
+        {% endif %}
 
-        {{ data.text | safe }}
+        Liebe{% if member.sex == "M" %}r{% endif %} {{ member.first_name }}
 
-        <br>
-        <br>
-        <br>
+        {% if not invoice.paid and invoice.number > 0 %}
+        <p>
+            Leider ist Dein Mitgliederbeitrag für den JJJCA bisher nicht oder nur teilweise eingegangen.
+            Bitte hole dies bis zum unten genannten Datum nach.
+        </p>
+        {% else %}
+        <p>
+            Im Namen des JJJAC stelle ich Dir den Mitgliederbeitrag für das Jahr {{ invoice.year }} in Rechnung.
+        </p>
+        {% endif %}
+
+        <p>
+            Ich möchte darauf hinweisen, dass der Beitrag auch dann geschuldet ist, wenn keine Trainings besucht werden. Ein Austritt kann jeweils bis zum 31.12 des Vorjahres schriftlich beim Vorstand eingereicht werden und wird für den Beitrag des Folgejahres berücksichtigt.
+        </p>
+
+        <p>
+            Bei Fragen erreichst Du mich unter <strong>079 960 71 30</strong> oder <strong>kassier@jjjcaarau.ch</strong>.
+        </p>
+
+        <p>
+            Liebe Grüsse und viel Spass beim weiteren Trainieren<br>
+            Noah (Kassier)
+        </p>
+
         <table>
             <thead>
                 <th>Posten</th>
                 <th>Betrag</th>
             </thead>
             <tbody>
-                {% if data.position1 %}
                 <tr>
-                    <td>{{ data.position1 }}</td>
-                    <td>{{ data.position_amount1 }} CHF</td>
+                    <td>Grundbeitrag</td>
+                    <td>{{ invoice.amount_membership }} CHF</td>
+                </tr>
+                {% if invoice.amount_passport %}
+                <tr>
+                    <td>Pass (einmalig beim Eintritt)</td>
+                    <td>{{ invoice.amount_passport }} CHF</td>
                 </tr>
                 {% endif %}
-                {% if data.position2 %}
+                {% if invoice.amount_rebate > 0 or invoice.percentage_rebate > 0 %}
                 <tr>
-                    <td>{{ data.position2 }}</td>
-                    <td>{{ data.position_amount2 }} CHF</td>
+                    <td>{{ invoice.rebate_reason }}</td>
+                    <td>
+                    {% if invoice.amount_rebate > 0 %}
+                        {{ invoice.amount_rebate }} CHF
+                    {% elif invoice.percentage_rebate > 0 %}
+                        {{ invoice.percentage_rebate }} %
+                    {% endif %}
+                    </td>
                 </tr>
                 {% endif %}
-                {% if data.position3 %}
+                {% if invoice.amount_paid > 0 %}
                 <tr>
-                    <td>{{ data.position3 }}</td>
-                    <td>{{ data.position_amount3 }} CHF</td>
-                </tr>
-                {% endif %}
-                {% if data.position4 %}
-                <tr>
-                    <td>{{ data.position4 }}</td>
-                    <td>{{ data.position_amount4 }} CHF</td>
+                    <td>Eingegangene Zahlungen</td>
+                    <td>
+                        {{ invoice.amount_paid }} CHF
+                    </td>
                 </tr>
                 {% endif %}
             </tbody>
@@ -193,7 +229,7 @@ html #small-address {
             </thead>
             <tbody>
                 <tr>
-                <td>{{ due_date }}</td>
+                <td>{{ invoice.due_date }}</td>
                 <td>
                     IBAN CH94 0588 1077 2509 6100 0<br>
                     <p id="small-address">
@@ -203,7 +239,7 @@ html #small-address {
                     </p>
                 </td>
                 <td>
-                {{ total }} CHF
+                {{ invoice_total }} CHF
                 </td>
                 </tr>
             </tbody>

@@ -104,6 +104,8 @@ fn main() {
                 crate::routes::invoices::send_all,
                 crate::routes::invoices::send_first,
                 crate::routes::invoices::send_late_notice,
+                crate::routes::invoices::generate_get,
+                crate::routes::invoices::generate_post,
             ],
         )
         .mount(

@@ -1,0 +1,100 @@
+{% extends 'layout' %}
+{% block includes %}
+<link rel="stylesheet" href="/static/css/pages/members/stats.css">
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <div class="text-center">
+                <h1 class="content-title">Members View</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <form class="member-form-fields" action="/invoices/generate" method="POST">
+                <div class="form-row">
+                    <div class="col">
+                        <label>Name</label>
+                        <input name="name" type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col">
+                        <label>Address</label>
+                        <input name="address" type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col">
+                        <label>Zip Code</label>
+                        <input name="zip_code" type="text" class="form-control">
+                    </div>
+                    <div class="col">
+                        <label>City</label>
+                        <input name="city" type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col">
+                        <label>Title</label>
+                        <input name="title" type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col">
+                        <label>Text</label>
+                        <input name="text" type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col">
+                        <label>Position</label>
+                        <input name="position1" type="text" class="form-control">
+                    </div>
+                    <div class="col">
+                        <label>Amount</label>
+                        <input name="position_amount1" type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col">
+                        <label>Position</label>
+                        <input name="position2" type="text" class="form-control">
+                    </div>
+                    <div class="col">
+                        <label>Amount</label>
+                        <input name="position_amount2" type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col">
+                        <label>Position</label>
+                        <input name="position3" type="text" class="form-control">
+                    </div>
+                    <div class="col">
+                        <label>Amount</label>
+                        <input name="position_amount3" type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col">
+                        <label>Position</label>
+                        <input name="position4" type="text" class="form-control">
+                    </div>
+                    <div class="col">
+                        <label>Amount</label>
+                        <input name="position_amount4" type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col">
+                        <input class="btn btn-warning" formaction="/invoices/generate" type="submit" value="Generate Invoice" />
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
