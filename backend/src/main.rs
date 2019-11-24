@@ -93,6 +93,7 @@ fn main() {
         .mount(
             "/invoices",
             routes![
+                crate::routes::invoices::manage,
                 crate::routes::invoices::update,
                 crate::routes::invoices::pay,
                 crate::routes::invoices::delete,

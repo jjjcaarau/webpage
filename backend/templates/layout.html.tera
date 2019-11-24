@@ -62,8 +62,9 @@
                         {% if user %}
                         <li class="nav-item"><a class="nav-link" href="/members/list">Members</a></li>
                         {% if user.can_edit_members %}
-                        <li class="nav-item"><a class="nav-link" href="/members/stats">Invoicing</a></li>
+                        {# <li class="nav-item"><a class="nav-link" href="/members/stats">Invoicing</a></li> #}
                         <li class="nav-item"><a class="nav-link" href="/invoices/generate">Generate Invoice</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/invoices/manage">Manage Invoices</a></li>
                         {% endif %}
                         <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
                         {% else %}

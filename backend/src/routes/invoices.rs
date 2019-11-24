@@ -1,3 +1,4 @@
+use crate::invoices::model::Invoice;
 use rocket::http::Status;
 use rocket::request::Form;
 use rocket::response::{Flash, Redirect};
@@ -140,6 +141,23 @@ pub struct Generate {
     pub position_amount3: Option<i32>,
     pub position4: Option<String>,
     pub position_amount4: Option<i32>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct Invoices {
+    pub invoices: Vec<Invoice>,
+}
+
+#[get("/manage")]
+pub fn manage(user: User) -> Result<Template, Status> {
+    let connection = crate::db::establish_connection();
+    let invoices = crate::invoices::actions::list_all_unpaid(&connection);
+    match invoices {
+        Ok(invoices) => {
+            Ok(Template::render("pages/invoices/manage", Context::new(Some(user), Invoices { invoices })))
+        }
+        Err(_) => Err(Status::InternalServerError),
+    }
 }
 
 #[get("/generate")]

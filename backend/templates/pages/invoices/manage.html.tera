@@ -1,0 +1,119 @@
+{% extends 'layout' %}
+{% block includes %}
+<link rel="stylesheet" href="/static/css/pages/members/stats.css">
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <div class="text-center">
+                <h1 class="content-title">Members View</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <form class="generate-form" method="POST">
+                <div class="form-row">
+                    <div class="col">
+                        <label>&nbsp;</label>
+                        <input class="btn btn-primary" formaction="/invoices/generate_all" type="submit" value="Generate all types of invoices" />
+                    </div>
+                    <div class="col">
+                        <label>&nbsp;</label>
+                        <input class="btn btn-primary" formaction="/invoices/generate_late_notice" type="submit" value="Generate late notice invoices only" />
+                    </div>
+                    <div class="col">
+                        <label>&nbsp;</label>
+                        <input class="btn btn-primary" formaction="/invoices/generate_first" type="submit" value="Generate first invoices only" />
+                    </div>
+                    <div class="col">
+                        <label>Use todays date</label><br>
+                        <input type="checkbox" name="today" checked />
+                    </div>
+                    <div class="col">
+                        <label>Specific date</label>
+                        <input class="form-control" name="date" type="text" />
+                    </div>
+                </div>
+            </form>
+            <form class="send-form" method="POST">
+                <input class="btn btn-warning" formaction="/invoices/send_all" type="submit" value="Send all types of invoices" />
+                <input class="btn btn-warning" formaction="/invoices/send_late_notice" type="submit" value="Send late notice invoices only" />
+                <input class="btn btn-warning" formaction="/invoices/send_first" type="submit" value="Send first invoices only" />
+            </form>
+            <h3>Open Invoices: {{ invoices | length }}</h3>
+            {% for invoice in invoices %}
+                {% if invoice.paid %}
+                    {% set color = "#28a745" %}
+                    {% set badge_color = "light" %}
+                {% else %}
+                    {% set color = "transparent" %}
+                    {% set badge_color = "dark" %}
+                {% endif %}
+                <span class="badge badge-{{ badge_color }}">
+                    RE-{{ invoice.id }}
+                </span>
+                <span class="badge badge-{{ badge_color }}">
+                    {{ invoice.number }}
+                </span>
+                <span class="badge badge-{{ badge_color }}">
+                    {{ invoice.date }}
+                </span>
+                {% if invoice.comment %}
+                <span class="badge badge-{{ badge_color }}">
+                    {{ invoice.comment }}
+                </span>
+                {% endif %}
+                {% if not invoice.paid %}
+                <form class="mark-pay" method="POST">
+                    <input class="btn btn-warning" type="submit" formaction="/invoices/send/{{ invoice.id }}" value="Send" />
+                    <input class="btn btn-success" type="submit" formaction="/invoices/pay/{{ invoice.id }}" value="Mark as paid" />
+                    <input class="btn btn-danger" type="submit" formaction="/invoices/delete/{{ invoice.id }}" value="Delete" />
+                    <a class="btn btn-primary" href="/invoices/pdf/{{ invoice.id }}" target="_BLANK">PDF</a>
+                </form>
+                <form class="member-form-fields" action="/invoices/update/{{ invoice.id }}" method="POST">
+                    <div class="form-row">
+                        <div class="col">
+                            <label>Passport fee</label>
+                            <input name="amount_passport" type="text" value="{{ invoice.amount_passport }}" class="form-control">
+                        </div>
+                        <div class="col">
+                            <label>Membership fee</label>
+                            <input name="amount_membership" type="text" value="{{ invoice.amount_membership }}" class="form-control">
+                        </div>
+                        <div class="col">
+                            <label>Rebate amount</label>
+                            <input name="amount_rebate" type="text" value="{{ invoice.amount_rebate }}" class="form-control">
+                        </div>
+                        <div class="col">
+                            <label>Rebate percentage</label>
+                            <input name="percentage_rebate" type="text" value="{{ invoice.percentage_rebate }}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col">
+                            <label>Rebate reason</label>
+                            <input name="rebate_reason" type="text" value="{{ invoice.rebate_reason }}" class="form-control">
+                        </div>
+                        <div class="col">
+                            <label>Already paid amount</label>
+                            <input name="amount_paid" type="text" value="{{ invoice.amount_paid }}" class="form-control">
+                        </div>
+                        <div class="col">
+                            <label>Comment</label>
+                            <input name="comment" type="text" value="{{ invoice.comment }}" class="form-control">
+                        </div>
+                        <div class="col">
+                            <label>Actions</label>
+                            <input class="btn btn-primary form-control" type="submit" value="Update" />
+                        </div>
+                    </div>
+                </form>
+                {% else %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -27,6 +27,15 @@ pub fn _list_all(connection: &SqliteConnection) -> Result<Vec<Invoice>, diesel::
     Ok(invoice_list)
 }
 
+pub fn list_all_unpaid(connection: &SqliteConnection) -> Result<Vec<Invoice>, diesel::result::Error> {
+    let invoice_list = invoices::table
+        .order_by(invoices::columns::id)
+        .filter(invoices::columns::paid.eq(false))
+        .load::<Invoice>(connection)?;
+
+    Ok(invoice_list)
+}
+
 /// Fetches an existing invoice from the DB.
 pub fn get(connection: &SqliteConnection, id: i32) -> Result<Invoice, Error> {
     let invoice = {
@@ -99,7 +108,7 @@ pub fn _update_paid(
         .map(|_| ())
 }
 
-pub fn _confirm_paid(
+pub fn confirm_paid(
     connection: &SqliteConnection,
     invoice: &Invoice,
 ) -> Result<(), diesel::result::Error> {
@@ -131,7 +140,7 @@ pub fn generate_invoice(
     member: &Member,
     events: &Vec<Event>,
     date: &chrono::NaiveDate,
-) -> Option<(NewInvoice, chrono::NaiveDate)> {
+) -> Option<(NewInvoice, Option<Invoice>, chrono::NaiveDate)> {
     let events: Vec<_> = events
         .iter()
         .cloned()
@@ -153,8 +162,11 @@ pub fn generate_invoice(
             amount_rebate,
             percentage_rebate,
             rebate_reason,
+            last_invoice,
         ) = if let Ok(last_invoice) = last_invoice {
             // First invoice this year was already created.
+
+            let last_invoice_clone = last_invoice.clone();
 
             // If invoice this year was already paid, don't take action ofc.
             if last_invoice.paid {
@@ -171,6 +183,7 @@ pub fn generate_invoice(
                 last_invoice.amount_rebate,
                 last_invoice.percentage_rebate,
                 last_invoice.rebate_reason,
+                Some(last_invoice_clone),
             )
         } else {
             // First invoice this year.
@@ -193,7 +206,17 @@ pub fn generate_invoice(
             } else {
                 1.0
             };
-            (chrono::Utc::now().date().naive_utc(), 0, 0, (amount as f32 * factor) as i32, 0, 0, 0, String::new())
+            (
+                chrono::Utc::now().date().naive_utc(),
+                0,
+                0,
+                (amount as f32 * factor) as i32,
+                0,
+                0,
+                0,
+                String::new(),
+                None,
+            )
         };
 
         // If there was no passport ordered and no fee is due
@@ -223,7 +246,7 @@ pub fn generate_invoice(
             comment: String::default(),
         };
 
-        return Some((invoice, last_due_date));
+        return Some((invoice, last_invoice, last_due_date));
     }
     return None;
 }
@@ -232,15 +255,20 @@ fn try_generate_late_notice(
     connection: &SqliteConnection,
     last_due_date: &chrono::NaiveDate,
     invoice: &NewInvoice,
+    last_invoice: Option<&Invoice>,
     member: &Member,
 ) -> bool {
     if invoice.number > 0 && last_due_date < &chrono::Utc::now().date().naive_utc() {
         create(connection, &invoice).unwrap();
-        println!(
-            "Generated {}. late notice for {} {}.",
-            invoice.number, member.first_name, member.last_name
-        );
-        true
+        if last_invoice.map(|li| confirm_paid(connection, li)).is_some() {
+            println!(
+                "Generated {}. late notice for {} {}.",
+                invoice.number, member.first_name, member.last_name
+            );
+            true
+        } else {
+            false
+        }
     } else {
         false
     }
@@ -272,10 +300,10 @@ pub fn generate_invoices(
 
     let mut count = 0;
     for member in members {
-        if let Some((invoice, last_due_date)) = generate_invoice(connection, &member.0, &member.1, date) {
+        if let Some((invoice, last_invoice, last_due_date)) = generate_invoice(connection, &member.0, &member.1, date) {
             match invoice_type {
                 InvoiceType::All => {
-                    count += if try_generate_late_notice(connection, &last_due_date, &invoice, &member.0) {
+                    count += if try_generate_late_notice(connection, &last_due_date, &invoice, last_invoice.as_ref(), &member.0) {
                         1
                     } else {
                         0
@@ -294,7 +322,7 @@ pub fn generate_invoices(
                     };
                 }
                 InvoiceType::LateNotice => {
-                    count += if try_generate_late_notice(connection, &last_due_date, &invoice, &member.0) {
+                    count += if try_generate_late_notice(connection, &last_due_date, &invoice, last_invoice.as_ref(), &member.0) {
                         1
                     } else {
                         0
