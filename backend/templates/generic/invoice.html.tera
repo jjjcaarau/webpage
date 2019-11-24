@@ -19,7 +19,7 @@
     }
     @bottom-right {
         color: #aa99aa;
-        content: 'Judo und Ju Jitsu Club Aarau | Delfterstrasse 44 | 5000 Aarau';
+        content: 'Judo und Ju Jitsu Club Aarau | Delfterstrasse 44 | 5004 Aarau';
         font-size: 9pt;
     }
 }

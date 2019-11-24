@@ -1,4 +1,5 @@
 use crate::invoices::model::Invoice;
+use crate::members::model::Member;
 use rocket::http::Status;
 use rocket::request::Form;
 use rocket::response::{Flash, Redirect};
@@ -16,6 +17,7 @@ pub struct Update {
     percentage_rebate: Option<i32>,
     rebate_reason: Option<String>,
     comment: Option<String>,
+    paid: Option<bool>,
 }
 
 // _user: User,
@@ -46,18 +48,21 @@ pub fn update(id: i32, update: Form<Update>) -> Flash<Redirect> {
             if let Some(comment) = update.comment.clone() {
                 invoice.comment = comment;
             }
+            if let Some(paid) = update.paid {
+                invoice.paid = paid;
+            }
             crate::invoices::actions::update(&connection, &invoice)
                 .expect("Failed to update invoice.");
 
             Flash::success(
-                Redirect::to("/members/stats"),
+                Redirect::to("/invoices/manage"),
                 "Successfully updated invoice.",
             )
         }
         Err(Error::Diesel(_)) => {
-            Flash::error(Redirect::to("/members/stats"), "Internal Server Error")
+            Flash::error(Redirect::to("/invoices/manage"), "Internal Server Error")
         }
-        Err(Error::NotFound) => Flash::error(Redirect::to("/members/stats"), "Invoice not found."),
+        Err(Error::NotFound) => Flash::error(Redirect::to("/invoices/manage"), "Invoice not found."),
     }
 }
 
@@ -66,7 +71,6 @@ pub fn update(id: i32, update: Form<Update>) -> Flash<Redirect> {
 pub fn pay(id: i32) -> Flash<Redirect> {
     let connection = crate::db::establish_connection();
     let invoice = crate::invoices::actions::get(&connection, id);
-    dbg!(id);
     match invoice {
         Ok(mut invoice) => {
             invoice.paid = true;
@@ -74,14 +78,14 @@ pub fn pay(id: i32) -> Flash<Redirect> {
                 .expect("Failed to update invoice.");
 
             Flash::success(
-                Redirect::to("/members/stats"),
+                Redirect::to("/invoices/manage"),
                 "Successfully marked invoice as paid.",
             )
         }
         Err(Error::Diesel(_)) => {
-            Flash::error(Redirect::to("/members/stats"), "Internal Server Error")
+            Flash::error(Redirect::to("/invoices/manage"), "Internal Server Error")
         }
-        Err(Error::NotFound) => Flash::error(Redirect::to("/members/stats"), "Invoice not found."),
+        Err(Error::NotFound) => Flash::error(Redirect::to("/invoices/manage"), "Invoice not found."),
     }
 }
 
@@ -96,14 +100,14 @@ pub fn delete(id: i32) -> Flash<Redirect> {
                 .expect("Failed to delete invoice.");
 
             Flash::success(
-                Redirect::to("/members/stats"),
+                Redirect::to("/invoices/manage"),
                 "Successfully deleted invoice.",
             )
         }
         Err(Error::Diesel(_)) => {
-            Flash::error(Redirect::to("/members/stats"), "Internal Server Error")
+            Flash::error(Redirect::to("/invoices/manage"), "Internal Server Error")
         }
-        Err(Error::NotFound) => Flash::error(Redirect::to("/members/stats"), "Invoice not found."),
+        Err(Error::NotFound) => Flash::error(Redirect::to("/invoices/manage"), "Invoice not found."),
     }
 }
 
@@ -145,7 +149,7 @@ pub struct Generate {
 
 #[derive(Debug, Serialize)]
 pub struct Invoices {
-    pub invoices: Vec<Invoice>,
+    pub invoices: Vec<(Invoice, Member)>,
 }
 
 #[get("/manage")]

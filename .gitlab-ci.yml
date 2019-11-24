@@ -28,7 +28,7 @@ build-frontend:
     artifacts:
         paths:
             - static/
-        expire_in: 1h 
+        expire_in: 24h 
     script:
         - cd frontend
         - yarn install

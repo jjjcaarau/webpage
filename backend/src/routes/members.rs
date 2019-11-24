@@ -31,11 +31,12 @@ pub fn list_redirect() -> Redirect {
     Redirect::to(uri!(crate::login::login_page))
 }
 
+#[allow(unused_variables)]
 #[get("/view/<id>")]
 pub fn view(user: User, id: i32) -> Template {
     Template::render(
         "pages/members/view",
-        Context::new(Some(user), id),
+        Context::new(Some(user), std::collections::HashMap::<i32,i32>::new()),
     )
 }
 

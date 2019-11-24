@@ -19,7 +19,7 @@
     }
     @bottom-right {
         color: #aa99aa;
-        content: 'Judo und Ju Jitsu Club Aarau | Delfterstrasse 44 | 5000 Aarau';
+        content: 'Judo und Ju Jitsu Club Aarau | Delfterstrasse 44 | 5004 Aarau';
         font-size: 9pt;
     }
 }
@@ -35,8 +35,12 @@ html body {
     margin: 0;
 }
 
+html p {
+    text-align: justify;
+}
+
 html #logo {
-    height: 3cm;
+    height: 1.7cm;
     position: absolute;
     right: 0;
     top: -1cm;
@@ -52,12 +56,14 @@ html address#from {
 }
 
 html address#to {
-    margin-top: 1cm;
+    margin-top: 2.8cm;
     text-align: left;
 }
 
 html dl {
     text-align: right;
+    margin-top: -1.9cm;
+    margin-bottom: 2.4cm;
 }
 
 html dl dt, html dl dd {
@@ -112,6 +118,7 @@ html table#total {
     bottom: 0;
     font-size: 15pt;
     margin: 0 -3cm;
+    margin-bottom: -0.5cm;
     position: absolute;
     width: 18cm;
 }
@@ -121,8 +128,10 @@ html table#total tr td {
 }
 
 html #small-address {
+    margin-top: 0.2cm;
+    margin-bottom: 0.2cm;
     font-size: 10pt;
-    line-height: 1.25rem;
+    line-height: 1rem;
 }
         </style>
     </head>
@@ -151,9 +160,9 @@ html #small-address {
         </dl>
 
         {% if invoice.number > 0 %}
-        <h3>{{ invoice.number }}. Mahnung, RE {{ invoice.id }}</h3>
+        <h3>{{ invoice.number }}. Mahnung Mitgliederbeitrag {{ invoice.year }}</h3>
         {% else %}
-        <h3>RE {{ invoice.id }}</h3>
+        <h3>Rechnung Mitgliederbeitrag {{ invoice.year }}</h3>
         {% endif %}
 
         Liebe{% if member.sex == "M" %}r{% endif %} {{ member.first_name }}
@@ -165,7 +174,7 @@ html #small-address {
         </p>
         {% else %}
         <p>
-            Im Namen des JJJAC stelle ich Dir den Mitgliederbeitrag für das Jahr {{ invoice.year }} in Rechnung.
+            Im Namen des JJJCA stelle ich Dir den Mitgliederbeitrag für das Jahr {{ invoice.year }} in Rechnung.
         </p>
         {% endif %}
 
@@ -203,9 +212,9 @@ html #small-address {
                     <td>{{ invoice.rebate_reason }}</td>
                     <td>
                     {% if invoice.amount_rebate > 0 %}
-                        {{ invoice.amount_rebate }} CHF
+                        - {{ invoice.amount_rebate }} CHF
                     {% elif invoice.percentage_rebate > 0 %}
-                        {{ invoice.percentage_rebate }} %
+                        - {{ invoice.percentage_rebate }} %
                     {% endif %}
                     </td>
                 </tr>
@@ -214,7 +223,7 @@ html #small-address {
                 <tr>
                     <td>Eingegangene Zahlungen</td>
                     <td>
-                        {{ invoice.amount_paid }} CHF
+                        - {{ invoice.amount_paid }} CHF
                     </td>
                 </tr>
                 {% endif %}

@@ -44,74 +44,82 @@
             </form>
             <h3>Open Invoices: {{ invoices | length }}</h3>
             {% for invoice in invoices %}
-                {% if invoice.paid %}
+                {% if invoice.0.paid %}
                     {% set color = "#28a745" %}
                     {% set badge_color = "light" %}
                 {% else %}
                     {% set color = "transparent" %}
                     {% set badge_color = "dark" %}
                 {% endif %}
-                <span class="badge badge-{{ badge_color }}">
-                    RE-{{ invoice.id }}
-                </span>
-                <span class="badge badge-{{ badge_color }}">
-                    {{ invoice.number }}
-                </span>
-                <span class="badge badge-{{ badge_color }}">
-                    {{ invoice.date }}
-                </span>
-                {% if invoice.comment %}
-                <span class="badge badge-{{ badge_color }}">
-                    {{ invoice.comment }}
-                </span>
-                {% endif %}
-                {% if not invoice.paid %}
-                <form class="mark-pay" method="POST">
-                    <input class="btn btn-warning" type="submit" formaction="/invoices/send/{{ invoice.id }}" value="Send" />
-                    <input class="btn btn-success" type="submit" formaction="/invoices/pay/{{ invoice.id }}" value="Mark as paid" />
-                    <input class="btn btn-danger" type="submit" formaction="/invoices/delete/{{ invoice.id }}" value="Delete" />
-                    <a class="btn btn-primary" href="/invoices/pdf/{{ invoice.id }}" target="_BLANK">PDF</a>
-                </form>
-                <form class="member-form-fields" action="/invoices/update/{{ invoice.id }}" method="POST">
-                    <div class="form-row">
-                        <div class="col">
-                            <label>Passport fee</label>
-                            <input name="amount_passport" type="text" value="{{ invoice.amount_passport }}" class="form-control">
+                <div class="member" style="background-color:{{ color }}">
+                    {{ invoice.1.first_name }}
+                    {{ invoice.1.last_name }}
+                    <span class="badge badge-{{ badge_color }}">
+                        RE-{{ invoice.0.id }}
+                    </span>
+                    <span class="badge badge-{{ badge_color }}">
+                        {{ invoice.0.number }}
+                    </span>
+                    <span class="badge badge-{{ badge_color }}">
+                        {{ invoice.0.date }}
+                    </span>
+                    {% if invoice.0.comment %}
+                    <span class="badge badge-{{ badge_color }}">
+                        {{ invoice.0.comment }}
+                    </span>
+                    {% endif %}
+                    {% if not invoice.0.paid %}
+                    <form class="mark-pay" method="POST">
+                        <input class="btn btn-warning" type="submit" formaction="/invoices/send/{{ invoice.0.id }}" value="Send" />
+                        <input class="btn btn-success" type="submit" formaction="/invoices/pay/{{ invoice.0.id }}" value="Mark as paid" />
+                        <input class="btn btn-danger" type="submit" formaction="/invoices/delete/{{ invoice.0.id }}" value="Delete" />
+                        <a class="btn btn-primary" href="/invoices/pdf/{{ invoice.0.id }}" target="_BLANK">PDF</a>
+                    </form>
+                    <form class="member-form-fields" action="/invoices/update/{{ invoice.0.id }}" method="POST">
+                        <div class="form-row">
+                            <div class="col">
+                                <label>Passport fee</label>
+                                <input name="amount_passport" type="text" value="{{ invoice.0.amount_passport }}" class="form-control">
+                            </div>
+                            <div class="col">
+                                <label>Membership fee</label>
+                                <input name="amount_membership" type="text" value="{{ invoice.0.amount_membership }}" class="form-control">
+                            </div>
+                            <div class="col">
+                                <label>Rebate amount</label>
+                                <input name="amount_rebate" type="text" value="{{ invoice.0.amount_rebate }}" class="form-control">
+                            </div>
+                            <div class="col">
+                                <label>Rebate percentage</label>
+                                <input name="percentage_rebate" type="text" value="{{ invoice.0.percentage_rebate }}" class="form-control">
+                            </div>
+                            <div class="col">
+                                <label>Mark as paid</label>
+                                <input name="paid" type="checkbox" value="true" class="form-control">
+                            </div>
                         </div>
-                        <div class="col">
-                            <label>Membership fee</label>
-                            <input name="amount_membership" type="text" value="{{ invoice.amount_membership }}" class="form-control">
+                        <div class="form-row">
+                            <div class="col">
+                                <label>Rebate reason</label>
+                                <input name="rebate_reason" type="text" value="{{ invoice.0.rebate_reason }}" class="form-control">
+                            </div>
+                            <div class="col">
+                                <label>Already paid amount</label>
+                                <input name="amount_paid" type="text" value="{{ invoice.0.amount_paid }}" class="form-control">
+                            </div>
+                            <div class="col">
+                                <label>Comment</label>
+                                <input name="comment" type="text" value="{{ invoice.0.comment }}" class="form-control">
+                            </div>
+                            <div class="col">
+                                <label>Actions</label>
+                                <input class="btn btn-primary form-control" type="submit" value="Update" />
+                            </div>
                         </div>
-                        <div class="col">
-                            <label>Rebate amount</label>
-                            <input name="amount_rebate" type="text" value="{{ invoice.amount_rebate }}" class="form-control">
-                        </div>
-                        <div class="col">
-                            <label>Rebate percentage</label>
-                            <input name="percentage_rebate" type="text" value="{{ invoice.percentage_rebate }}" class="form-control">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="col">
-                            <label>Rebate reason</label>
-                            <input name="rebate_reason" type="text" value="{{ invoice.rebate_reason }}" class="form-control">
-                        </div>
-                        <div class="col">
-                            <label>Already paid amount</label>
-                            <input name="amount_paid" type="text" value="{{ invoice.amount_paid }}" class="form-control">
-                        </div>
-                        <div class="col">
-                            <label>Comment</label>
-                            <input name="comment" type="text" value="{{ invoice.comment }}" class="form-control">
-                        </div>
-                        <div class="col">
-                            <label>Actions</label>
-                            <input class="btn btn-primary form-control" type="submit" value="Update" />
-                        </div>
-                    </div>
-                </form>
-                {% else %}
-                {% endif %}
+                    </form>
+                    {% else %}
+                    {% endif %}
+                </div>
             {% endfor %}
         </div>
     </div>

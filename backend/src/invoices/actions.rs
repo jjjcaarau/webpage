@@ -6,7 +6,7 @@ use std::process::{Command, Stdio};
 use super::model::{Invoice, NewInvoice};
 use crate::events::model::Event;
 use crate::members::model::{Member, MemberType};
-use crate::schema::{invoices};
+use crate::schema::{invoices, members};
 use diesel::prelude::*;
 use rocket::http::ContentType;
 use rocket::http::Status;
@@ -27,11 +27,22 @@ pub fn _list_all(connection: &SqliteConnection) -> Result<Vec<Invoice>, diesel::
     Ok(invoice_list)
 }
 
-pub fn list_all_unpaid(connection: &SqliteConnection) -> Result<Vec<Invoice>, diesel::result::Error> {
+pub fn list_all_unpaid(connection: &SqliteConnection) -> Result<Vec<(Invoice, Member)>, diesel::result::Error> {
     let invoice_list = invoices::table
         .order_by(invoices::columns::id)
         .filter(invoices::columns::paid.eq(false))
         .load::<Invoice>(connection)?;
+
+    let invoice_list = invoice_list.into_iter().map(|invoice| {
+        let member: Member = members::table
+            .filter(members::columns::id.eq(invoice.member_id))
+            .first(connection)
+            .unwrap();
+        (
+            invoice,
+            member,
+        )
+    }).collect();
 
     Ok(invoice_list)
 }
@@ -144,15 +155,14 @@ pub fn generate_invoice(
     let events: Vec<_> = events
         .iter()
         .cloned()
-        // .filter(|event| event.date <= *date)
+        .filter(|event| event.date <= *date)
         .collect();
     let tags = crate::members::actions::get_tags(member, &events);
-    if crate::members::actions::is_paying(&tags) {
-        use chrono::Datelike;
-        let year = date.year();
-
-        let last_invoice = get_last_this_year(connection, member, year);
-
+    use chrono::Datelike;
+    let year = date.year();
+    let last_invoice = get_last_this_year(connection, member, year);
+    if (!events.is_empty() && crate::members::actions::is_paying(&tags))
+    || last_invoice.as_ref().ok().map_or(false, |li| !li.paid)  {
         let (
             last_due_date,
             number,
@@ -225,7 +235,11 @@ pub fn generate_invoice(
             return None;
         }
 
-        let due_date = date.clone() + chrono::Duration::days(30);
+        let due_date = date.clone() + chrono::Duration::days(if number > 0 {
+            CONFIG.general.grace_period_late
+        } else {
+            CONFIG.general.grace_period
+        });
 
         // Create a new invoice.
         let invoice = NewInvoice {
@@ -496,7 +510,7 @@ pub fn generate_pdf(data: &Generate) -> std::process::ChildStdout {
 
 
     let date = chrono::Utc::now().date().naive_utc();
-    let due_date = chrono::Utc::now().date().naive_utc() + chrono::Duration::days(30);
+    let due_date = chrono::Utc::now().date().naive_utc() + chrono::Duration::days(CONFIG.general.grace_period);
 
     let mut context = tera::Context::new();
     context.insert("data", &data);

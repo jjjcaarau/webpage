@@ -2,7 +2,7 @@
 log_level = "Warn"
 blog_root = "../blog/"
 upload_root = "../upload/"
-site_url = "127.0.0.1:8000"
+site_url = "192.168.178.25:8000"
 email = "noreply@jjjcaarau.ch"
 smtp_server = "localhost"
 smtp_port = 2555
@@ -11,10 +11,12 @@ smtp_password = ""
 fee_actives = 420
 fee_kids = 240
 fee_students = 300
+grace_period = 30
+grace_period_late = 15
 
 [rocket]
 environment = "Development"
-address = "127.0.0.1"
+address = "0.0.0.0"
 port = "8000"
 log_level = "Warn"
 secret_key = "8Xui8SN4mI+7egV/9dlfYYLGQJeEx4+DwmSQLwDVXJg="
