@@ -8,5 +8,5 @@ docker run \
     --restart=always \
     -ti \
     -v "/var/www/jjjcaarau.ch/data/:/app/data/" \
-    -e JJJCA_CONFIG=defaults/config/production.toml \
+    -e JJJCA_CONFIG=/app/defaults/config/production.toml \
     -p 8088:1337 jjjcaarau-webpage:production
