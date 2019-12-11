@@ -27,12 +27,8 @@ mkdir -p data/config/
 mkdir -p data/templates/
 mkdir -p data/blog/
 
-if [ "$(ls -A data/templates)" ]; then
-     echo "Templates found, not taking any action."
-else
-    echo "No templates found. Setting up a default ones."
-    cp -R defaults/templates/* data/templates/
-fi
+echo "Copying all templates"
+cp -R defaults/templates/* data/templates/
 
 cd data
 
