@@ -21,8 +21,7 @@ pub fn login(mut cookies: Cookies<'_>, login: Form<Login>) -> Result<Redirect, F
 
     // Request recovery password.
     if login.submit == "recovery" {
-        if let Ok(member) = crate::members::actions::get_by_email(&connection, &login.username)
-        {
+        if let Ok(member) = crate::members::actions::get_by_email(&connection, &login.username) {
             let hash = uuid::Uuid::new_v4().to_string();
 
             crate::members::actions::update_recovery(&connection, &member.0, Some(hash.clone())).unwrap();
