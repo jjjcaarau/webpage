@@ -3,20 +3,6 @@ use crate::schema::*;
 use crate::events::model::EventDivision;
 
 #[derive(
-    Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug, Copy, Clone,
-)]
-#[derivative(Default(bound = ""))]
-pub enum MemberType {
-    #[derivative(Default)]
-    Active,
-    Passive,
-    Parent,
-    Student,
-    Kid,
-    Extern,
-}
-
-#[derive(
     Queryable,
     Identifiable,
     AsChangeset,
@@ -47,7 +33,6 @@ pub struct Member {
     pub comment: String,
     pub email_allowed: bool,
     pub passport_no: String,
-    pub member_type: MemberType,
     pub needs_mark: bool,
     pub section_jujitsu: bool,
     pub section_judo: bool,
@@ -79,7 +64,6 @@ pub struct NewMember {
     pub comment: String,
     pub email_allowed: bool,
     pub passport_no: String,
-    pub member_type: MemberType,
     pub needs_mark: bool,
     pub section_jujitsu: bool,
     pub section_judo: bool,
@@ -109,7 +93,6 @@ pub struct JsonMember {
     pub comment: Option<String>,
     pub email_allowed: bool,
     pub passport_no: Option<String>,
-    pub member_type: MemberType,
     pub needs_mark: bool,
     pub section_jujitsu: bool,
     pub section_judo: bool,
@@ -163,17 +146,4 @@ pub enum Tag {
     Passive,
     Parent,
     Grade(Grade),
-}
-
-impl From<MemberType> for Tag {
-    fn from(member_type: MemberType) -> Self {
-        match member_type {
-            MemberType::Active => Tag::Active,
-            MemberType::Passive => Tag::Passive,
-            MemberType::Parent => Tag::Parent,
-            MemberType::Student => Tag::Student,
-            MemberType::Kid => Tag::Kid,
-            MemberType::Extern => Tag::Extern,
-        }
-    }
 }

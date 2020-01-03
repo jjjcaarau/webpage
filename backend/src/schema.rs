@@ -59,7 +59,6 @@ table! {
         comment -> Text,
         email_allowed -> Bool,
         passport_no -> Text,
-        member_type -> crate::members::model::MemberTypeMapping,
         needs_mark -> Bool,
         section_jujitsu -> Bool,
         section_judo -> Bool,
@@ -70,4 +69,9 @@ table! {
     }
 }
 
-allow_tables_to_appear_in_same_query!(courses, events, invoices, members,);
+allow_tables_to_appear_in_same_query!(
+    courses,
+    events,
+    invoices,
+    members,
+);

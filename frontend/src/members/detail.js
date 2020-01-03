@@ -97,20 +97,6 @@ export const MemberDetail = {
                     checkbox(member, 'section_judo_kids', 'Sektion Judo Kinder'),
                     input(member, 'passport_no', 'Passnummer'),
                     checkbox(member, 'needs_mark', 'Jahresmarke benötigt'),
-                    m('.row.form-group', [
-                        m('label.col-lg-2.col-md-3.col-sm-4.col-form-label', 'Mitglieds-Art'),
-                        m('select.col-lg-10.col-md-9.col-sm-8.form-control', {
-                            onchange: e => member.member_type = e.target.value,
-                            value: member.member_type,
-                        }, [
-                            m('option[value=Active]', 'Aktiv'),
-                            m('option[value=Passive]', 'Passiv'),
-                            m('option[value=Parent]', 'Vormund'),
-                            m('option[value=Student]', 'Student'),
-                            m('option[value=Kid]', 'Kind'),
-                            m('option[value=Extern]', 'Extern'),
-                        ]),
-                    ]),
                     input(member, 'password', 'Passwort', undefined, undefined, true),
                     checkbox(member, 'can_edit_members', 'Kann Member editieren'),
                 ]),

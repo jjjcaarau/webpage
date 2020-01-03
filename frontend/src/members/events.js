@@ -28,12 +28,8 @@ const eventString = event => {
                 case 'Demotion': return 'Rücktritt aus dem Vorstand'
             }
         }
-        case 'Honorary': {
-            return 'Ernennung zum Ehrenmitglied'
-        }
-        case 'Js': {
-            return 'J+S Kurs (' + event.division + ')'
-        }
+        case 'Honorary': return 'Ernennung zum Ehrenmitglied'
+        case 'Js': return 'J+S Kurs (' + event.division + ')'
         case 'Kyu1': return 'Erhalt 1. Kyu ' + event.division
         case 'Kyu2': return 'Erhalt 2. Kyu ' + event.division
         case 'Kyu3': return 'Erhalt 3. Kyu ' + event.division
@@ -49,6 +45,10 @@ const eventString = event => {
         case 'Dan8': return 'Erhalt 8. Dan ' + event.division
         case 'Dan9': return 'Erhalt 9. Dan ' + event.division
         case 'Dan10': return 'Erhalt 10. Dan ' + event.division
+        case 'Active': return 'Statusänderung zu "Aktiv"'
+        case 'Passive': return 'Statusänderung zu "Passiv"'
+        case 'Parent': return 'Statusänderung zu "Elternteil"'
+        case 'Extern': return 'Statusänderung zu "Extern"'
         default: return 'Unbekanntes Ereignis'
     }
 }
@@ -63,12 +63,14 @@ const eventTypeString = event => {
         case 'Kyu': return 'Gurtprüfung'
         case 'Entry': return 'Clubeintritt'
         case 'Resignation': return 'Clubaustritt'
+        case 'Membership': return 'Statusänderung'
     }
 }
 
 /// All possible event types.
 const event_types = [
     'Entry',
+    'Membership',
     'Resignation',
     'Trainer',
     'CoTrainer',
@@ -318,6 +320,58 @@ const KyuEventAdd = {
     }
 }
 
+const MembershipEventAdd = {
+    oninit: function(vnode) {
+        vnode.attrs.transmitter.add = () =>
+            m.request({
+                method: 'POST',
+                url: "/events/create_json",
+                data: {
+                    member_id: vnode.state.member.id,
+                    event_type: vnode.state.event_type,
+                    class: vnode.state.class,
+                    division: vnode.state.division,
+                    comment: vnode.state.comment,
+                    date: vnode.state.date,
+                }
+            })
+        vnode.state.date = getToday()
+        vnode.state.class = 'Promotion'
+        vnode.state.division = 'Club'
+        vnode.state.event_type = 'Active'
+        vnode.state.comment = ''
+        vnode.state.member = vnode.attrs.member
+    },
+    onbeforeupdate: function(vnode) {
+        vnode.state.member = vnode.attrs.member
+        vnode.state.class = vnode.attrs.class
+    },
+    view: function(vnode) {
+        return [
+            ' am ',
+            m('input.form-control[type=text][placeholder=Datum(YYYY-MM-DD)][pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"].', {
+                onchange: e => vnode.state.date = e.target.value,
+                value: vnode.state.date,
+            }),
+            ' zu ',
+            m('select.form-control', {
+                onchange: e => vnode.state.event_type = e.target.value,
+                value: vnode.state.event_type,
+            }, [
+                m('option[value=Active]', 'Aktiv'),
+                m('option[value=Passive]', 'Passiv'),
+                m('option[value=Parent]', 'Elternteil'),
+                m('option[value=Extern]', 'Extern'),
+            ]),
+            ' weil ',
+            m('input.form-control[type=text][placeholder=Kommentar]', {
+                onchange: e => vnode.state.comment = e.target.value,
+                value: vnode.state.comment,
+            }),
+        ]
+    }
+}
+
 export const MemberEvents = {
     oninit: function(vnode) {
         vnode.state.events = vnode.attrs.events;
@@ -368,6 +422,7 @@ export const MemberEvents = {
                     (() => {
                         switch(vnode.state.type) {
                             case 'Entry': return m(ClubEventAdd, { transmitter: vnode.state.transmitter, member, class: 'Promotion' })
+                            case 'Membership': return m(MembershipEventAdd, { transmitter: vnode.state.transmitter, member })
                             case 'Resignation': return m(ClubEventAdd, { transmitter: vnode.state.transmitter, member, class: 'Demotion' })
                             case 'Trainer': return m(TrainerEventAdd, { transmitter: vnode.state.transmitter, member, type: 'Trainer' })
                             case 'CoTrainer': return m(TrainerEventAdd, { transmitter: vnode.state.transmitter, member, type: 'CoTrainer' })

@@ -1,3 +1,4 @@
+use crate::members::actions::{is_kid, is_student, is_active};
 use crate::routes::invoices::Generate;
 use std::io::BufWriter;
 use std::io::Write;
@@ -5,7 +6,7 @@ use std::process::{Command, Stdio};
 
 use super::model::{Invoice, NewInvoice};
 use crate::events::model::Event;
-use crate::members::model::{Member, MemberType};
+use crate::members::model::{Member};
 use crate::schema::{invoices, members};
 use diesel::prelude::*;
 use rocket::http::ContentType;
@@ -200,11 +201,14 @@ pub fn generate_invoice(
             let month = date.month();
 
             // Figure amount based on settings.
-            let amount = match member.member_type {
-                MemberType::Active => CONFIG.general.fee_actives,
-                MemberType::Kid => CONFIG.general.fee_kids,
-                MemberType::Student => CONFIG.general.fee_students,
-                _ => 0,
+            let amount = if is_kid(&tags) {
+                CONFIG.general.fee_kids
+            } else if is_student(&tags) {
+                CONFIG.general.fee_students
+            } else if is_active(&tags) {
+                CONFIG.general.fee_actives
+            } else {
+                0
             };
 
             // Return invoice data factoring in month of the year for under year entries.

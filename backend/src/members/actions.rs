@@ -1,8 +1,9 @@
-use super::model::{Division, Grade, Member, MemberType, NewMember, Tag};
+use super::model::{Division, Grade, Member, NewMember, Tag};
 use crate::events::model::{Event, EventClass, EventDivision, EventType};
 use crate::invoices::model::Invoice;
 use crate::schema::{events, invoices, members};
 use diesel::prelude::*;
+use chrono::Duration;
 
 use crate::error::Error;
 
@@ -225,17 +226,26 @@ pub fn get_stats(connection: &SqliteConnection) -> Stats {
     let paying_members = zipped_members
         .clone()
         .into_iter()
-        .filter(|m| m.0.member_type == MemberType::Active && is_paying(&get_tags(&m.0, &m.1)))
+        .filter(|m| {
+            let tags = get_tags(&m.0, &m.1);
+            is_active(&tags) && is_paying(&tags)
+        })
         .collect::<Vec<_>>();
     let paying_kids = zipped_members
         .clone()
         .into_iter()
-        .filter(|m| m.0.member_type == MemberType::Kid && is_paying(&get_tags(&m.0, &m.1)))
+        .filter(|m| {
+            let tags = get_tags(&m.0, &m.1);
+            is_kid(&tags) && is_paying(&tags)
+        })
         .collect::<Vec<_>>();
     let paying_students = zipped_members
         .clone()
         .into_iter()
-        .filter(|m| m.0.member_type == MemberType::Student && is_paying(&get_tags(&m.0, &m.1)))
+        .filter(|m| {
+            let tags = get_tags(&m.0, &m.1);
+            is_student(&tags) && is_paying(&tags)
+        })
         .collect::<Vec<_>>();
 
     Stats {
@@ -262,7 +272,70 @@ pub fn is_paying(tags: &Vec<Tag>) -> bool {
             _ => (),
         }
     }
-    return true;
+    true
+}
+
+pub fn is_kid(tags: &Vec<Tag>) -> bool {
+    for tag in tags {
+        match tag {
+            Tag::Kid => return true,
+            _ => (),
+        }
+    }
+    false
+}
+
+pub fn is_student(tags: &Vec<Tag>) -> bool {
+    for tag in tags {
+        match tag {
+            Tag::Student => return true,
+            _ => (),
+        }
+    }
+    false
+}
+
+pub fn is_active(tags: &Vec<Tag>) -> bool {
+    for tag in tags {
+        match tag {
+            Tag::Active => return true,
+            _ => (),
+        }
+    }
+    false
+}
+
+/// This function returns the membership type from the set of membership events.
+/// The set should only contain membership events. Otherwise the result is unpredictable.
+pub fn get_membership(member: &Member, membership_events: &mut Vec<&Event>) -> Tag {
+    membership_events.sort_by(
+        |a, b| match b.date.partial_cmp(&a.date).expect("Buggedi bug bug.") {
+            std::cmp::Ordering::Equal => b.id.cmp(&a.id),
+            other => other,
+        },
+    );
+
+    if membership_events.len() > 0 {
+        let last = membership_events[0];
+        match last.event_type {
+            EventType::Active => {
+                let age = chrono::Utc::now().date().naive_utc() - member.birthday;
+                if age <= Duration::days(15 * 365) {
+                    Tag::Kid
+                } else if age >= Duration::days(16 * 365) && age <= Duration::days(19 * 365) {
+                    Tag::Student
+                } else {
+                    Tag::Active
+                }
+            },
+            EventType::Passive => Tag::Passive,
+            EventType::Parent => Tag::Parent,
+            EventType::Extern => Tag::Extern,
+            _ => Tag::Passive
+        }
+    } else {
+        Tag::Passive
+    }
 }
 
 /// Returns all tags a member is associated with.
@@ -273,6 +346,7 @@ pub fn get_tags(member: &Member, events: &Vec<Event>) -> Vec<Tag> {
     let mut cotrainer_events = Vec::new();
     let mut judo_events = Vec::new();
     let mut jujitsu_events = Vec::new();
+    let mut membership_events = Vec::new();
 
     let mut result = vec![];
 
@@ -348,6 +422,15 @@ pub fn get_tags(member: &Member, events: &Vec<Event>) -> Vec<Tag> {
                 _ => (),
             }
         }
+
+        // Get all membership type events.
+        match event.event_type {
+            EventType::Active => membership_events.push(event),
+            EventType::Passive => membership_events.push(event),
+            EventType::Parent => membership_events.push(event),
+            EventType::Extern => membership_events.push(event),
+            _ => ()
+        }
     }
 
     // Check if resigned
@@ -365,10 +448,10 @@ pub fn get_tags(member: &Member, events: &Vec<Event>) -> Vec<Tag> {
         if last.class == EventClass::Demotion {
             result.push(Tag::Resigned);
         } else {
-            result.push(member.member_type.into());
+            result.push(get_membership(member, &mut membership_events));
         }
     } else {
-        result.push(member.member_type.into());
+        result.push(get_membership(member, &mut membership_events));
     }
 
     board_events.sort_by(

@@ -40,6 +40,8 @@ export const Badges = {
 
         let badges = []
 
+        console.log(tags)
+
         tags.forEach(tag => {
             switch(tag) {
                 case 'Active':

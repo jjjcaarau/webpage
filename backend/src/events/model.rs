@@ -26,6 +26,12 @@ pub enum EventType {
     Dan8,
     Dan9,
     Dan10,
+    Active,
+    Passive,
+    Parent,
+    Student,
+    Kid,
+    Extern,
 }
 
 #[derive(Derivative, DbEnum, AsExpression, Serialize, Deserialize, PartialEq, Debug, Clone)]
