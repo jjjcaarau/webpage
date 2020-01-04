@@ -194,7 +194,7 @@ pub fn generate_all(_user: User, generate: Form<GenerateYearly>) -> Redirect {
         &date,
         crate::invoices::actions::InvoiceType::All,
     );
-    Redirect::to("/members/stats")
+    Redirect::to("/invoices/manage")
 }
 
 #[post("/generate_late_notice", data = "<generate>")]
@@ -210,7 +210,7 @@ pub fn generate_late_notice(_user: User, generate: Form<GenerateYearly>) -> Redi
         &date,
         crate::invoices::actions::InvoiceType::LateNotice,
     );
-    Redirect::to("/members/stats")
+    Redirect::to("/invoices/manage")
 }
 
 #[post("/generate_first", data = "<generate>")]
@@ -226,7 +226,7 @@ pub fn generate_first(_user: User, generate: Form<GenerateYearly>) -> Redirect {
         &date,
         crate::invoices::actions::InvoiceType::First,
     );
-    Redirect::to("/members/stats")
+    Redirect::to("/invoices/manage")
 }
 
 #[post("/send/<id>")]
@@ -246,7 +246,7 @@ pub fn send(_user: User, id: i32) -> Redirect {
         crate::invoices::actions::InvoiceType::All,
         false,
     );
-    Redirect::to("/members/stats")
+    Redirect::to("/invoices/manage")
 }
 
 #[post("/send_all")]
@@ -257,7 +257,7 @@ pub fn send_all(_user: User) -> Redirect {
         crate::invoices::actions::InvoiceType::All,
         false,
     );
-    Redirect::to("/members/stats")
+    Redirect::to("/invoices/manage")
 }
 
 #[post("/send_late_notice")]
@@ -268,7 +268,7 @@ pub fn send_late_notice(_user: User) -> Redirect {
         crate::invoices::actions::InvoiceType::LateNotice,
         false,
     );
-    Redirect::to("/members/stats")
+    Redirect::to("/invoices/manage")
 }
 
 #[post("/send_first")]
@@ -279,7 +279,7 @@ pub fn send_first(_user: User) -> Redirect {
         crate::invoices::actions::InvoiceType::First,
         false,
     );
-    Redirect::to("/members/stats")
+    Redirect::to("/invoices/manage")
 }
 
 // #[get("/generate_invoices", rank = 2)]

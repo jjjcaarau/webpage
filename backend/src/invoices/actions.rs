@@ -359,6 +359,7 @@ pub fn generate_invoices(
     match invoice_type {
         InvoiceType::All | InvoiceType::LateNotice => {
             let unpaid = list_all_unpaid(connection).unwrap();
+            println!("{}", unpaid.len());
             for (invoice, member, events) in unpaid {
                 if let Some((invoice, last_invoice, last_due_date)) = generate_late_notice(connection, &member, &events, date) {
                     count += if try_generate_late_notice(connection, &last_due_date, &invoice, last_invoice.as_ref(), &member) {
