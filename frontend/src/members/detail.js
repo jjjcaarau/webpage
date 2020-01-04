@@ -76,7 +76,6 @@ export const MemberDetail = {
                         ]),
                     ]),
                     input(member, 'birthday', 'Geburtstag*', '[0-9]{4}-[0-9]{2}-[0-9]{2}', 'YYYY-MM-DD'),
-                    checkbox(member, 'email_allowed', 'Möchte Emails'),
                     input(member, 'email', 'Email'),
                     input(member, 'phone_p', 'Telefon (P)'),
                     input(member, 'phone_w', 'Telefon (G)'),
