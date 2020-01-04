@@ -6,8 +6,8 @@ use std::process::{Command, Stdio};
 
 use super::model::{Invoice, NewInvoice};
 use crate::events::model::Event;
-use crate::members::model::{Member};
-use crate::schema::{invoices, members};
+use crate::members::model::Member;
+use crate::schema::invoices;
 use diesel::prelude::*;
 use rocket::http::ContentType;
 use rocket::http::Status;
@@ -28,7 +28,7 @@ pub fn _list_all(connection: &SqliteConnection) -> Result<Vec<Invoice>, diesel::
     Ok(invoice_list)
 }
 
-pub fn list_all_unpaid(connection: &SqliteConnection) -> Result<Vec<(Invoice, Member, Vec<Event>)>, diesel::result::Error> {
+pub fn list_all_unpaid(connection: &SqliteConnection) -> Result<Vec<(Invoice, Member)>, diesel::result::Error> {
     let invoice_list = invoices::table
         .order_by(invoices::columns::id)
         .filter(invoices::columns::paid.eq(false))
@@ -39,7 +39,6 @@ pub fn list_all_unpaid(connection: &SqliteConnection) -> Result<Vec<(Invoice, Me
         (
             invoice,
             member_data.0,
-            member_data.1,
         )
     }).collect();
 
@@ -150,183 +149,120 @@ pub fn generate_invoice(
     member: &Member,
     events: &Vec<Event>,
     date: &chrono::NaiveDate,
-) -> Option<(NewInvoice, Option<Invoice>, chrono::NaiveDate)> {
+) -> Option<NewInvoice> {
     let tags = crate::members::actions::get_tags(member, &events, date);
     use chrono::Datelike;
     let year = date.year();
     let last_invoice = get_last_this_year(connection, member, year);
-    if (!events.is_empty() && crate::members::actions::is_paying(&tags))
-    || last_invoice.as_ref().ok().map_or(false, |li| !li.paid)  {
-        if last_invoice.is_err() {
-            // First invoice this year.
-            let month = date.month();
+    if !events.is_empty() && crate::members::actions::is_paying(&tags) && last_invoice.is_err() {
+        // First invoice this year.
+        let month = date.month();
 
-            // Figure amount based on settings.
-            let amount = if is_kid(&tags) {
-                CONFIG.general.fee_kids
-            } else if is_student(&tags) {
-                CONFIG.general.fee_students
-            } else if is_active(&tags) {
-                CONFIG.general.fee_actives
-            } else {
-                0
-            };
-
-            // Return invoice data factoring in month of the year for under year entries.
-            // TODO: fix numbers after testing!
-            let factor = if month <= 3 {
-                1.0
-            } else if month > 3 && month <= 9 {
-                0.5
-            } else {
-                0.0
-            };
-            let last_due_date = chrono::Utc::now().date().naive_utc();
-            let number = 0;
-            let amount_paid = 0;
-            let amount_membership = (amount as f32 * factor) as i32;
-            let amount_passport = 0;
-            let amount_rebate = 0;
-            let percentage_rebate = 0;
-            let rebate_reason = String::new();
-            let last_invoice = None;
-
-            // If there was no passport ordered and no fee is due
-            // (members with a passport and club entry in months 10 to 12), do not create a invoice.
-            if amount_membership == 0 && amount_passport == 0 {
-                return None;
-            }
-
-            let due_date = date.clone() + chrono::Duration::days(CONFIG.general.grace_period);
-
-            // Create a new invoice.
-            let invoice = NewInvoice {
-                member_id: member.id,
-                year,
-                date: date.clone(),
-                due_date,
-                sent: None,
-                sent_as: Default::default(),
-                number,
-                amount_passport,
-                amount_membership,
-                amount_paid,
-                amount_rebate,
-                percentage_rebate,
-                rebate_reason,
-                paid: false,
-                comment: String::default(),
-            };
-
-            return Some((invoice, last_invoice, last_due_date));
-        };
-    }
-    return None;
-}
-
-pub fn generate_late_notice(
-    connection: &SqliteConnection,
-    member: &Member,
-    events: &Vec<Event>,
-    date: &chrono::NaiveDate,
-) -> Option<(NewInvoice, Option<Invoice>, chrono::NaiveDate)> {
-    let tags = crate::members::actions::get_tags(member, &events, date);
-    use chrono::Datelike;
-    let year = date.year();
-    let last_invoice = get_last_this_year(connection, member, year);
-    if (!events.is_empty() && crate::members::actions::is_paying(&tags))
-    || last_invoice.as_ref().ok().map_or(false, |li| !li.paid)  {
-        if let Ok(last_invoice) = last_invoice {
-            // First invoice this year was already created.
-
-            let last_invoice_clone = last_invoice.clone();
-
-            // If invoice this year was already paid, don't take action ofc.
-            if last_invoice.paid {
-                return None;
-            }
-
-            let last_due_date = last_invoice.due_date;
-            // Make sure we advance the invoice number to account for unpaid history.
-            let number = last_invoice.number + 1;
-            let amount_paid = last_invoice.amount_paid;
-            let amount_membership = last_invoice.amount_membership;
-            let amount_passport = last_invoice.amount_passport;
-            let amount_rebate = last_invoice.amount_rebate;
-            let percentage_rebate = last_invoice.percentage_rebate;
-            let rebate_reason = last_invoice.rebate_reason;
-            let last_invoice = Some(last_invoice_clone);
-
-            // If there was no passport ordered and no fee is due
-            // (members with a passport and club entry in months 10 to 12), do not create a invoice.
-            if amount_membership == 0 && amount_passport == 0 {
-                return None;
-            }
-
-            let due_date = date.clone() + chrono::Duration::days(CONFIG.general.grace_period_late);
-
-            // Create a new invoice.
-            let invoice = NewInvoice {
-                member_id: member.id,
-                year,
-                date: date.clone(),
-                due_date,
-                sent: None,
-                sent_as: Default::default(),
-                number,
-                amount_passport,
-                amount_membership,
-                amount_paid,
-                amount_rebate,
-                percentage_rebate,
-                rebate_reason,
-                paid: false,
-                comment: String::default(),
-            };
-
-            return Some((invoice, last_invoice, last_due_date));
-        }
-    }
-    return None;
-}
-
-fn try_generate_late_notice(
-    connection: &SqliteConnection,
-    last_due_date: &chrono::NaiveDate,
-    invoice: &NewInvoice,
-    last_invoice: Option<&Invoice>,
-    member: &Member,
-) -> bool {
-    if invoice.number > 0 && last_due_date < &chrono::Utc::now().date().naive_utc() {
-        create(connection, &invoice).unwrap();
-        if last_invoice.map(|li| confirm_paid(connection, li)).is_some() {
-            println!(
-                "Generated {}. late notice for {} {}.",
-                invoice.number, member.first_name, member.last_name
-            );
-            true
+        // Figure amount based on settings.
+        let amount = if is_kid(&tags) {
+            CONFIG.general.fee_kids
+        } else if is_student(&tags) {
+            CONFIG.general.fee_students
+        } else if is_active(&tags) {
+            CONFIG.general.fee_actives
         } else {
-            false
-        }
+            0
+        };
+
+        // Return invoice data factoring in month of the year for under year entries.
+        let factor = if month <= 3 {
+            1.0
+        } else if month > 3 && month <= 9 {
+            0.5
+        } else {
+            // If there was no passport ordered and no fee is due
+            // (members with a passport and club entry in months 10 to 12), do not create a invoice.
+            return None;
+        };
+
+        // Create a new invoice.
+        Some(NewInvoice {
+            member_id: member.id,
+            year,
+            date: date.clone(),
+            due_date: date.clone() + chrono::Duration::days(CONFIG.general.grace_period),
+            sent: None,
+            sent_as: Default::default(),
+            number: 0,
+            amount_passport: 0,
+            amount_membership: (amount as f32 * factor) as i32,
+            amount_paid: 0,
+            amount_rebate: 0,
+            percentage_rebate: 0,
+            rebate_reason: String::new(),
+            paid: false,
+            comment: String::default(),
+        })
     } else {
-        false
+        None
     }
 }
 
-fn try_generate_first(
+/// Creates a new invoice data object as a late notice from an existing invoice.
+pub fn generate_late_notice(
+    member: &Member,
+    last_invoice: &Invoice,
+    date: &chrono::NaiveDate,
+) -> NewInvoice {
+    NewInvoice {
+        member_id: member.id,
+        year: last_invoice.year,
+        date: date.clone(),
+        due_date: date.clone() + chrono::Duration::days(CONFIG.general.grace_period_late),
+        sent: None,
+        sent_as: Default::default(),
+        number: last_invoice.number + 1,
+        amount_passport: last_invoice.amount_passport,
+        amount_membership: last_invoice.amount_membership,
+        amount_paid: last_invoice.amount_paid,
+        amount_rebate: last_invoice.amount_rebate,
+        percentage_rebate: last_invoice.percentage_rebate,
+        rebate_reason: last_invoice.rebate_reason.clone(),
+        paid: false,
+        comment: String::default(),
+    }
+}
+
+/// Tries to create a new database entry for the given invoice.
+/// Returns an Error if it fails.
+fn try_create_late_notice(
+    connection: &SqliteConnection,
+    invoice: &NewInvoice,
+    last_invoice: &Invoice,
+    member: &Member,
+) -> crate::error::Result<()> {
+    if invoice.number > 0 && last_invoice.due_date < chrono::Utc::now().date().naive_utc() {
+        create(connection, &invoice)?;
+        confirm_paid(connection, last_invoice)?;
+        println!(
+            "Generated {}. late notice for {} {}.",
+            invoice.number, member.first_name, member.last_name
+        );
+        Ok(())
+    } else {
+        Err(Error::NotDue)
+    }
+}
+
+fn try_create_first(
     connection: &SqliteConnection,
     invoice: &NewInvoice,
     member: &Member,
-) -> bool {
+) -> crate::error::Result<()> {
     if invoice.number == 0 {
-        create(connection, &invoice).unwrap();
+        create(connection, &invoice)?;
         println!(
             "Generated first invoice for {} {}.",
             member.first_name, member.last_name
         );
-        true
+        Ok(())
     } else {
-        false
+        Err(Error::NotDue)
     }
 }
 
@@ -341,8 +277,8 @@ pub fn generate_invoices(
     match invoice_type {
         InvoiceType::All | InvoiceType::First => {
             for member in members {
-                if let Some((invoice, last_invoice, last_due_date)) = generate_invoice(connection, &member.0, &member.1, date) {
-                    count += if try_generate_first(connection, &invoice, &member.0) {
+                if let Some(invoice) = generate_invoice(connection, &member.0, &member.1, date) {
+                    count += if try_create_first(connection, &invoice, &member.0).is_ok() {
                         1
                     } else {
                         0
@@ -360,14 +296,13 @@ pub fn generate_invoices(
         InvoiceType::All | InvoiceType::LateNotice => {
             let unpaid = list_all_unpaid(connection).unwrap();
             println!("{}", unpaid.len());
-            for (invoice, member, events) in unpaid {
-                if let Some((invoice, last_invoice, last_due_date)) = generate_late_notice(connection, &member, &events, date) {
-                    count += if try_generate_late_notice(connection, &last_due_date, &invoice, last_invoice.as_ref(), &member) {
-                        1
-                    } else {
-                        0
-                    };
-                }
+            for (last_invoice, member) in unpaid {
+                let invoice = generate_late_notice(&member, &last_invoice, date);
+                count += if try_create_late_notice(connection, &invoice, &last_invoice, &member).is_ok() {
+                    1
+                } else {
+                    0
+                };
             }
         },
         _ => (),

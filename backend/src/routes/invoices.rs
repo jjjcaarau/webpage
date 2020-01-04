@@ -1,6 +1,5 @@
 use crate::invoices::model::Invoice;
 use crate::members::model::Member;
-use crate::events::model::Event;
 use rocket::http::Status;
 use rocket::request::Form;
 use rocket::response::{Flash, Redirect};
@@ -64,6 +63,7 @@ pub fn update(id: i32, update: Form<Update>) -> Flash<Redirect> {
             Flash::error(Redirect::to("/invoices/manage"), "Internal Server Error")
         }
         Err(Error::NotFound) => Flash::error(Redirect::to("/invoices/manage"), "Invoice not found."),
+        _ => unreachable!("This should never be reached. Please file a bug."),
     }
 }
 
@@ -87,6 +87,7 @@ pub fn pay(id: i32) -> Flash<Redirect> {
             Flash::error(Redirect::to("/invoices/manage"), "Internal Server Error")
         }
         Err(Error::NotFound) => Flash::error(Redirect::to("/invoices/manage"), "Invoice not found."),
+        _ => unreachable!("This should never be reached. Please file a bug."),
     }
 }
 
@@ -109,6 +110,7 @@ pub fn delete(id: i32) -> Flash<Redirect> {
             Flash::error(Redirect::to("/invoices/manage"), "Internal Server Error")
         }
         Err(Error::NotFound) => Flash::error(Redirect::to("/invoices/manage"), "Invoice not found."),
+        _ => unreachable!("This should never be reached. Please file a bug."),
     }
 }
 
@@ -125,6 +127,7 @@ pub fn pdf(id: i32) -> Result<crate::invoices::actions::YearlyInvoiceData, Statu
         }
         Err(Error::Diesel(_)) => Err(Status::InternalServerError),
         Err(Error::NotFound) => Err(Status::NotFound),
+        _ => unreachable!("This should never be reached. Please file a bug."),
     }
 }
 
@@ -150,7 +153,7 @@ pub struct Generate {
 
 #[derive(Debug, Serialize)]
 pub struct Invoices {
-    pub invoices: Vec<(Invoice, Member, Vec<Event>)>,
+    pub invoices: Vec<(Invoice, Member)>,
 }
 
 #[get("/manage")]

@@ -82,6 +82,7 @@ pub fn view_json(_user: User, id: i32) -> Json<ViewResult> {
         }
         Err(Error::Diesel(_)) => panic!("Internal Server Error"),
         Err(Error::NotFound) => panic!("Not Found"),
+        _ => unreachable!("This should never be reached. Please file a bug."),
     }
 }
 
