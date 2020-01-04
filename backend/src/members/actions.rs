@@ -322,9 +322,9 @@ pub fn get_membership(member: &Member, membership_events: &mut Vec<&Event>) -> T
         match last.event_type {
             EventType::Active => {
                 let age = chrono::Utc::now().date().naive_utc() - member.birthday;
-                if age <= Duration::days(15 * 365) {
+                if age <= Duration::days(16 * 365 - 1) {
                     Tag::Kid
-                } else if age >= Duration::days(16 * 365) && age <= Duration::days(19 * 365) {
+                } else if age >= Duration::days(16 * 365) && age <= Duration::days(20 * 365 - 1) {
                     Tag::Student
                 } else {
                     Tag::Active
