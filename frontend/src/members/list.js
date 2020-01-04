@@ -177,13 +177,71 @@ const generateExcel = function(vnode) {
     };
     wb.SheetNames.push("Members");
 
-    let ws_data = [['Vorname' , 'Nachname']];  //a row with 2 columns
+    let ws_data = [[
+        'Ausgetreten',
+        'Vorname',
+        'Zweitname',
+        'Nachname',
+        'Geburtsdatum',
+        'Geschlecht',
+        'E-Mail',
+        'Telefon Privat',
+        'Telefon Geschäft',
+        'Telefon Mobil',
+        'PLZ',
+        'Wohnort',
+        'Strasse',
+        'Hausnummer',
+        'Bemerkungen',
+        'Sektion Ju Jitsu',
+        'Sektion Judo Erwachsene',
+        'Sektion Judo Kinder',
+        'Passnummer',
+        'Benötigt Jahresmarke',
+        'Mitgliedsart',
+        'Trainer',
+        'Kyu Judo',
+        'Kyu Ju-Jitsu',
+        'Eintritt',
+        'Austritt',
+        'Ehrenmittglied',
+        'Extern',
+        'Vorstand'
+    ]];
 
     vnode.state.filteredMembers.forEach(member => {
         ws_data.push([
+            member[3].includes('Resigned'),
             member[0].first_name,
+            member[0].second_name,
             member[0].last_name,
+            member[0].birthday,
+            member[0].sex,
+            member[0].email,
+            member[0].phone_p,
+            member[0].phone_w,
+            member[0].mobile,
+            member[0].postcode,
+            member[0].city,
+            member[0].address,
+            member[0].address_no,
+            member[0].comment,
+            member[0].section_jujitsu,
+            member[0].section_judo,
+            member[0].section_judo_kids,
+            member[0].passport_no,
+            member[0].needs_mark,
+            // member[0]. Mitgliedsart,
+            // member[0]. Trainer,
+            // member[0]. Kyu Judo,
+            // member[0]. Kyu Ju-Jitsu,
+            // member[0]. Eintritt,
+            // member[0]. Austritt,
+            // member[0]. Ehrenmittglied,
+            // member[0]. Extern,
+            // member[0]. Vorstand
         ])
+        console.log(member)
     });
 
     let ws = XLSX.utils.aoa_to_sheet(ws_data);
