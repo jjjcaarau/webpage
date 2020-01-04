@@ -28,20 +28,18 @@ pub fn _list_all(connection: &SqliteConnection) -> Result<Vec<Invoice>, diesel::
     Ok(invoice_list)
 }
 
-pub fn list_all_unpaid(connection: &SqliteConnection) -> Result<Vec<(Invoice, Member)>, diesel::result::Error> {
+pub fn list_all_unpaid(connection: &SqliteConnection) -> Result<Vec<(Invoice, Member, Vec<Event>)>, diesel::result::Error> {
     let invoice_list = invoices::table
         .order_by(invoices::columns::id)
         .filter(invoices::columns::paid.eq(false))
         .load::<Invoice>(connection)?;
 
     let invoice_list = invoice_list.into_iter().map(|invoice| {
-        let member: Member = members::table
-            .filter(members::columns::id.eq(invoice.member_id))
-            .first(connection)
-            .unwrap();
+        let member_data = crate::members::actions::get(connection, invoice.member_id).unwrap();
         (
             invoice,
-            member,
+            member_data.0,
+            member_data.1,
         )
     }).collect();
 
@@ -159,39 +157,7 @@ pub fn generate_invoice(
     let last_invoice = get_last_this_year(connection, member, year);
     if (!events.is_empty() && crate::members::actions::is_paying(&tags))
     || last_invoice.as_ref().ok().map_or(false, |li| !li.paid)  {
-        let (
-            last_due_date,
-            number,
-            amount_paid,
-            amount_membership,
-            amount_passport,
-            amount_rebate,
-            percentage_rebate,
-            rebate_reason,
-            last_invoice,
-        ) = if let Ok(last_invoice) = last_invoice {
-            // First invoice this year was already created.
-
-            let last_invoice_clone = last_invoice.clone();
-
-            // If invoice this year was already paid, don't take action ofc.
-            if last_invoice.paid {
-                return None;
-            }
-
-            // Make sure we advance the invoice number to account for unpaid history.
-            (
-                last_invoice.due_date,
-                last_invoice.number + 1,
-                last_invoice.amount_paid,
-                last_invoice.amount_membership,
-                last_invoice.amount_passport,
-                last_invoice.amount_rebate,
-                last_invoice.percentage_rebate,
-                last_invoice.rebate_reason,
-                Some(last_invoice_clone),
-            )
-        } else {
+        if last_invoice.is_err() {
             // First invoice this year.
             let month = date.month();
 
@@ -215,51 +181,111 @@ pub fn generate_invoice(
             } else {
                 0.0
             };
-            (
-                chrono::Utc::now().date().naive_utc(),
-                0,
-                0,
-                (amount as f32 * factor) as i32,
-                0,
-                0,
-                0,
-                String::new(),
-                None,
-            )
-        };
+            let last_due_date = chrono::Utc::now().date().naive_utc();
+            let number = 0;
+            let amount_paid = 0;
+            let amount_membership = (amount as f32 * factor) as i32;
+            let amount_passport = 0;
+            let amount_rebate = 0;
+            let percentage_rebate = 0;
+            let rebate_reason = String::new();
+            let last_invoice = None;
 
-        // If there was no passport ordered and no fee is due
-        // (members with a passport and club entry in months 10 to 12), do not create a invoice.
-        if amount_membership == 0 && amount_passport == 0 {
-            return None;
+            // If there was no passport ordered and no fee is due
+            // (members with a passport and club entry in months 10 to 12), do not create a invoice.
+            if amount_membership == 0 && amount_passport == 0 {
+                return None;
+            }
+
+            let due_date = date.clone() + chrono::Duration::days(CONFIG.general.grace_period);
+
+            // Create a new invoice.
+            let invoice = NewInvoice {
+                member_id: member.id,
+                year,
+                date: date.clone(),
+                due_date,
+                sent: None,
+                sent_as: Default::default(),
+                number,
+                amount_passport,
+                amount_membership,
+                amount_paid,
+                amount_rebate,
+                percentage_rebate,
+                rebate_reason,
+                paid: false,
+                comment: String::default(),
+            };
+
+            return Some((invoice, last_invoice, last_due_date));
+        };
+    }
+    return None;
+}
+
+pub fn generate_late_notice(
+    connection: &SqliteConnection,
+    member: &Member,
+    events: &Vec<Event>,
+    date: &chrono::NaiveDate,
+) -> Option<(NewInvoice, Option<Invoice>, chrono::NaiveDate)> {
+    let tags = crate::members::actions::get_tags(member, &events, date);
+    use chrono::Datelike;
+    let year = date.year();
+    let last_invoice = get_last_this_year(connection, member, year);
+    if (!events.is_empty() && crate::members::actions::is_paying(&tags))
+    || last_invoice.as_ref().ok().map_or(false, |li| !li.paid)  {
+        if let Ok(last_invoice) = last_invoice {
+            // First invoice this year was already created.
+
+            let last_invoice_clone = last_invoice.clone();
+
+            // If invoice this year was already paid, don't take action ofc.
+            if last_invoice.paid {
+                return None;
+            }
+
+            let last_due_date = last_invoice.due_date;
+            // Make sure we advance the invoice number to account for unpaid history.
+            let number = last_invoice.number + 1;
+            let amount_paid = last_invoice.amount_paid;
+            let amount_membership = last_invoice.amount_membership;
+            let amount_passport = last_invoice.amount_passport;
+            let amount_rebate = last_invoice.amount_rebate;
+            let percentage_rebate = last_invoice.percentage_rebate;
+            let rebate_reason = last_invoice.rebate_reason;
+            let last_invoice = Some(last_invoice_clone);
+
+            // If there was no passport ordered and no fee is due
+            // (members with a passport and club entry in months 10 to 12), do not create a invoice.
+            if amount_membership == 0 && amount_passport == 0 {
+                return None;
+            }
+
+            let due_date = date.clone() + chrono::Duration::days(CONFIG.general.grace_period_late);
+
+            // Create a new invoice.
+            let invoice = NewInvoice {
+                member_id: member.id,
+                year,
+                date: date.clone(),
+                due_date,
+                sent: None,
+                sent_as: Default::default(),
+                number,
+                amount_passport,
+                amount_membership,
+                amount_paid,
+                amount_rebate,
+                percentage_rebate,
+                rebate_reason,
+                paid: false,
+                comment: String::default(),
+            };
+
+            return Some((invoice, last_invoice, last_due_date));
         }
-
-        let due_date = date.clone() + chrono::Duration::days(if number > 0 {
-            CONFIG.general.grace_period_late
-        } else {
-            CONFIG.general.grace_period
-        });
-
-        // Create a new invoice.
-        let invoice = NewInvoice {
-            member_id: member.id,
-            year,
-            date: date.clone(),
-            due_date,
-            sent: None,
-            sent_as: Default::default(),
-            number,
-            amount_passport,
-            amount_membership,
-            amount_paid,
-            amount_rebate,
-            percentage_rebate,
-            rebate_reason,
-            paid: false,
-            comment: String::default(),
-        };
-
-        return Some((invoice, last_invoice, last_due_date));
     }
     return None;
 }
@@ -312,40 +338,41 @@ pub fn generate_invoices(
     let members = crate::members::actions::list_all(connection).unwrap();
 
     let mut count = 0;
-    for member in members {
-        if let Some((invoice, last_invoice, last_due_date)) = generate_invoice(connection, &member.0, &member.1, date) {
-            match invoice_type {
-                InvoiceType::All => {
-                    count += if try_generate_late_notice(connection, &last_due_date, &invoice, last_invoice.as_ref(), &member.0) {
-                        1
-                    } else {
-                        0
-                    };
+    match invoice_type {
+        InvoiceType::All | InvoiceType::First => {
+            for member in members {
+                if let Some((invoice, last_invoice, last_due_date)) = generate_invoice(connection, &member.0, &member.1, date) {
                     count += if try_generate_first(connection, &invoice, &member.0) {
-                        1
-                    } else {
-                        0
-                    };
-                }
-                InvoiceType::First => {
-                    count += if try_generate_first(connection, &invoice, &member.0) {
-                        1
-                    } else {
-                        0
-                    };
-                }
-                InvoiceType::LateNotice => {
-                    count += if try_generate_late_notice(connection, &last_due_date, &invoice, last_invoice.as_ref(), &member.0) {
                         1
                     } else {
                         0
                     };
                 }
             }
-        }
+        },
+        _ => (),
     }
 
     println!("Generated {} invoices.", count);
+
+    count = 0;
+    match invoice_type {
+        InvoiceType::All | InvoiceType::LateNotice => {
+            let unpaid = list_all_unpaid(connection).unwrap();
+            for (invoice, member, events) in unpaid {
+                if let Some((invoice, last_invoice, last_due_date)) = generate_late_notice(connection, &member, &events, date) {
+                    count += if try_generate_late_notice(connection, &last_due_date, &invoice, last_invoice.as_ref(), &member) {
+                        1
+                    } else {
+                        0
+                    };
+                }
+            }
+        },
+        _ => (),
+    }
+
+    println!("Generated {} late notices.", count);
 }
 
 pub fn send_invoice(

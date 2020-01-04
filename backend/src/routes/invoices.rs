@@ -1,5 +1,6 @@
 use crate::invoices::model::Invoice;
 use crate::members::model::Member;
+use crate::events::model::Event;
 use rocket::http::Status;
 use rocket::request::Form;
 use rocket::response::{Flash, Redirect};
@@ -149,7 +150,7 @@ pub struct Generate {
 
 #[derive(Debug, Serialize)]
 pub struct Invoices {
-    pub invoices: Vec<(Invoice, Member)>,
+    pub invoices: Vec<(Invoice, Member, Vec<Event>)>,
 }
 
 #[get("/manage")]
