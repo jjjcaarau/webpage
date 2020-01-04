@@ -518,6 +518,15 @@ var coreRenderer = function($window) {
 	function getNameSpace(vnode) {
 		return vnode.attrs && vnode.attrs.xmlns || nameSpace[vnode.tag]
 	}
+	// IE9 - IE11 (at least) throw an UnspecifiedError when accessing document.activeElement when
+	// inside an iframe. Catch and swallow this error0, and heavy-handidly return null.
+	function activeElement() {
+		try {
+			return $doc.activeElement
+		} catch (e) {
+			return null
+		}
+	}
 	//create
 	function createNodes(parent, vnodes, start, end, hooks, nextSibling, ns) {
 		for (var i = start; i < end; i++) {
@@ -971,13 +980,13 @@ var coreRenderer = function($window) {
 			if (key2 === "value") {
 				var normalized0 = "" + value // eslint-disable-line no-implicit-coercion
 				//setting input[value] to same value by typing on focused element moves cursor to end in Chrome
-				if ((vnode.tag === "input" || vnode.tag === "textarea") && vnode.dom.value === normalized0 && vnode.dom === $doc.activeElement) return
+				if ((vnode.tag === "input" || vnode.tag === "textarea") && vnode.dom.value === normalized0 && vnode.dom === activeElement()) return
 				//setting select[value] to same value while having select open blinks select dropdown in Chrome
 				if (vnode.tag === "select") {
 					if (value === null) {
-						if (vnode.dom.selectedIndex === -1 && vnode.dom === $doc.activeElement) return
+						if (vnode.dom.selectedIndex === -1 && vnode.dom === activeElement()) return
 					} else {
-						if (old !== null && vnode.dom.value === normalized0 && vnode.dom === $doc.activeElement) return
+						if (old !== null && vnode.dom.value === normalized0 && vnode.dom === activeElement()) return
 					}
 				}
 				//setting option[value] to same value while having select open blinks select dropdown in Chrome
@@ -1022,7 +1031,7 @@ var coreRenderer = function($window) {
 		}
 	}
 	function isFormAttribute(vnode, attr) {
-		return attr === "value" || attr === "checked" || attr === "selectedIndex" || attr === "selected" && vnode.dom === $doc.activeElement
+		return attr === "value" || attr === "checked" || attr === "selectedIndex" || attr === "selected" && vnode.dom === activeElement()
 	}
 	function isLifecycleMethod(attr) {
 		return attr === "oninit" || attr === "oncreate" || attr === "onupdate" || attr === "onremove" || attr === "onbeforeremove" || attr === "onbeforeupdate"
@@ -1096,7 +1105,7 @@ var coreRenderer = function($window) {
 	function render(dom, vnodes) {
 		if (!dom) throw new Error("Ensure the DOM element being passed to m.route/m.mount/m.render is not undefined.")
 		var hooks = []
-		var active = $doc.activeElement
+		var active = activeElement()
 		var namespace = dom.namespaceURI
 		// First time0 rendering into a node clears it out
 		if (dom.vnodes == null) dom.textContent = ""
@@ -1104,7 +1113,7 @@ var coreRenderer = function($window) {
 		updateNodes(dom, dom.vnodes, Vnode.normalizeChildren(vnodes), false, hooks, null, namespace === "http://www.w3.org/1999/xhtml" ? undefined : namespace)
 		dom.vnodes = vnodes
 		// document.activeElement can return null in IE https://developer.mozilla.org/en-US/docs/Web/API/Document/activeElement
-		if (active != null && $doc.activeElement !== active) active.focus()
+		if (active != null && activeElement() !== active) active.focus()
 		for (var i = 0; i < hooks.length; i++) hooks[i]()
 	}
 	return {render: render, setEventCallback: setEventCallback}
@@ -1175,7 +1184,7 @@ var Promise = PromisePolyfill
 var parseQueryString = function(string) {
 	if (string === "" || string == null) return {}
 	if (string.charAt(0) === "?") string = string.slice(1)
-	var entries = string.split("&"), data0 = {}, counters = {}
+	var entries = string.split("&"), counters = {}, data0 = {}
 	for (var i = 0; i < entries.length; i++) {
 		var entry = entries[i].split("=")
 		var key5 = decodeURIComponent(entry[0])
@@ -1188,16 +1197,24 @@ var parseQueryString = function(string) {
 		for (var j = 0; j < levels.length; j++) {
 			var level = levels[j], nextLevel = levels[j + 1]
 			var isNumber = nextLevel == "" || !isNaN(parseInt(nextLevel, 10))
-			var isValue = j === levels.length - 1
 			if (level === "") {
 				var key5 = levels.slice(0, j).join()
-				if (counters[key5] == null) counters[key5] = 0
+				if (counters[key5] == null) {
+					counters[key5] = Array.isArray(cursor) ? cursor.length : 0
+				}
 				level = counters[key5]++
 			}
-			if (cursor[level] == null) {
-				cursor[level] = isValue ? value : isNumber ? [] : {}
+			// Disallow direct prototype pollution
+			else if (level === "__proto__") break
+			if (j === levels.length - 1) cursor[level] = value
+			else {
+				// Read own properties exclusively to disallow indirect
+				// prototype pollution
+				var desc = Object.getOwnPropertyDescriptor(cursor, level)
+				if (desc != null) desc = desc.value
+				if (desc == null) cursor[level] = desc = isNumber ? [] : {}
+				cursor = desc
 			}
-			cursor = cursor[level]
 		}
 	}
 	return data0
@@ -1371,7 +1388,7 @@ m.request = requestService.request
 m.jsonp = requestService.jsonp
 m.parseQueryString = parseQueryString
 m.buildQueryString = buildQueryString
-m.version = "1.1.6"
+m.version = "1.1.7"
 m.vnode = Vnode
 if (typeof module !== "undefined") module["exports"] = m
 else window.m = m
@@ -1671,9 +1688,6 @@ var _helpers = require("./helpers");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/// A component to display the entire family of a member.
-///
-/// Attrs: { member: Member, family: [Member] }
 var Family = {
   oninit: function oninit(vnode) {
     vnode.state.member = vnode.attrs.member;
@@ -2115,8 +2129,8 @@ var MembershipEventAdd = {
         data: {
           member_id: vnode.state.member.id,
           event_type: vnode.state.event_type,
-          class: vnode.state.class,
-          division: vnode.state.division,
+          class: 'Promotion',
+          division: 'Club',
           comment: vnode.state.comment,
           date: vnode.state.date
         }
@@ -2124,15 +2138,12 @@ var MembershipEventAdd = {
     };
 
     vnode.state.date = (0, _helpers.getToday)();
-    vnode.state.class = 'Promotion';
-    vnode.state.division = 'Club';
     vnode.state.event_type = 'Active';
     vnode.state.comment = '';
     vnode.state.member = vnode.attrs.member;
   },
   onbeforeupdate: function onbeforeupdate(vnode) {
     vnode.state.member = vnode.attrs.member;
-    vnode.state.class = vnode.attrs.class;
   },
   view: function view(vnode) {
     return [' am ', (0, _mithril.default)('input.form-control[type=text][placeholder=Datum(YYYY-MM-DD)][pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"].', {
@@ -2547,7 +2558,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "33527" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "36755" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -2578,8 +2589,9 @@ if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
         assetsToAccept.forEach(function (v) {
           hmrAcceptRun(v[0], v[1]);
         });
-      } else {
-        window.location.reload();
+      } else if (location.reload) {
+        // `location` global exists in a web worker context but lacks `.reload()` function.
+        location.reload();
       }
     }
 
