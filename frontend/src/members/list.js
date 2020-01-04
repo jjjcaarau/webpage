@@ -30,12 +30,6 @@ function copyTextToClipboard(text) {
 }
 
 const filterMembers = function(vnode) {
-    
-    // 'section' ['judo', 'ju jitsu', 'jujitsu']
-    // 'type' ['aktiv', 'passiv', 'kind' 'ausgetreten', 'extern']
-    // 'range'
-    // 'vorname', 'nachname'
-    
     let filters = vnode.state.tags.map(
         t => t
             .trim()
@@ -202,16 +196,69 @@ const generateExcel = function(vnode) {
         'Trainer',
         'Kyu Judo',
         'Kyu Ju-Jitsu',
-        'Eintritt',
-        'Austritt',
         'Ehrenmittglied',
-        'Extern',
         'Vorstand'
     ]];
 
     vnode.state.filteredMembers.forEach(member => {
+        let memberType = 'Ausgetreten';
+        let trainerType = 'Nein';
+        let kyu = {
+            Judo: '6. Kyu',
+            JuJitsu: '6. Kyu',
+        };
+        let honorary = 'Nein';
+        let board = 'Nein';
+
+        member[3].forEach((tag) => {
+            switch(tag) {
+                case 'Active':
+                    memberType = 'Aktiv';
+                    break;
+                case 'Passive':
+                    memberType = 'Passiv';
+                    break;
+                case 'Student':
+                    memberType = 'Schüler';
+                    break;
+                case 'Parent':
+                    memberType = 'Elternteil';
+                    break;
+                case 'Kid':
+                    memberType = 'Kind';
+                    break;
+                case 'Extern':
+                    memberType = 'Extern';
+                    break;
+                case 'Trainer':
+                    trainerType = 'Trainer';
+                    break;
+                case 'CoTrainer':
+                    trainerType = 'Co-Trainer';
+                    break;
+                case 'Honorary':
+                    honorary = 'Ja';
+                    break;
+                case 'Board':
+                    board = 'Ja';
+                    break;
+                default:
+                    break;
+            }
+
+            if(tag.Grade) {
+                console.log(tag.Grade)
+                if(tag.Grade.Dan) {
+                    kyu[tag.Grade.Dan[0]] = tag.Grade.Dan[1] + '. Dan ';
+                }
+                if(tag.Grade.Kyu) {
+                    kyu[tag.Grade.Kyu[0]] = tag.Grade.Kyu[1] + '. Kyu ';
+                }
+            }
+        })
+
         ws_data.push([
-            member[3].includes('Resigned'),
+            member[3].includes('Resigned') ? 'Ja' : 'Nein',
             member[0].first_name,
             member[0].second_name,
             member[0].last_name,
@@ -226,22 +273,18 @@ const generateExcel = function(vnode) {
             member[0].address,
             member[0].address_no,
             member[0].comment,
-            member[0].section_jujitsu,
-            member[0].section_judo,
-            member[0].section_judo_kids,
+            member[0].section_jujitsu ? 'Ja' : 'Nein',
+            member[0].section_judo ? 'Ja' : 'Nein',
+            member[0].section_judo_kids ? 'Ja' : 'Nein',
             member[0].passport_no,
-            member[0].needs_mark,
-            // member[0]. Mitgliedsart,
-            // member[0]. Trainer,
-            // member[0]. Kyu Judo,
-            // member[0]. Kyu Ju-Jitsu,
-            // member[0]. Eintritt,
-            // member[0]. Austritt,
-            // member[0]. Ehrenmittglied,
-            // member[0]. Extern,
-            // member[0]. Vorstand
+            member[0].needs_mark ? 'Ja' : 'Nein',
+            memberType,
+            trainerType,
+            kyu.Judo,
+            kyu.JuJitsu,
+            honorary,
+            board,
         ])
-        console.log(member)
     });
 
     let ws = XLSX.utils.aoa_to_sheet(ws_data);

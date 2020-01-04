@@ -65024,10 +65024,6 @@ function copyTextToClipboard(text) {
 }
 
 var filterMembers = function filterMembers(vnode) {
-  // 'section' ['judo', 'ju jitsu', 'jujitsu']
-  // 'type' ['aktiv', 'passiv', 'kind' 'ausgetreten', 'extern']
-  // 'range'
-  // 'vorname', 'nachname'
   var filters = vnode.state.tags.map(function (t) {
     return t.trim().split(':').map(function (t) {
       return t.trim();
@@ -65191,7 +65187,6 @@ var filterMembers = function filterMembers(vnode) {
   }).map(function (m) {
     return m[0].email;
   }).join(',');
-  console.log(vnode.state.mails);
 };
 
 var generateExcel = function generateExcel(vnode) {
@@ -65204,11 +65199,75 @@ var generateExcel = function generateExcel(vnode) {
     CreatedDate: new Date().now
   };
   wb.SheetNames.push("Members");
-  var ws_data = [['Vorname', 'Nachname']]; //a row with 2 columns
-
+  var ws_data = [['Ausgetreten', 'Vorname', 'Zweitname', 'Nachname', 'Geburtsdatum', 'Geschlecht', 'E-Mail', 'Telefon Privat', 'Telefon Geschäft', 'Telefon Mobil', 'PLZ', 'Wohnort', 'Strasse', 'Hausnummer', 'Bemerkungen', 'Sektion Ju Jitsu', 'Sektion Judo Erwachsene', 'Sektion Judo Kinder', 'Passnummer', 'Benötigt Jahresmarke', 'Mitgliedsart', 'Trainer', 'Kyu Judo', 'Kyu Ju-Jitsu', 'Ehrenmittglied', 'Vorstand']];
   vnode.state.filteredMembers.forEach(function (member) {
-    console.log(member);
-    ws_data.push([member[0].first_name, member[0].last_name]);
+    var memberType = 'Ausgetreten';
+    var trainerType = 'Nein';
+    var kyu = {
+      Judo: '6. Kyu',
+      JuJitsu: '6. Kyu'
+    };
+    var honorary = 'Nein';
+    var board = 'Nein';
+    member[3].forEach(function (tag) {
+      switch (tag) {
+        case 'Active':
+          memberType = 'Aktiv';
+          break;
+
+        case 'Passive':
+          memberType = 'Passiv';
+          break;
+
+        case 'Student':
+          memberType = 'Schüler';
+          break;
+
+        case 'Parent':
+          memberType = 'Elternteil';
+          break;
+
+        case 'Kid':
+          memberType = 'Kind';
+          break;
+
+        case 'Extern':
+          memberType = 'Extern';
+          break;
+
+        case 'Trainer':
+          trainerType = 'Trainer';
+          break;
+
+        case 'CoTrainer':
+          trainerType = 'Co-Trainer';
+          break;
+
+        case 'Honorary':
+          honorary = 'Ja';
+          break;
+
+        case 'Board':
+          board = 'Ja';
+          break;
+
+        default:
+          break;
+      }
+
+      if (tag.Grade) {
+        console.log(tag.Grade);
+
+        if (tag.Grade.Dan) {
+          kyu[tag.Grade.Dan[0]] = tag.Grade.Dan[1] + '. Dan ';
+        }
+
+        if (tag.Grade.Kyu) {
+          kyu[tag.Grade.Kyu[0]] = tag.Grade.Kyu[1] + '. Kyu ';
+        }
+      }
+    });
+    ws_data.push([member[3].includes('Resigned') ? 'Ja' : 'Nein', member[0].first_name, member[0].second_name, member[0].last_name, member[0].birthday, member[0].sex, member[0].email, member[0].phone_p, member[0].phone_w, member[0].mobile, member[0].postcode, member[0].city, member[0].address, member[0].address_no, member[0].comment, member[0].section_jujitsu ? 'Ja' : 'Nein', member[0].section_judo ? 'Ja' : 'Nein', member[0].section_judo_kids ? 'Ja' : 'Nein', member[0].passport_no, member[0].needs_mark ? 'Ja' : 'Nein', memberType, trainerType, kyu.Judo, kyu.JuJitsu, honorary, board]);
   });
 
   var ws = _xlsx.default.utils.aoa_to_sheet(ws_data);
@@ -65423,7 +65482,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "39625" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "39967" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
