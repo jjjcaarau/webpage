@@ -164,7 +164,6 @@ const filterMembers = function(vnode) {
         .filter(m => m[0].email_allowed)
         .map(m => m[0].email)
         .join(',')
-    console.log(vnode.state.mails)
 }
 
 const generateExcel = function(vnode) {
@@ -181,7 +180,6 @@ const generateExcel = function(vnode) {
     let ws_data = [['Vorname' , 'Nachname']];  //a row with 2 columns
 
     vnode.state.filteredMembers.forEach(member => {
-        console.log(member)
         ws_data.push([
             member[0].first_name,
             member[0].last_name,
