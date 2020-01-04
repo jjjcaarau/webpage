@@ -34,7 +34,7 @@ pub fn list_all(
     let tag_list = member_list
         .iter()
         .zip(event_list.iter())
-        .map(|(m, e)| get_tags(m, e))
+        .map(|(m, e)| get_tags(m, e, &chrono::Utc::now().date().naive_utc()))
         .collect::<Vec<_>>();
     Ok(itertools::izip!(
         member_list.into_iter(),
@@ -71,7 +71,7 @@ pub fn get(
         })
         .order_by(members::columns::birthday)
         .load::<Member>(connection)?;
-    let tag_list = get_tags(&member, &event_list);
+    let tag_list = get_tags(&member, &event_list, &chrono::Utc::now().date().naive_utc());
 
     Ok((member, event_list, family_list, tag_list))
 }
@@ -102,7 +102,7 @@ pub fn get_by_email(
         })
         .order_by(members::columns::birthday)
         .load::<Member>(connection)?;
-    let tag_list = get_tags(&member, &event_list);
+    let tag_list = get_tags(&member, &event_list, &chrono::Utc::now().date().naive_utc());
 
     Ok((member, event_list, family_list, tag_list))
 }
@@ -229,7 +229,7 @@ pub fn get_stats(connection: &SqliteConnection) -> Stats {
         .clone()
         .into_iter()
         .filter(|m| {
-            let tags = get_tags(&m.0, &m.1);
+            let tags = get_tags(&m.0, &m.1, &chrono::Utc::now().date().naive_utc());
             is_active(&tags) && is_paying(&tags)
         })
         .collect::<Vec<_>>();
@@ -237,7 +237,7 @@ pub fn get_stats(connection: &SqliteConnection) -> Stats {
         .clone()
         .into_iter()
         .filter(|m| {
-            let tags = get_tags(&m.0, &m.1);
+            let tags = get_tags(&m.0, &m.1, &chrono::Utc::now().date().naive_utc());
             is_kid(&tags) && is_paying(&tags)
         })
         .collect::<Vec<_>>();
@@ -245,7 +245,7 @@ pub fn get_stats(connection: &SqliteConnection) -> Stats {
         .clone()
         .into_iter()
         .filter(|m| {
-            let tags = get_tags(&m.0, &m.1);
+            let tags = get_tags(&m.0, &m.1, &chrono::Utc::now().date().naive_utc());
             is_student(&tags) && is_paying(&tags)
         })
         .collect::<Vec<_>>();
@@ -341,7 +341,7 @@ pub fn get_membership(member: &Member, membership_events: &mut Vec<&Event>) -> T
 }
 
 /// Returns all tags a member is associated with.
-pub fn get_tags(member: &Member, events: &Vec<Event>) -> Vec<Tag> {
+pub fn get_tags(member: &Member, events: &Vec<Event>, date: &chrono::NaiveDate) -> Vec<Tag> {
     let mut club_events = Vec::new();
     let mut board_events = Vec::new();
     let mut trainer_events = Vec::new();
@@ -351,6 +351,10 @@ pub fn get_tags(member: &Member, events: &Vec<Event>) -> Vec<Tag> {
     let mut membership_events = Vec::new();
 
     let mut result = vec![];
+
+    let events = events
+        .iter()
+        .filter(|event| event.date <= *date);
 
     for event in events {
         // Find club events.

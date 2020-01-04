@@ -153,12 +153,7 @@ pub fn generate_invoice(
     events: &Vec<Event>,
     date: &chrono::NaiveDate,
 ) -> Option<(NewInvoice, Option<Invoice>, chrono::NaiveDate)> {
-    let events: Vec<_> = events
-        .iter()
-        .cloned()
-        .filter(|event| event.date <= *date)
-        .collect();
-    let tags = crate::members::actions::get_tags(member, &events);
+    let tags = crate::members::actions::get_tags(member, &events, date);
     use chrono::Datelike;
     let year = date.year();
     let last_invoice = get_last_this_year(connection, member, year);
