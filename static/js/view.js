@@ -1495,10 +1495,11 @@ var input = function input(storage, key, text, pattern, placeholder, isPassword)
 var checkbox = function checkbox(storage, key, text) {
   return (0, _mithril.default)('.row.form-group', [(0, _mithril.default)('.col-lg-2.col-md-3.col-sm-4', (0, _mithril.default)('label', {
     for: 'field-' + key
-  }, text)), (0, _mithril.default)('.form-check.col-lg-10.col-md-9.col-sm-8', [(0, _mithril.default)('input[type=checkbox].form-check-input' + (storage[key] ? '[checked]' : ''), {
+  }, text)), (0, _mithril.default)('.form-check.col-lg-10.col-md-9.col-sm-8', [(0, _mithril.default)('input[type=checkbox].form-check-input', {
     name: storage[key],
     placeholder: text,
     id: 'field-' + key,
+    checked: storage[key],
     onchange: function onchange(e) {
       return storage[key] = !storage[key];
     }
@@ -1542,12 +1543,12 @@ var MemberDetail = {
         return member.sex = e.target.value;
       },
       value: member.sex
-    }, [(0, _mithril.default)('option[value=F]', 'Weiblich'), (0, _mithril.default)('option[value=M]', 'Männlich')])]), input(member, 'birthday', 'Geburtstag*', '[0-9]{4}-[0-9]{2}-[0-9]{2}', 'YYYY-MM-DD'), checkbox(member, 'email_allowed', 'Möchte Emails'), input(member, 'email', 'Email'), input(member, 'phone_p', 'Telefon (P)'), input(member, 'phone_w', 'Telefon (G)'), input(member, 'mobile', 'Mobiltelefon'), input(member, 'address', 'Strasse*'), input(member, 'address_no', 'Hausnummer*'), input(member, 'postcode', 'PLZ*'), input(member, 'city', 'Wohnort*'), (0, _mithril.default)('.row.form-group', [(0, _mithril.default)('label.col-lg-2.col-md-3.col-sm-4.col-form-label', 'Bemerkungen'), (0, _mithril.default)('textarea[name=comment].col-lg-10.col-md-9.col-sm-8.form-control[placeholder="Bemerkungen"]', {
+    }, [(0, _mithril.default)('option[value=F]', 'Weiblich'), (0, _mithril.default)('option[value=M]', 'Männlich')])]), input(member, 'birthday', 'Geburtstag*', '[0-9]{4}-[0-9]{2}-[0-9]{2}', 'YYYY-MM-DD'), input(member, 'email', 'Email'), input(member, 'phone_p', 'Telefon (P)'), input(member, 'phone_w', 'Telefon (G)'), input(member, 'mobile', 'Mobiltelefon'), input(member, 'address', 'Strasse*'), input(member, 'address_no', 'Hausnummer*'), input(member, 'postcode', 'PLZ*'), input(member, 'city', 'Wohnort*'), (0, _mithril.default)('.row.form-group', [(0, _mithril.default)('label.col-lg-2.col-md-3.col-sm-4.col-form-label', 'Bemerkungen'), (0, _mithril.default)('textarea[name=comment].col-lg-10.col-md-9.col-sm-8.form-control[placeholder="Bemerkungen"]', {
       value: member.comment,
       oninput: function oninput(e) {
         return member.comment = e.target.value;
       }
-    })]), checkbox(member, 'section_jujitsu', 'Sektion Ju Jitsu'), checkbox(member, 'section_judo', 'Sektion Judo'), checkbox(member, 'section_judo_kids', 'Sektion Judo Kinder'), input(member, 'passport_no', 'Passnummer'), checkbox(member, 'needs_mark', 'Jahresmarke benötigt'), input(member, 'password', 'Passwort', undefined, undefined, true), checkbox(member, 'can_edit_members', 'Kann Member editieren')]), (0, _mithril.default)('.row', [(0, _mithril.default)('.col-1', [!vnode.state.working ? (0, _mithril.default)('button[type="submit"].btn.btn-primary', {
+    })]), checkbox(member, 'section_jujitsu', 'Sektion Ju Jitsu'), checkbox(member, 'section_judo', 'Sektion Judo'), checkbox(member, 'section_judo_kids', 'Sektion Judo Kinder'), input(member, 'passport_no', 'Passnummer'), checkbox(member, 'first_club', 'Stammverein'), checkbox(member, 'needs_mark', 'Jahresmarke benötigt'), input(member, 'password', 'Passwort', undefined, undefined, true), checkbox(member, 'can_edit_members', 'Kann Member editieren')]), (0, _mithril.default)('.row', [(0, _mithril.default)('.col-1', [!vnode.state.working ? (0, _mithril.default)('button[type="submit"].btn.btn-primary', {
       onclick: function onclick(e) {
         e.preventDefault();
         updateMember(vnode);
@@ -2328,10 +2329,8 @@ var Badges = {
   },
   view: function view(vnode) {
     var member = vnode.state.member;
-    var events = vnode.state.events;
     var tags = vnode.state.tags;
     var badges = [];
-    console.log(tags);
     tags.forEach(function (tag) {
       switch (tag) {
         case 'Active':
@@ -2470,7 +2469,7 @@ var MemberView = {
       id: 0,
       sex: 'F',
       member_type: 'Active',
-      email_allowed: false,
+      first_club: true,
       needs_mark: false,
       section_jujitsu: false,
       section_judo: false,
@@ -2558,7 +2557,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "39967" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "45343" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

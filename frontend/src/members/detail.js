@@ -19,10 +19,11 @@ const checkbox = (storage, key, text) =>
     m('.row.form-group', [
         m('.col-lg-2.col-md-3.col-sm-4', m('label', { for: 'field-' + key }, text)),
         m('.form-check.col-lg-10.col-md-9.col-sm-8', [
-            m('input[type=checkbox].form-check-input' + (storage[key] ? '[checked]' : ''), {
+            m('input[type=checkbox].form-check-input', {
                 name: storage[key],
                 placeholder: text,
                 id: 'field-' + key,
+                checked: storage[key],
                 onchange: (e) => storage[key] = !storage[key],
             }),
         ])
@@ -95,6 +96,7 @@ export const MemberDetail = {
                     checkbox(member, 'section_judo', 'Sektion Judo'),
                     checkbox(member, 'section_judo_kids', 'Sektion Judo Kinder'),
                     input(member, 'passport_no', 'Passnummer'),
+                    checkbox(member, 'first_club', 'Stammverein'),
                     checkbox(member, 'needs_mark', 'Jahresmarke benötigt'),
                     input(member, 'password', 'Passwort', undefined, undefined, true),
                     checkbox(member, 'can_edit_members', 'Kann Member editieren'),

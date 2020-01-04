@@ -13,7 +13,7 @@ export const MemberView = {
             id: 0,
             sex: 'F',
             member_type: 'Active',
-            email_allowed: false,
+            first_club: true,
             needs_mark: false,
             section_jujitsu: false,
             section_judo: false,

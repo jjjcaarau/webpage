@@ -155,7 +155,6 @@ const filterMembers = function(vnode) {
     });
 
     vnode.state.mails = vnode.state.filteredMembers
-        .filter(m => m[0].email_allowed)
         .map(m => m[0].email)
         .join(',')
 }

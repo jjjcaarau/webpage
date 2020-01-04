@@ -57,7 +57,7 @@ table! {
         address -> Text,
         address_no -> Text,
         comment -> Text,
-        email_allowed -> Bool,
+        first_club -> Bool,
         passport_no -> Text,
         needs_mark -> Bool,
         section_jujitsu -> Bool,

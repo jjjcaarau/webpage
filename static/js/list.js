@@ -65182,9 +65182,7 @@ var filterMembers = function filterMembers(vnode) {
 
     return 0; //default return value (no sorting)
   });
-  vnode.state.mails = vnode.state.filteredMembers.filter(function (m) {
-    return m[0].email_allowed;
-  }).map(function (m) {
+  vnode.state.mails = vnode.state.filteredMembers.map(function (m) {
     return m[0].email;
   }).join(',');
 };
@@ -65482,7 +65480,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "39967" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "45343" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

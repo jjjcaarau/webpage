@@ -1,75 +1,3 @@
-ALTER TABLE events RENAME TO events_old;
-CREATE TABLE events (
-    id INTEGER PRIMARY KEY NOT NULL,
-    member_id INTEGER NOT NULL,
-    event_type TEXT CHECK(event_type IN (
-        'trainer',
-        'co_trainer',
-        'club',
-        'board',
-        'honorary',
-        'js',
-        'kyu1',
-        'kyu2',
-        'kyu3',
-        'kyu4',
-        'kyu5',
-        'dan1',
-        'dan2',
-        'dan3',
-        'dan4',
-        'dan5',
-        'dan6',
-        'dan7',
-        'dan8',
-        'dan9',
-        'dan10',
-        'active',
-        'passive',
-        'parent',
-        'extern'
-    )) NOT NULL,
-    class TEXT CHECK(class IN('promotion', 'demotion')) NOT NULL,
-    division TEXT CHECK(division IN ('club', 'judo', 'jujitsu')) NOT NULL,
-    comment TEXT NULL,
-    date DATE NOT NULL
-);
-
-INSERT INTO events (
-    id,
-    member_id,
-    event_type,
-    class,
-    division,
-    comment,
-    date
-) SELECT
-    id,
-    member_id,
-    event_type,
-    class,
-    division,
-    comment,
-    date
-FROM events_old;
-
-INSERT INTO events (
-    member_id,
-    event_type,
-    class,
-    division,
-    comment,
-    date
-)
-SELECT
-    id as member_id,
-    REPLACE(REPLACE(member_type, 'kid', 'active'), 'student', 'active') as event_type,
-    'promotion' as class,
-    'club' as division,
-    NULL as comment,
-    date('now') as date
-FROM members;
-
 ALTER TABLE members RENAME TO members_old;
 CREATE TABLE members (
     id INTEGER PRIMARY KEY NOT NULL,
@@ -88,7 +16,7 @@ CREATE TABLE members (
     address TEXT NOT NULL,
     address_no TEXT NOT NULL,
     comment TEXT NOT NULL,
-    email_allowed BOOLEAN NOT NULL,
+    first_club BOOLEAN NOT NULL,
     passport_no TEXT NOT NULL,
     needs_mark BOOLEAN NOT NULL,
     section_jujitsu BOOLEAN NOT NULL,
@@ -116,7 +44,7 @@ INSERT INTO members (
     address,
     address_no,
     comment,
-    email_allowed,
+    first_club,
     passport_no,
     needs_mark,
     section_jujitsu,
@@ -142,7 +70,7 @@ INSERT INTO members (
     address,
     address_no,
     comment,
-    email_allowed,
+    1,
     passport_no,
     needs_mark,
     section_jujitsu,
@@ -152,7 +80,5 @@ INSERT INTO members (
     password_recovery,
     can_edit_members
 FROM members_old;
-
-DROP TABLE events_old;
 
 DROP TABLE members_old;

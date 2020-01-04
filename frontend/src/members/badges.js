@@ -35,12 +35,9 @@ export const Badges = {
     },
     view: function(vnode) {
         let member = vnode.state.member;
-        let events = vnode.state.events;
         let tags = vnode.state.tags;
 
         let badges = []
-
-        console.log(tags)
 
         tags.forEach(tag => {
             switch(tag) {
