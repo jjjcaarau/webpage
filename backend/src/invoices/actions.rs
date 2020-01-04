@@ -218,7 +218,7 @@ pub fn generate_invoice(
             } else if month > 3 && month <= 9 {
                 0.5
             } else {
-                1.0
+                0.0
             };
             (
                 chrono::Utc::now().date().naive_utc(),
