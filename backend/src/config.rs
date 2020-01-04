@@ -36,6 +36,7 @@ pub struct General {
     pub fee_actives: i32,
     pub fee_kids: i32,
     pub fee_students: i32,
+    pub fee_passport: i32,
     pub grace_period: i64,
     pub grace_period_late: i64,
 }

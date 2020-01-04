@@ -49,8 +49,6 @@ pub fn send(
     let build_result = builder.build();
     let email = build_result?;
 
-    dbg!(&CONFIG.general);
-
     let smtp_server = CONFIG.general.smtp_server.clone();
     let smtp_port = CONFIG.general.smtp_port;
     let smtp_username = CONFIG.general.smtp_username.clone();

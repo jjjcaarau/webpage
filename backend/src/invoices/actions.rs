@@ -6,7 +6,7 @@ use std::process::{Command, Stdio};
 
 use super::model::{Invoice, NewInvoice};
 use crate::events::model::Event;
-use crate::members::model::Member;
+use crate::members::model::{Member, Tag, Grade};
 use crate::schema::invoices;
 use diesel::prelude::*;
 use rocket::http::ContentType;
@@ -169,6 +169,16 @@ pub fn generate_invoice(
             0
         };
 
+        let mut needs_passport = false;
+        for tag in tags {
+            if let Tag::Grade(grade) = tag {
+                match grade {
+                    Grade::Kyu(_division, n) => if n > 5 { needs_passport = true; },
+                    Grade::Dan(_division, _n) => (),
+                }
+            }
+        }
+
         // Return invoice data factoring in month of the year for under year entries.
         let factor = if month <= 3 {
             1.0
@@ -189,7 +199,7 @@ pub fn generate_invoice(
             sent: None,
             sent_as: Default::default(),
             number: 0,
-            amount_passport: 0,
+            amount_passport: if needs_passport { CONFIG.general.fee_passport } else { 0 },
             amount_membership: (amount as f32 * factor) as i32,
             amount_paid: 0,
             amount_rebate: 0,
@@ -295,7 +305,6 @@ pub fn generate_invoices(
     match invoice_type {
         InvoiceType::All | InvoiceType::LateNotice => {
             let unpaid = list_all_unpaid(connection).unwrap();
-            println!("{}", unpaid.len());
             for (last_invoice, member) in unpaid {
                 let invoice = generate_late_notice(&member, &last_invoice, date);
                 count += if try_create_late_notice(connection, &invoice, &last_invoice, &member).is_ok() {

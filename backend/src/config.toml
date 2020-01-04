@@ -11,6 +11,7 @@ smtp_password = ""
 fee_actives = 420
 fee_kids = 240
 fee_students = 300
+fee_passport = 50
 grace_period = 30
 grace_period_late = 15
 
