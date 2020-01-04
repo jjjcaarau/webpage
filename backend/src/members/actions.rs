@@ -1,8 +1,10 @@
+
+use diesel::prelude::*;
+
 use super::model::{Division, Grade, Member, NewMember, Tag};
 use crate::events::model::{Event, EventClass, EventDivision, EventType};
 use crate::invoices::model::Invoice;
 use crate::schema::{events, invoices, members};
-use diesel::prelude::*;
 use chrono::Duration;
 
 use crate::error::Error;

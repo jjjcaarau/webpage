@@ -1,3 +1,6 @@
+import XLSX from 'xlsx'
+import { saveAs } from 'file-saver'
+
 function fallbackCopyTextToClipboard(text) {
     var textArea = document.createElement("textarea");
     textArea.value = text;
@@ -164,6 +167,47 @@ const filterMembers = function(vnode) {
     console.log(vnode.state.mails)
 }
 
+const generateExcel = function(vnode) {
+    let wb = XLSX.utils.book_new();
+
+    wb.Props = {
+        Title: "JJJCAarau Members List",
+        Subject: "",
+        Author: "JJJCAarau Webpage",
+        CreatedDate: new Date().now
+    };
+    wb.SheetNames.push("Members");
+
+    let ws_data = [['Vorname' , 'Nachname']];  //a row with 2 columns
+
+    vnode.state.filteredMembers.forEach(member => {
+        console.log(member)
+        ws_data.push([
+            member[0].first_name,
+            member[0].last_name,
+        ])
+    });
+
+    let ws = XLSX.utils.aoa_to_sheet(ws_data);
+    wb.Sheets["Members"] = ws;
+
+    let wbout = XLSX.write(wb, { bookType:'xlsx',  type: 'binary' });
+    return wbout;
+}
+
+const downloadExcel = function(vnode) {
+    let data = generateExcel(vnode)
+
+    function s2ab(s) { 
+        var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+        var view = new Uint8Array(buf);  //create uint8array as viewer
+        for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+        return buf;    
+    }
+
+    saveAs(new Blob([s2ab(data)],{type:"application/octet-stream"}), 'test.xlsx');
+}
+
 import { TagInput, Tag, Icon, Icons, Intent, Size, CustomSelect, Button, Collapse, ControlGroup, Card } from 'construct-ui'
 
 const ordering = [
@@ -219,6 +263,12 @@ var MembersList = {
                         window.location = '/members/view/0'
                     },
                 }),
+                m(Button, {
+                    iconLeft: Icons.PLUS,
+                    label: 'Exel-Liste exportieren',
+                    intent: 'primary',
+                    onclick: () => downloadExcel(vnode),
+                }),
                 // m(Button, {
                 //     label: 'Filter-Hilfe anzeigen',
                 //     onclick: () => {
@@ -238,9 +288,7 @@ var MembersList = {
                 m('br'),
                 m('a', { href: 'mailto:' + vnode.state.mails }, 'Email an Liste schreiben ...'),
             ])),
-            // 'section' ['judo', 'ju jitsu', 'jujitsu']
-            // 'type' ['aktiv', 'passiv', 'kind' 'ausgetreten', 'extern']
-            // 'vorname', 'nachname'
+            
             m('div.col-12', [
                 'Filter sind einzugeben mit dem Format ', m('b', 'filter:wert'), '. Zum Beispiel ', m('b', 'sektion:jujitsu'), ' oder ', m('b', 's:jj'), '.',
                 m('br'),
