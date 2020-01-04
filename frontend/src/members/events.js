@@ -329,22 +329,19 @@ const MembershipEventAdd = {
                 data: {
                     member_id: vnode.state.member.id,
                     event_type: vnode.state.event_type,
-                    class: vnode.state.class,
-                    division: vnode.state.division,
+                    class: 'Promotion',
+                    division: 'Club',
                     comment: vnode.state.comment,
                     date: vnode.state.date,
                 }
             })
         vnode.state.date = getToday()
-        vnode.state.class = 'Promotion'
-        vnode.state.division = 'Club'
         vnode.state.event_type = 'Active'
         vnode.state.comment = ''
         vnode.state.member = vnode.attrs.member
     },
     onbeforeupdate: function(vnode) {
         vnode.state.member = vnode.attrs.member
-        vnode.state.class = vnode.attrs.class
     },
     view: function(vnode) {
         return [
