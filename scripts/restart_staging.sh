@@ -9,4 +9,6 @@ docker run \
     -ti \
     -v "/var/www/staging.jjjcaarau.ch/data/:/app/data/" \
     -e JJJCA_CONFIG=/app/defaults/config/staging.toml \
-    -p 8087:1337 jjjcaarau-webpage:staging
+    -p 8087:1337 \
+    -p 13377:13377 \
+    jjjcaarau-webpage:staging

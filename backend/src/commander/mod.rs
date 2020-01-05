@@ -3,22 +3,22 @@ mod invoices;
 
 use bufstream::BufStream;
 use std::io::{BufRead, Write};
-use std::os::unix::net::{UnixListener, UnixStream};
+use std::net::{TcpListener, TcpStream};
 use std::thread::{self, JoinHandle};
 use structopt::StructOpt;
 
 use crate::config::CONFIG;
 
-fn handle_client(stream: UnixStream) {
+fn handle_client(stream: TcpStream) {
     let mut stream = BufStream::new(stream);
     loop {
         let mut s = String::new();
         s += "cli ";
         stream.read_line(&mut s).unwrap();
-        let opt = cli::Opt::from_iter(s.trim().split(" "));
+        let opt = cli::Opt::from_iter_safe(s.trim().split(" "));
 
         match opt {
-            cli::Opt::Invoice(invoice) => match invoice {
+            Ok(cli::Opt::Invoice(invoice)) => match invoice {
                 cli::Invoice::Generate { typ } => match &typ[..] {
                     "all" => invoices::generate_all(),
                     "first" => invoices::generate_first(),
@@ -32,6 +32,7 @@ fn handle_client(stream: UnixStream) {
                     t => println!("Action type \"{}\" does not exist.", t),
                 },
             },
+            Err(e) => println!("{}", e.message),
         }
 
         stream.flush().unwrap();
@@ -40,7 +41,8 @@ fn handle_client(stream: UnixStream) {
 
 pub fn init() -> JoinHandle<()> {
     thread::spawn(|| {
-        let listener = UnixListener::bind(&CONFIG.api.socket_path).unwrap();
+        let listener = TcpListener::bind(&CONFIG.api.connection_string).unwrap();
+        println!("Commander listening on {}.", &CONFIG.api.connection_string);
 
         for stream in listener.incoming() {
             match stream {

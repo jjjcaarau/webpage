@@ -26,4 +26,4 @@ recaptcha_private_key = ""
 recaptcha_url = "https://www.google.com/recaptcha/api/siteverify"
 
 [api]
-socket_path = "/tmp/jjjca_control.sock"
+connection_string = "127.0.0.1:13377"

@@ -9,4 +9,6 @@ docker run \
     -ti \
     -v "/var/www/jjjcaarau.ch/data/:/app/data/" \
     -e JJJCA_CONFIG=/app/defaults/config/production.toml \
-    -p 8088:1337 jjjcaarau-webpage:production
+    -p 8088:1337 \
+    -p 13377:13377 \
+    jjjcaarau-webpage:production

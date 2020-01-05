@@ -43,7 +43,7 @@ pub struct General {
 
 #[derive(Debug, Deserialize)]
 pub struct Api {
-    pub socket_path: String,
+    pub connection_string: String,
 }
 
 #[derive(Debug, Deserialize)]
