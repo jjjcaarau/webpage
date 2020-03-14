@@ -140,6 +140,7 @@ pub enum Tag {
     Board,
     Kid,
     Student,
+    Adult,
     Resigned,
     Extern,
     Active,
