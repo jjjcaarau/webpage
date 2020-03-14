@@ -95,6 +95,9 @@ const filterMembers = function (vnode) {
                     if (f[1] == 'aktiv' || f[1] == 'a') {
                         return tags.filter(t => t == 'Active').length > 0
                     }
+                    if (f[1] == 'ehrenmitglied' || f[1] == 'h') {
+                        return tags.filter(t => t == 'Honorary').length > 0
+                    }
                     if (f[1] == 'passiv' || f[1] == 'p') {
                         return tags.filter(t => t == 'Passive').length > 0
                     }
