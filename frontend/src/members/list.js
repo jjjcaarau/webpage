@@ -407,7 +407,7 @@ var MembersList = {
                 m('ul', [
                     m('li', 'sektion(s):[judo(j), jujitsu(jj), kinder(k)], z.B. s:jj'),
                     m('li', 'mitgliedschaft(m):[aktiv(a), passiv(p), ausgetreten(r), extern(e)], z.B. m:a'),
-                    m('li', 'alterskategorie(a):[kind(k), jugendlich(j), erwachsen(e)], z.B. t:k'),
+                    m('li', 'alterskategorie(a):[kind(k), jugendlich(j), erwachsen(e)], z.B. a:k'),
                     m('li', 'vorname(v):[beliebiger wert], z.B. v:Thomas'),
                     m('li', 'nachname(n):[beliebiger wert], z.B. n:Gabrielli'),
                     m('li', 'range(r):yyyy-yyyy, z.B. r:1999-2003'),
