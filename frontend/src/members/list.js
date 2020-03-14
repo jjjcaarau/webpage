@@ -24,18 +24,18 @@ function copyTextToClipboard(text) {
         fallbackCopyTextToClipboard(text);
         return;
     }
-    navigator.clipboard.writeText(text).catch(function(err) {
+    navigator.clipboard.writeText(text).catch(function (err) {
         console.error('Async: Could not copy text: ', err);
     });
 }
 
-const filterMembers = function(vnode) {
+const filterMembers = function (vnode) {
     let filters = vnode.state.tags.map(
         t => t
             .trim()
             .split(':')
             .map(t => t.trim())
-        )
+    )
 
     let firstName = undefined
     let secondName = undefined
@@ -48,7 +48,7 @@ const filterMembers = function(vnode) {
         secondName = filters.splice(idx, 1)[0]
     }
 
-    if(firstName) {
+    if (firstName) {
         var options = {
             keys: ['0.first_name'],
             threshold: 0.00,
@@ -60,7 +60,7 @@ const filterMembers = function(vnode) {
         vnode.state.filteredMembers = vnode.state.members
     }
 
-    if(secondName) {
+    if (secondName) {
         var options = {
             keys: ['0.last_name'],
             threshold: 0.00,
@@ -77,38 +77,47 @@ const filterMembers = function(vnode) {
         let count = filters
             .map(f => {
                 if (f[0] == 'sektion' || f[0] == 's') {
-                    if(f[1] == 'jujitsu' || f[1] == 'ju jitsu' || f[1] == 'jj') {
+                    if (f[1] == 'jujitsu' || f[1] == 'ju jitsu' || f[1] == 'jj') {
                         return m[0].section_jujitsu
                     }
-                    if(f[1] == 'judo', f[1] == 'j') {
+                    if (f[1] == 'judo', f[1] == 'j') {
                         return m[0].section_judo
                     }
-                    if(f[1] == 'kinder', f[1] == 'k') {
+                    if (f[1] == 'kinder', f[1] == 'k') {
                         return m[0].section_judo_kids
                     }
                     return true
                 }
 
-                if (f[0] == 'typ' || f[0] == 't') {
+                if (f[0] == 'mitgliedschaft' || f[0] == 'm') {
                     let tags = m[3]
 
-                    if(f[1] == 'aktiv' || f[1] == 'a') {
+                    if (f[1] == 'aktiv' || f[1] == 'a') {
                         return tags.filter(t => t == 'Active').length > 0
                     }
-                    if(f[1] == 'passiv' || f[1] == 'p') {
+                    if (f[1] == 'passiv' || f[1] == 'p') {
                         return tags.filter(t => t == 'Passive').length > 0
                     }
-                    if(f[1] == 'kind' || f[1] == 'k') {
-                        return tags.filter(t => t == 'Kid').length > 0
-                    }
-                    if(f[1] == 'jugendlich' || f[1] == 'j') {
-                        return tags.filter(t => t == 'Student').length > 0
-                    }
-                    if(f[1] == 'ausgetreten' || f[1] == 'r') {
+                    if (f[1] == 'ausgetreten' || f[1] == 'r') {
                         return tags.filter(t => t == 'Resigned').length > 0
                     }
-                    if(f[1] == 'extern' || f[1] == 'e') {
+                    if (f[1] == 'extern' || f[1] == 'e') {
                         return tags.filter(t => t == 'Extern').length > 0
+                    }
+                    return true
+                }
+
+                if (f[0] == 'alterskategorie' || f[0] == 'a') {
+                    let tags = m[3]
+
+                    if (f[1] == 'kind' || f[1] == 'k') {
+                        return tags.filter(t => t == 'Kid').length > 0
+                    }
+                    if (f[1] == 'jugendlich' || f[1] == 'j') {
+                        return tags.filter(t => t == 'Student').length > 0
+                    }
+                    if (f[1] == 'erwachsen' || f[1] == 'e') {
+                        return tags.filter(t => t == 'Adult').length > 0
                     }
                     return true
                 }
@@ -117,15 +126,15 @@ const filterMembers = function(vnode) {
                     let range = f[1].split('-').map(t => t.trim())
                     let year = new Date(m[0].birthday).getFullYear()
 
-                    if(range[0] <= year && year <= range[1]) {
+                    if (range[0] <= year && year <= range[1]) {
                         return true
                     }
                     return false
                 }
 
                 let name = f[0].toLowerCase().split(' ')
-                if(m[0].first_name.toLowerCase().includes(name[0])) {
-                    if(name.length > 1) {
+                if (m[0].first_name.toLowerCase().includes(name[0])) {
+                    if (name.length > 1) {
                         return m[0].last_name.toLowerCase().includes(name[name.length - 1])
                     } else {
                         return true
@@ -136,13 +145,13 @@ const filterMembers = function(vnode) {
             })
             .reduce((accumulator, currentValue) => accumulator + currentValue, 0)
 
-        if(count == len) {
+        if (count == len) {
             return m
         }
         return undefined
     }).filter(m => m !== undefined)
 
-    vnode.state.filteredMembers.sort(function(a, b){
+    vnode.state.filteredMembers.sort(function (a, b) {
         let nameA = a[0][vnode.state.order.value].toLowerCase()
         let nameB = b[0][vnode.state.order.value].toLowerCase()
         if (nameA < nameB) {
@@ -159,7 +168,7 @@ const filterMembers = function(vnode) {
         .join(',')
 }
 
-const generateExcel = function(vnode) {
+const generateExcel = function (vnode) {
     let wb = XLSX.utils.book_new();
 
     wb.Props = {
@@ -201,6 +210,7 @@ const generateExcel = function(vnode) {
 
     vnode.state.filteredMembers.forEach(member => {
         let memberType = 'Ausgetreten';
+        let memberAgeCategory = '';
         let trainerType = 'Nein';
         let kyu = {
             Judo: '6. Kyu',
@@ -210,7 +220,7 @@ const generateExcel = function(vnode) {
         let board = 'Nein';
 
         member[3].forEach((tag) => {
-            switch(tag) {
+            switch (tag) {
                 case 'Active':
                     memberType = 'Aktiv';
                     break;
@@ -218,13 +228,16 @@ const generateExcel = function(vnode) {
                     memberType = 'Passiv';
                     break;
                 case 'Student':
-                    memberType = 'Schüler';
+                    memberAgeCategory = 'Schüler';
                     break;
                 case 'Parent':
                     memberType = 'Elternteil';
                     break;
                 case 'Kid':
-                    memberType = 'Kind';
+                    memberAgeCategory = 'Kind';
+                    break;
+                case 'Adult':
+                    memberAgeCategory = 'Erwachsener';
                     break;
                 case 'Extern':
                     memberType = 'Extern';
@@ -245,12 +258,12 @@ const generateExcel = function(vnode) {
                     break;
             }
 
-            if(tag.Grade) {
+            if (tag.Grade) {
                 console.log(tag.Grade)
-                if(tag.Grade.Dan) {
+                if (tag.Grade.Dan) {
                     kyu[tag.Grade.Dan[0]] = tag.Grade.Dan[1] + '. Dan ';
                 }
-                if(tag.Grade.Kyu) {
+                if (tag.Grade.Kyu) {
                     kyu[tag.Grade.Kyu[0]] = tag.Grade.Kyu[1] + '. Kyu ';
                 }
             }
@@ -289,21 +302,21 @@ const generateExcel = function(vnode) {
     let ws = XLSX.utils.aoa_to_sheet(ws_data);
     wb.Sheets["Members"] = ws;
 
-    let wbout = XLSX.write(wb, { bookType:'xlsx',  type: 'binary' });
+    let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
     return wbout;
 }
 
-const downloadExcel = function(vnode) {
+const downloadExcel = function (vnode) {
     let data = generateExcel(vnode)
 
-    function s2ab(s) { 
+    function s2ab(s) {
         var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
         var view = new Uint8Array(buf);  //create uint8array as viewer
-        for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
-        return buf;    
+        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+        return buf;
     }
 
-    saveAs(new Blob([s2ab(data)],{type:"application/octet-stream"}), 'test.xlsx');
+    saveAs(new Blob([s2ab(data)], { type: "application/octet-stream" }), 'test.xlsx');
 }
 
 import { TagInput, Tag, Icon, Icons, Intent, Size, CustomSelect, Button, Collapse, ControlGroup, Card } from 'construct-ui'
@@ -321,7 +334,7 @@ const ordering = [
 ]
 
 var MembersList = {
-    oninit: function(vnode) {
+    oninit: function (vnode) {
         vnode.state.q = ''
         vnode.state.kids = true
         vnode.state.judo = true
@@ -344,12 +357,12 @@ var MembersList = {
             method: 'GET',
             url: "/members/list_json",
         })
-        .then(function(result) {
-            vnode.state.members = result;
-            filterMembers(vnode, vnode.state.q);
-        })
+            .then(function (result) {
+                vnode.state.members = result;
+                filterMembers(vnode, vnode.state.q);
+            })
     },
-    view: function(vnode) {
+    view: function (vnode) {
         const isEmpty = this.tags.length === 0;
         return [
             m('div.col-9', m(ControlGroup, { style: 'display:flex;' }, [
@@ -386,14 +399,15 @@ var MembersList = {
                 m('br'),
                 m('a', { href: 'mailto:' + vnode.state.mails }, 'Email an Liste schreiben ...'),
             ])),
-            
+
             m('div.col-12', [
                 'Filter sind einzugeben mit dem Format ', m('b', 'filter:wert'), '. Zum Beispiel ', m('b', 'sektion:jujitsu'), ' oder ', m('b', 's:jj'), '.',
                 m('br'),
                 'Mögliche Filter sind, wobei mögliche Werte in eckigen Klammern und Kürzel in runden Klammern sind:',
                 m('ul', [
                     m('li', 'sektion(s):[judo(j), jujitsu(jj), kinder(k)], z.B. s:jj'),
-                    m('li', 'typ(t):[aktiv(a), passiv(p), kind(k), jugendlich(j), ausgetreten(r), extern(e)], z.B. t:a'),
+                    m('li', 'mitgliedschaft(m):[aktiv(a), passiv(p), ausgetreten(r), extern(e)], z.B. m:a'),
+                    m('li', 'alterskategorie(a):[kind(k), jugendlich(j), erwachsen(e)], z.B. t:k'),
                     m('li', 'vorname(v):[beliebiger wert], z.B. v:Thomas'),
                     m('li', 'nachname(n):[beliebiger wert], z.B. n:Gabrielli'),
                     m('li', 'range(r):yyyy-yyyy, z.B. r:1999-2003'),
@@ -417,7 +431,7 @@ var MembersList = {
                         contentRight: isEmpty ? '' : m(Icon, {
                             name: Icons.X,
                             onclick: v => this.clear(vnode, v)
-                            }),
+                        }),
                         class: 'search-input',
                         onAdd: v => this.onAdd(vnode, v),
                     }),
@@ -440,20 +454,20 @@ var MembersList = {
             m('div.col-12', [
                 m('table.table.table-hover.col-12', [
                     m('thead', m('tr', [
-                            m('th', 'ID'),
-                            m('th', 'Vorname'),
-                            m('th', 'Nachname(n)'),
-                            m('th', 'E-Mail'),
-                            m('th', 'Geburtstag'),
+                        m('th', 'ID'),
+                        m('th', 'Vorname'),
+                        m('th', 'Nachname(n)'),
+                        m('th', 'E-Mail'),
+                        m('th', 'Geburtstag'),
                     ])),
                     m('tbody', [
-                        vnode.state.filteredMembers ? vnode.state.filteredMembers.map(function(entry) {
+                        vnode.state.filteredMembers ? vnode.state.filteredMembers.map(function (entry) {
                             let member = entry[0];
                             let events = entry[1];
-                            
+
                             return [
                                 m('tr', {
-                                    onclick: function(e) {
+                                    onclick: function (e) {
                                         e.preventDefault();
                                         window.location = '/members/view/' + member.id;
                                     },
@@ -483,7 +497,7 @@ var MembersList = {
 
         filterMembers(vnode)
     },
-    clear(vnode){
+    clear(vnode) {
         vnode.state.tags = []
         window.sessionStorage.setItem('searchTags', JSON.stringify(vnode.state.tags))
         filterMembers(vnode)
@@ -495,6 +509,6 @@ var MembersList = {
     }
 }
 
-window.onload = function() {
+window.onload = function () {
     m.mount(document.getElementById('mount'), MembersList)
 };
