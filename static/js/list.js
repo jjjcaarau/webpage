@@ -65090,7 +65090,7 @@ var filterMembers = function filterMembers(vnode) {
         return true;
       }
 
-      if (f[0] == 'typ' || f[0] == 't') {
+      if (f[0] == 'mitgliedschaft' || f[0] == 'm') {
         var tags = m[3];
 
         if (f[1] == 'aktiv' || f[1] == 'a') {
@@ -65105,18 +65105,6 @@ var filterMembers = function filterMembers(vnode) {
           }).length > 0;
         }
 
-        if (f[1] == 'kind' || f[1] == 'k') {
-          return tags.filter(function (t) {
-            return t == 'Kid';
-          }).length > 0;
-        }
-
-        if (f[1] == 'jugendlich' || f[1] == 'j') {
-          return tags.filter(function (t) {
-            return t == 'Student';
-          }).length > 0;
-        }
-
         if (f[1] == 'ausgetreten' || f[1] == 'r') {
           return tags.filter(function (t) {
             return t == 'Resigned';
@@ -65126,6 +65114,30 @@ var filterMembers = function filterMembers(vnode) {
         if (f[1] == 'extern' || f[1] == 'e') {
           return tags.filter(function (t) {
             return t == 'Extern';
+          }).length > 0;
+        }
+
+        return true;
+      }
+
+      if (f[0] == 'alterskategorie' || f[0] == 'a') {
+        var _tags = m[3];
+
+        if (f[1] == 'kind' || f[1] == 'k') {
+          return _tags.filter(function (t) {
+            return t == 'Kid';
+          }).length > 0;
+        }
+
+        if (f[1] == 'jugendlich' || f[1] == 'j') {
+          return _tags.filter(function (t) {
+            return t == 'Student';
+          }).length > 0;
+        }
+
+        if (f[1] == 'erwachsen' || f[1] == 'e') {
+          return _tags.filter(function (t) {
+            return t == 'Adult';
           }).length > 0;
         }
 
@@ -65200,6 +65212,7 @@ var generateExcel = function generateExcel(vnode) {
   var ws_data = [['Ausgetreten', 'Vorname', 'Zweitname', 'Nachname', 'Geburtsdatum', 'Geschlecht', 'E-Mail', 'Telefon Privat', 'Telefon Geschäft', 'Telefon Mobil', 'PLZ', 'Wohnort', 'Strasse', 'Hausnummer', 'Bemerkungen', 'Sektion Ju Jitsu', 'Sektion Judo Erwachsene', 'Sektion Judo Kinder', 'Passnummer', 'Benötigt Jahresmarke', 'Mitgliedsart', 'Trainer', 'Kyu Judo', 'Kyu Ju-Jitsu', 'Ehrenmittglied', 'Vorstand']];
   vnode.state.filteredMembers.forEach(function (member) {
     var memberType = 'Ausgetreten';
+    var memberAgeCategory = '';
     var trainerType = 'Nein';
     var kyu = {
       Judo: '6. Kyu',
@@ -65218,7 +65231,7 @@ var generateExcel = function generateExcel(vnode) {
           break;
 
         case 'Student':
-          memberType = 'Schüler';
+          memberAgeCategory = 'Schüler';
           break;
 
         case 'Parent':
@@ -65226,7 +65239,11 @@ var generateExcel = function generateExcel(vnode) {
           break;
 
         case 'Kid':
-          memberType = 'Kind';
+          memberAgeCategory = 'Kind';
+          break;
+
+        case 'Adult':
+          memberAgeCategory = 'Erwachsener';
           break;
 
         case 'Extern':
@@ -65373,7 +65390,7 @@ var MembersList = {
       }
     }, 'Email-Liste kopieren ...'), m('br'), m('a', {
       href: 'mailto:' + vnode.state.mails
-    }, 'Email an Liste schreiben ...')])), m('div.col-12', ['Filter sind einzugeben mit dem Format ', m('b', 'filter:wert'), '. Zum Beispiel ', m('b', 'sektion:jujitsu'), ' oder ', m('b', 's:jj'), '.', m('br'), 'Mögliche Filter sind, wobei mögliche Werte in eckigen Klammern und Kürzel in runden Klammern sind:', m('ul', [m('li', 'sektion(s):[judo(j), jujitsu(jj), kinder(k)], z.B. s:jj'), m('li', 'typ(t):[aktiv(a), passiv(p), kind(k), jugendlich(j), ausgetreten(r), extern(e)], z.B. t:a'), m('li', 'vorname(v):[beliebiger wert], z.B. v:Thomas'), m('li', 'nachname(n):[beliebiger wert], z.B. n:Gabrielli'), m('li', 'range(r):yyyy-yyyy, z.B. r:1999-2003')]), 'Gibt es Input ohne Selektor, z.B. "Cris To", dann wird direkt nach Vor- und Nachnamen gesucht.', m('br'), 'Es können mehrere Filter angewandt werden, wobei alle erfüllt sein müssen damit ein Eintrag erscheint!']), m('div.col-12', [m(_constructUi.ControlGroup, {
+    }, 'Email an Liste schreiben ...')])), m('div.col-12', ['Filter sind einzugeben mit dem Format ', m('b', 'filter:wert'), '. Zum Beispiel ', m('b', 'sektion:jujitsu'), ' oder ', m('b', 's:jj'), '.', m('br'), 'Mögliche Filter sind, wobei mögliche Werte in eckigen Klammern und Kürzel in runden Klammern sind:', m('ul', [m('li', 'sektion(s):[judo(j), jujitsu(jj), kinder(k)], z.B. s:jj'), m('li', 'mitgliedschaft(m):[aktiv(a), passiv(p), ausgetreten(r), extern(e)], z.B. m:a'), m('li', 'alterskategorie(a):[kind(k), jugendlich(j), erwachsen(e)], z.B. t:k'), m('li', 'vorname(v):[beliebiger wert], z.B. v:Thomas'), m('li', 'nachname(n):[beliebiger wert], z.B. n:Gabrielli'), m('li', 'range(r):yyyy-yyyy, z.B. r:1999-2003')]), 'Gibt es Input ohne Selektor, z.B. "Cris To", dann wird direkt nach Vor- und Nachnamen gesucht.', m('br'), 'Es können mehrere Filter angewandt werden, wobei alle erfüllt sein müssen damit ein Eintrag erscheint!']), m('div.col-12', [m(_constructUi.ControlGroup, {
       style: 'display:flex;'
     }, [m(_constructUi.TagInput, {
       addOnBlur: this.addOnBlur,
@@ -65480,7 +65497,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "45343" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "38445" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
