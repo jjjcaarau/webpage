@@ -44,8 +44,9 @@ RUN set \
     zlib-dev \
     libffi-dev \
     python3-dev \
-    py3-pip \
-    py3-wheel \
+    py3-virtualenv \
+    && python3 -m virtualenv --python=/usr/bin/python3 venv \
+    && . venv/bin/activate \
     && pip3 \
     install \
     --no-cache-dir \
