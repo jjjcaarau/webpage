@@ -18,7 +18,7 @@ RUN cargo build --release
 # Final Stage
 # ------------------------------------------------------------------------------
 
-FROM alpine:latest
+FROM alpine:3.12
 
 RUN apk \
     --update \
@@ -44,6 +44,8 @@ RUN set \
     zlib-dev \
     libffi-dev \
     python3-dev \
+    py3-pip \
+    py3-wheel \
     && pip3 \
     install \
     --no-cache-dir \
