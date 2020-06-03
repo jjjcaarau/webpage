@@ -30,6 +30,8 @@ mkdir -p data/blog/
 echo "Copying all templates"
 cp -R defaults/templates/* data/templates/
 
+. /venv/bin/activate
+
 cd data
 
 JJJCAARAU_WEB_PORT=1337 \
