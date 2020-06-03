@@ -2,7 +2,7 @@
 # Cargo Build Stage
 # ------------------------------------------------------------------------------
 
-FROM ekidd/rust-musl-builder:nightly-2019-08-13-openssl11 as cargo-build
+FROM ekidd/rust-musl-builder:nightly-2020-05-07 as cargo-build
 
 # Install diesel cli for migrations.
 RUN cargo install diesel_cli --no-default-features --features sqlite-bundled
@@ -25,30 +25,30 @@ RUN apk \
     --upgrade \
     --no-cache \
     add \
-        cairo-dev \
-        pango-dev \
-        gdk-pixbuf-dev \
-        ttf-dejavu
+    cairo-dev \
+    pango-dev \
+    gdk-pixbuf-dev \
+    ttf-dejavu
 
 ADD requirements.txt requirements.txt
 
 RUN set \
     -ex \
-&& apk \
+    && apk \
     --no-cache \
     --virtual .build-deps \
     add \
-        gcc \
-        musl-dev \
-        jpeg-dev \
-        zlib-dev \
-        libffi-dev \
-        python3-dev \
-&& pip3 \
+    gcc \
+    musl-dev \
+    jpeg-dev \
+    zlib-dev \
+    libffi-dev \
+    python3-dev \
+    && pip3 \
     install \
     --no-cache-dir \
     -r requirements.txt \
-&& apk \
+    && apk \
     del .build-deps
 
 WORKDIR /app
