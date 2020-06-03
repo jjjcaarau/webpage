@@ -1,1 +1,2 @@
+webencodings
 WeasyPrint
