@@ -285,24 +285,6 @@ pub fn generate_invoices(
 
     let mut count = 0;
     match invoice_type {
-        InvoiceType::All | InvoiceType::First => {
-            for member in members {
-                if let Some(invoice) = generate_invoice(connection, &member.0, &member.1, date) {
-                    count += if try_create_first(connection, &invoice, &member.0).is_ok() {
-                        1
-                    } else {
-                        0
-                    };
-                }
-            }
-        },
-        _ => (),
-    }
-
-    println!("Generated {} invoices.", count);
-
-    count = 0;
-    match invoice_type {
         InvoiceType::All | InvoiceType::LateNotice => {
             let unpaid = list_all_unpaid(connection).unwrap();
             for (last_invoice, member) in unpaid {
@@ -318,6 +300,24 @@ pub fn generate_invoices(
     }
 
     println!("Generated {} late notices.", count);
+
+    count = 0;
+    match invoice_type {
+        InvoiceType::All | InvoiceType::First => {
+            for member in members {
+                if let Some(invoice) = generate_invoice(connection, &member.0, &member.1, date) {
+                    count += if try_create_first(connection, &invoice, &member.0).is_ok() {
+                        1
+                    } else {
+                        0
+                    };
+                }
+            }
+        },
+        _ => (),
+    }
+
+    println!("Generated {} invoices.", count);
 }
 
 pub fn send_invoice(
