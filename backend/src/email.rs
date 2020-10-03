@@ -41,7 +41,7 @@ pub fn send(
     content_text: String,
     attachment: Option<(&[u8], &str)>,
 ) -> Result<(), EmailError> {
-    let mut body = MultiPart::related().singlepart(
+    let mut body = MultiPart::mixed().singlepart(
         SinglePart::builder()
             .header(ContentType::text_utf8())
             .body(content_text),
