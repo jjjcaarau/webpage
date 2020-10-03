@@ -59,7 +59,7 @@ pub fn send(
                 })
                 .header(ContentType(mime::APPLICATION_PDF))
                 .header(ContentTransferEncoding::Base64)
-                .body(base64::encode(&attachment)),
+                .body(attachment),
         );
     }
 
