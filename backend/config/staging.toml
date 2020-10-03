@@ -1,6 +1,6 @@
 [general]
 site_url = "https://staging.jjjcaarau.ch"
-smtp_server = "bogus.domain.ch"
+smtp_server = "localhost"
 smtp_port = 25
 smtp_username = "noreply@jjjcaarau.ch"
 smtp_password = "London.21"
@@ -11,7 +11,7 @@ blog_root = "/app/data/blog"
 environment = "Development"
 address = "0.0.0.0"
 port = "1337"
-log_level = "Warn"
+log_level = "WARN"
 static_root = "/app/static"
 recaptcha_private_key = ""
 recaptcha_url = "https://www.google.com/recaptcha/api/siteverify"

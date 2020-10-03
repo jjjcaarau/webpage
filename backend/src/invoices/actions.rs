@@ -1,12 +1,12 @@
-use crate::members::actions::{is_kid, is_student, is_active};
+use crate::members::actions::{is_active, is_kid, is_student};
 use crate::routes::invoices::Generate;
 use std::io::BufWriter;
 use std::io::Write;
 use std::process::{Command, Stdio};
 
-use super::model::{Invoice, NewInvoice};
+use super::model::{Invoice, NewInvoice, SentAs};
 use crate::events::model::Event;
-use crate::members::model::{Member, Tag, Grade};
+use crate::members::model::{Grade, Member, Tag};
 use crate::schema::invoices;
 use diesel::prelude::*;
 use rocket::http::ContentType;
@@ -28,19 +28,21 @@ pub fn _list_all(connection: &SqliteConnection) -> Result<Vec<Invoice>, diesel::
     Ok(invoice_list)
 }
 
-pub fn list_all_unpaid(connection: &SqliteConnection) -> Result<Vec<(Invoice, Member)>, diesel::result::Error> {
+pub fn list_all_unpaid(
+    connection: &SqliteConnection,
+) -> Result<Vec<(Invoice, Member)>, diesel::result::Error> {
     let invoice_list = invoices::table
         .order_by(invoices::columns::id)
         .filter(invoices::columns::paid.eq(false))
         .load::<Invoice>(connection)?;
 
-    let invoice_list = invoice_list.into_iter().map(|invoice| {
-        let member_data = crate::members::actions::get(connection, invoice.member_id).unwrap();
-        (
-            invoice,
-            member_data.0,
-        )
-    }).collect();
+    let invoice_list = invoice_list
+        .into_iter()
+        .map(|invoice| {
+            let member_data = crate::members::actions::get(connection, invoice.member_id).unwrap();
+            (invoice, member_data.0)
+        })
+        .collect();
 
     Ok(invoice_list)
 }
@@ -173,7 +175,11 @@ pub fn generate_invoice(
         for tag in tags {
             if let Tag::Grade(grade) = tag {
                 match grade {
-                    Grade::Kyu(_division, n) => if n > 5 { needs_passport = true; },
+                    Grade::Kyu(_division, n) => {
+                        if n > 5 {
+                            needs_passport = true;
+                        }
+                    }
                     Grade::Dan(_division, _n) => (),
                 }
             }
@@ -199,7 +205,11 @@ pub fn generate_invoice(
             sent: None,
             sent_as: Default::default(),
             number: 0,
-            amount_passport: if needs_passport { CONFIG.general.fee_passport } else { 0 },
+            amount_passport: if needs_passport {
+                CONFIG.general.fee_passport
+            } else {
+                0
+            },
             amount_membership: (amount as f32 * factor) as i32,
             amount_paid: 0,
             amount_rebate: 0,
@@ -289,13 +299,15 @@ pub fn generate_invoices(
             let unpaid = list_all_unpaid(connection).unwrap();
             for (last_invoice, member) in unpaid {
                 let invoice = generate_late_notice(&member, &last_invoice, date);
-                count += if try_create_late_notice(connection, &invoice, &last_invoice, &member).is_ok() {
+                count += if try_create_late_notice(connection, &invoice, &last_invoice, &member)
+                    .is_ok()
+                {
                     1
                 } else {
                     0
                 };
             }
-        },
+        }
         _ => (),
     }
 
@@ -313,7 +325,7 @@ pub fn generate_invoices(
                     };
                 }
             }
-        },
+        }
         _ => (),
     }
 
@@ -355,12 +367,17 @@ pub fn send_invoice(
         // Try send the email.
         let mut context = tera::Context::new();
         context.insert("member", &member);
-        let render = crate::tera_engine::TERA.render("invoice_email.tera", &context).unwrap();
+        let render = crate::tera_engine::TERA
+            .render("invoice_email.tera", &context)
+            .unwrap();
 
         println!("{}", &render);
 
         // All checks have passed until here, so try send the email.
-        let mut pdf_stream = generate_yearly_pdf(&crate::invoices::actions::YearlyInvoiceData { invoice: last_invoice.clone(), member: member.clone() });
+        let mut pdf_stream = generate_yearly_pdf(&crate::invoices::actions::YearlyInvoiceData {
+            invoice: last_invoice.clone(),
+            member: member.clone(),
+        });
         let mut pdf_data = vec![];
         use std::io::Read;
         pdf_stream.read_to_end(&mut pdf_data).unwrap();
@@ -369,15 +386,13 @@ pub fn send_invoice(
             member.email.clone(),
             "Neue Mitgliederrechnung".into(),
             render,
-            Some((
-                &pdf_data,
-                "Rechnung.pdf"
-            ))
+            Some((&pdf_data, "Rechnung.pdf")),
         )
         .is_ok()
         {
             // If all checks are passed, update the sent date for the DB entry of the invoice.
             last_invoice.sent = Some(*today);
+            last_invoice.sent_as = SentAs::Email;
             update(connection, &last_invoice).unwrap();
             true
         } else {
@@ -432,14 +447,17 @@ impl Responder<'static> for YearlyInvoiceData {
 
 pub fn generate_yearly_pdf(data: &YearlyInvoiceData) -> std::process::ChildStdout {
     let normal_total = (data.invoice.amount_passport + data.invoice.amount_membership) as f32;
-    let percentage_total = (normal_total * (1.0 - (data.invoice.percentage_rebate as f32 / 100.0)) as f32) as i32;
+    let percentage_total =
+        (normal_total * (1.0 - (data.invoice.percentage_rebate as f32 / 100.0)) as f32) as i32;
     let total = percentage_total - data.invoice.amount_rebate - data.invoice.amount_paid;
 
     let mut context = tera::Context::new();
     context.insert("invoice", &data.invoice);
     context.insert("member", &data.member);
     context.insert("invoice_total", &total);
-    let render = crate::tera_engine::TERA.render("invoice_yearly.html.tera", &context).unwrap();
+    let render = crate::tera_engine::TERA
+        .render("invoice_yearly.html.tera", &context)
+        .unwrap();
 
     let weasyprint = Command::new("python3")
         .args(&["-m", "weasyprint"])
@@ -475,20 +493,22 @@ impl Responder<'static> for Generate {
 
 pub fn generate_pdf(data: &Generate) -> std::process::ChildStdout {
     let total = data.position_amount1.unwrap_or(0)
-              + data.position_amount2.unwrap_or(0)
-              + data.position_amount3.unwrap_or(0)
-              + data.position_amount4.unwrap_or(0);
-
+        + data.position_amount2.unwrap_or(0)
+        + data.position_amount3.unwrap_or(0)
+        + data.position_amount4.unwrap_or(0);
 
     let date = chrono::Utc::now().date().naive_utc();
-    let due_date = chrono::Utc::now().date().naive_utc() + chrono::Duration::days(CONFIG.general.grace_period);
+    let due_date =
+        chrono::Utc::now().date().naive_utc() + chrono::Duration::days(CONFIG.general.grace_period);
 
     let mut context = tera::Context::new();
     context.insert("data", &data);
     context.insert("total", &total);
     context.insert("date", &date);
     context.insert("due_date", &due_date);
-    let render = crate::tera_engine::TERA.render("invoice.html.tera", &context).unwrap();
+    let render = crate::tera_engine::TERA
+        .render("invoice.html.tera", &context)
+        .unwrap();
 
     let weasyprint = Command::new("python3")
         .args(&["-m", "weasyprint"])

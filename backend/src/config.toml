@@ -1,13 +1,13 @@
 [general]
-log_level = "Warn"
+log_level = "WARN"
 blog_root = "../blog/"
 upload_root = "../upload/"
 site_url = "192.168.178.25:8000"
 email = "noreply@jjjcaarau.ch"
-smtp_server = "localhost"
-smtp_port = 2555
-smtp_username = "kek"
-smtp_password = ""
+smtp_server = "lx1.hoststar.hosting"
+smtp_port = 25
+smtp_username = "noreply@jjjcaarau.ch"
+smtp_password = "London.21"
 fee_actives = 420
 fee_kids = 240
 fee_students = 300
@@ -19,7 +19,7 @@ grace_period_late = 15
 environment = "Development"
 address = "0.0.0.0"
 port = "8000"
-log_level = "Warn"
+log_level = "WARN"
 secret_key = "8Xui8SN4mI+7egV/9dlfYYLGQJeEx4+DwmSQLwDVXJg="
 static_root = "../static/"
 recaptcha_private_key = ""
